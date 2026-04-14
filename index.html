@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EHS Dashboard</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(to right, #dcdcdc, #f5f5f5);
+}
+
+/* HEADER */
+header {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    padding-bottom: 70px;
+    position: relative;
+}
+
+header h1 { margin: 0; font-size: 40px; }
+header h2 { margin: 5px 0; }
+
+/* STATUS */
+.status-left {
+    position: absolute;
+    left: 20px;
+    top: 25px;
+}
+
+.status-btn {
+    background: green;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.status-options {
+    display: none;
+    position: absolute;
+    top: 45px;
+    left: 0;
+    width: 200px;
+    background: white;
+    border-radius: 5px;
+    overflow: hidden;
+    z-index: 9999;
+}
+
+.status-options div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.status-options div:nth-child(1){background: green; color:white;}
+.status-options div:nth-child(2){background: orange;}
+.status-options div:nth-child(3){background: red; color:white;}
+
+/* TIME */
+.time-box {
+    position: absolute;
+    right: 20px;
+    top: 25px;
+}
+
+/* DASHBOARD */
+.container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 60px;
+    background: black;
+}
+
+/* BOX */
+.box {
+    border: 2px solid red;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* TITLES */
+.title {
+    color: white;
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+
+/* VALUES */
+.value {
+    font-size: 60px;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <!-- STATUS -->
+    <div class="status-left">
+        <button class="status-btn" id="statusBtn">✔ No Injury</button>
+        <div class="status-options" id="statusMenu">
+            <div onclick="setStatus('✔ No Injury','green')">No Injury</div>
+            <div onclick="setStatus('Injury with Loss','orange')">Injury with Loss</div>
+            <div onclick="setStatus('Lost Time Case','red')">Lost Time Case</div>
+        </div>
+    </div>
+
+    <!-- TITLE -->
+    <h1>Prestige Technostar</h1>
+    <h2>EHS Performance Dashboard</h2>
+
+    <!-- TIME -->
+    <div class="time-box" id="time"></div>
+
+</header>
+
+<!-- DASHBOARD -->
+<div class="container">
+
+    <div class="box">
+        <div class="title">Manhours</div>
+        <div class="value">4520</div>
+    </div>
+
+    <div class="box" id="nearBox">
+        <div class="title">Near Miss (<span id="monthName"></span>)</div>
+        <div class="value" id="nearCount">0</div>
+    </div>
+
+    <div class="box" id="incidentBox">
+        <div class="title">Incident (<span id="monthName2"></span>)</div>
+        <div class="value" id="incidentCount">0</div>
+    </div>
+
+</div>
+
+<script>
+
+/* TIME */
+function updateTime() {
+    const now = new Date();
+
+    const day = now.toLocaleString('en-IN', { weekday: 'long' });
+    const date = now.getDate();
+    const month = now.toLocaleString('en-IN', { month: 'long' });
+    const year = now.getFullYear();
+    const time = now.toLocaleTimeString('en-IN');
+
+    document.getElementById("time").innerHTML =
+        `${day} | ${date} ${month} ${year} | ${time}`;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+/* MONTH */
+const now = new Date();
+const month = now.toLocaleString('en-IN', { month: 'long' });
+
+document.getElementById("monthName").innerText = month;
+document.getElementById("monthName2").innerText = month;
+
+/* STATUS */
+document.getElementById("statusBtn").onclick = function () {
+    let menu = document.getElementById("statusMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+};
+
+function setStatus(text, color) {
+    let btn = document.getElementById("statusBtn");
+    btn.innerText = text;
+    btn.style.background = color;
+    document.getElementById("statusMenu").style.display = "none";
+}
+
+/* CLOSE DROPDOWN */
+document.addEventListener("click", function(e){
+    let btn = document.getElementById("statusBtn");
+    let menu = document.getElementById("statusMenu");
+
+    if (!btn.contains(e.target) && !menu.contains(e.target)) {
+        menu.style.display = "none";
+    }
+});
+
+/* EXCEL LINKS */
+const nearSheet = "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
+const incidentSheet = "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
+
+/* DATE PARSER */
+function parseDate(timestamp) {
+    timestamp = timestamp.replace(/"/g, "").trim();
+    let d = new Date(timestamp);
+    if (!isNaN(d)) return d;
+
+    let parts = timestamp.split(" ")[0].split("/");
+    if (parts.length === 3) {
+        return new Date(parts[2], parts[1]-1, parts[0]);
+    }
+    return null;
+}
+
+/* COUNT */
+async function getMonthlyCount(url) {
+    const res = await fetch(url);
+    const text = await res.text();
+    const rows = text.split("\n");
+
+    let count = 0;
+    const now = new Date();
+
+    for (let i = 1; i < rows.length; i++) {
+        let cols = rows[i].split(",");
+        let timestamp = cols[0];
+
+        if (!timestamp) continue;
+
+        let date = parseDate(timestamp);
+        if (!date) continue;
+
+        if (date.getMonth() === now.getMonth() &&
+            date.getFullYear() === now.getFullYear()) {
+            count++;
+        }
+    }
+
+    return count;
+}
+
+/* LOAD DATA */
+async function loadData() {
+
+    let near = await getMonthlyCount(nearSheet);
+    let incident = await getMonthlyCount(incidentSheet);
+
+    document.getElementById("nearCount").innerText = near;
+    document.getElementById("incidentCount").innerText = incident;
+
+    /* 🎯 COLOR LOGIC */
+
+    // Near Miss → ALWAYS ORANGE
+    document.getElementById("nearBox").style.background = "orange";
+
+    // Incident → DYNAMIC
+    let incidentBox = document.getElementById("incidentBox");
+
+    if (incident <= 1) {
+        incidentBox.style.background = "green";
+    }
+    else if (incident == 2) {
+        incidentBox.style.background = "orange";
+    }
+    else {
+        incidentBox.style.background = "red";
+    }
+}
+
+setInterval(loadData, 5000);
+loadData();
+
+</script>
+
+</body>
+</html>
