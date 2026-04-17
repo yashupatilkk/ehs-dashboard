@@ -2,100 +2,93 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>EHS Dashboard</title>
+<title>EHS Dashboard FIXED</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
     margin: 0;
     font-family: Arial;
-    background: linear-gradient(to right, #dcdcdc, #f5f5f5);
+    background: #f4f4f4;
 }
 
-/* HEADER */
 header {
     background: linear-gradient(to right, #1e3c72, #2a5298);
     color: white;
     text-align: center;
-    padding: 20px;
-    padding-bottom: 70px;
-    position: relative;
+    padding: 15px;
 }
 
-header h1 { margin: 0; font-size: 40px; }
-header h2 { margin: 5px 0; }
-
-/* STATUS */
-.status-left {
-    position: absolute;
-    left: 20px;
-    top: 25px;
+#time {
+    margin-top: 5px;
 }
 
-.status-btn {
-    background: green;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-}
+.slide { display: none; }
+.active { display: block; }
 
-.status-options {
-    display: none;
-    position: absolute;
-    top: 45px;
-    left: 0;
-    width: 200px;
-    background: white;
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 9999;
-}
-
-.status-options div {
-    padding: 10px;
-    cursor: pointer;
-}
-
-.status-options div:nth-child(1){background: green; color:white;}
-.status-options div:nth-child(2){background: orange;}
-.status-options div:nth-child(3){background: red; color:white;}
-
-/* TIME */
-.time-box {
-    position: absolute;
-    right: 20px;
-    top: 25px;
-}
-
-/* DASHBOARD */
 .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    margin: 60px;
-    background: black;
+    gap: 10px;
+    margin: 20px;
 }
 
-/* BOX */
 .box {
-    border: 2px solid red;
-    height: 400px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-/* TITLES */
-.title {
+    background: black;
     color: white;
-    font-size: 28px;
-    margin-bottom: 15px;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
 }
 
-/* VALUES */
 .value {
-    font-size: 60px;
+    font-size: 35px;
+}
+
+/* PIE CHART */
+.chartBox {
+    width: 300px;
+    margin: 20px auto;
+}
+
+/* TABLE */
+table {
+    width: 95%;
+    margin: auto;
+    border-collapse: collapse;
+    background: white;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #1e3c72;
     color: white;
+}
+
+.red { background: red; color: white; }
+
+.controls {
+    text-align: center;
+    margin: 15px;
+}
+
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    background: #1e3c72;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+}
+button:hover {
+    background: #2a5298;
 }
 </style>
 </head>
@@ -103,168 +96,246 @@ header h2 { margin: 5px 0; }
 <body>
 
 <header>
-
-    <!-- STATUS -->
-    <div class="status-left">
-        <button class="status-btn" id="statusBtn">✔ No Injury</button>
-        <div class="status-options" id="statusMenu">
-            <div onclick="setStatus('✔ No Injury','green')">No Injury</div>
-            <div onclick="setStatus('Injury with Loss','orange')">Injury with Loss</div>
-            <div onclick="setStatus('Lost Time Case','red')">Lost Time Case</div>
-        </div>
-    </div>
-
-    <!-- TITLE -->
-    <h1>Prestige Technostar</h1>
-    <h2>EHS Performance Dashboard</h2>
-
-    <!-- TIME -->
-    <div class="time-box" id="time"></div>
-
+<h2>EHS Dashboard</h2>
+<div id="time"></div>
 </header>
 
-<!-- DASHBOARD -->
+<!-- SLIDE 1 -->
+<div class="slide active" id="slide1">
+
 <div class="container">
+    <div class="box">
+        Manhours<br><div class="value">4520</div>
+    </div>
 
     <div class="box">
-        <div class="title">Manhours</div>
-        <div class="value">452</div>
+        Near Miss (<span id="month1"></span>)<br>
+        <div class="value" id="near">0</div>
     </div>
 
-    <div class="box" id="nearBox">
-        <div class="title">Near Miss (<span id="monthName"></span>)</div>
-        <div class="value" id="nearCount">0</div>
+    <div class="box">
+        Incident (<span id="month2"></span>)<br>
+        <div class="value" id="incident">0</div>
     </div>
+</div>
 
-    <div class="box" id="incidentBox">
-        <div class="title">Incident (<span id="monthName2"></span>)</div>
-        <div class="value" id="incidentCount">0</div>
-    </div>
+<!-- PIE CHART ADDED ONLY HERE -->
+<div class="chartBox">
+    <canvas id="ehsPie"></canvas>
+</div>
 
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide" id="slide2">
+
+<h3 style="text-align:center;">Compliance (≤ 90 Days Only)</h3>
+
+<table>
+<thead>
+<tr>
+<th>SL</th>
+<th>Compliance</th>
+<th>Due Days</th>
+<th>Next Due Date</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+
+</div>
+
+<!-- BUTTONS -->
+<div class="controls">
+    <button onclick="prevSlide()">⬅ Prev</button>
+    <button onclick="nextSlide()">Next ➡</button>
 </div>
 
 <script>
 
 /* TIME */
-function updateTime() {
-    const now = new Date();
+setInterval(()=>{
+    let now = new Date();
 
-    const day = now.toLocaleString('en-IN', { weekday: 'long' });
-    const date = now.getDate();
-    const month = now.toLocaleString('en-IN', { month: 'long' });
-    const year = now.getFullYear();
-    const time = now.toLocaleTimeString('en-IN');
+    let day = now.toLocaleString('en-IN', { weekday: 'long' });
+    let date = now.getDate();
+    let month = now.toLocaleString('en-IN', { month: 'long' });
+    let year = now.getFullYear();
+    let time = now.toLocaleTimeString('en-IN');
 
-    document.getElementById("time").innerHTML =
+    document.getElementById("time").innerText =
         `${day} | ${date} ${month} ${year} | ${time}`;
-}
-setInterval(updateTime, 1000);
-updateTime();
+},1000);
 
 /* MONTH */
-const now = new Date();
-const month = now.toLocaleString('en-IN', { month: 'long' });
+function setMonthNames(){
+    let now = new Date();
+    let month = now.toLocaleString('en-IN', { month: 'long' });
 
-document.getElementById("monthName").innerText = month;
-document.getElementById("monthName2").innerText = month;
-
-/* STATUS */
-document.getElementById("statusBtn").onclick = function () {
-    let menu = document.getElementById("statusMenu");
-    menu.style.display = (menu.style.display === "block") ? "none" : "block";
-};
-
-function setStatus(text, color) {
-    let btn = document.getElementById("statusBtn");
-    btn.innerText = text;
-    btn.style.background = color;
-    document.getElementById("statusMenu").style.display = "none";
+    document.getElementById("month1").innerText = month;
+    document.getElementById("month2").innerText = month;
 }
+setMonthNames();
 
-/* CLOSE DROPDOWN */
-document.addEventListener("click", function(e){
-    let btn = document.getElementById("statusBtn");
-    let menu = document.getElementById("statusMenu");
-
-    if (!btn.contains(e.target) && !menu.contains(e.target)) {
-        menu.style.display = "none";
-    }
-});
-
-/* EXCEL LINKS */
+/* SHEETS */
 const nearSheet = "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
 const incidentSheet = "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
+const compSheet = "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
 
-/* DATE PARSER */
-function parseDate(timestamp) {
-    timestamp = timestamp.replace(/"/g, "").trim();
-    let d = new Date(timestamp);
-    if (!isNaN(d)) return d;
+/* CSV */
+async function getCSV(url){
+    let res = await fetch(url);
+    let text = await res.text();
 
-    let parts = timestamp.split(" ")[0].split("/");
-    if (parts.length === 3) {
-        return new Date(parts[2], parts[1]-1, parts[0]);
+    return text.trim().split("\n").map(r =>
+        r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
+    );
+}
+
+/* DATE */
+function parseDate(v){
+    if(!v) return null;
+
+    let d = new Date(v);
+    if(!isNaN(d)) return d;
+
+    let p = v.split("/");
+    if(p.length === 3){
+        return new Date(p[2], p[1]-1, p[0]);
     }
     return null;
 }
 
-/* COUNT */
-async function getMonthlyCount(url) {
-    const res = await fetch(url);
-    const text = await res.text();
-    const rows = text.split("\n");
+/* PIE CHART (NEW ONLY) */
+let pieChart;
 
-    let count = 0;
-    const now = new Date();
+function updatePie(near, inc){
 
-    for (let i = 1; i < rows.length; i++) {
-        let cols = rows[i].split(",");
-        let timestamp = cols[0];
+    if(!pieChart){
+        pieChart = new Chart(document.getElementById("ehsPie"), {
+            type: 'pie',
+            data: {
+                labels: ['Near Miss', 'Incident'],
+                datasets: [{
+                    data: [near, inc]
+                }]
+            }
+        });
+    } else {
+        pieChart.data.datasets[0].data = [near, inc];
+        pieChart.update();
+    }
+}
 
-        if (!timestamp) continue;
+/* STATS */
+async function loadStats(){
+    let near = await getCSV(nearSheet);
+    let inc = await getCSV(incidentSheet);
 
-        let date = parseDate(timestamp);
-        if (!date) continue;
+    let today = new Date();
 
-        if (date.getMonth() === now.getMonth() &&
-            date.getFullYear() === now.getFullYear()) {
-            count++;
+    function countThisMonth(data){
+        let count = 0;
+
+        for(let i=1;i<data.length;i++){
+            let d = parseDate(data[i][0]);
+            if(!d) continue;
+
+            if(d.getMonth() === today.getMonth() &&
+               d.getFullYear() === today.getFullYear()){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    let nearCount = countThisMonth(near);
+    let incCount = countThisMonth(inc);
+
+    document.getElementById("near").innerText = nearCount;
+    document.getElementById("incident").innerText = incCount;
+
+    /* UPDATE PIE CHART */
+    updatePie(nearCount, incCount);
+}
+
+/* COMPLIANCE */
+async function loadCompliance(){
+
+    let data = await getCSV(compSheet);
+    let list = [];
+
+    for(let i=1;i<data.length;i++){
+
+        let sl = data[i][0];
+        let compliance = data[i][1];
+        let nextDue = data[i][8];
+
+        let date = parseDate(nextDue);
+        if(!date) continue;
+
+        let today = new Date();
+        let days = Math.ceil((date - today)/(1000*60*60*24));
+
+        if(days >= 0 && days <= 90){
+            list.push({ sl, compliance, days, date });
         }
     }
 
-    return count;
+    let tbody = document.getElementById("table");
+    tbody.innerHTML = "";
+
+    if(list.length === 0){
+        tbody.innerHTML = "<tr><td colspan='4'>No compliance due in 90 days</td></tr>";
+        return;
+    }
+
+    list.forEach(r=>{
+        let tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${r.sl}</td>
+            <td>${r.compliance}</td>
+            <td class="red">${r.days}</td>
+            <td>${r.date.toLocaleDateString()}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
 }
 
-/* LOAD DATA */
-async function loadData() {
+/* SLIDES */
+let currentSlide = 0;
+const slides = document.querySelectorAll(".slide");
 
-    let near = await getMonthlyCount(nearSheet);
-    let incident = await getMonthlyCount(incidentSheet);
-
-    document.getElementById("nearCount").innerText = near;
-    document.getElementById("incidentCount").innerText = incident;
-
-    /* 🎯 COLOR LOGIC */
-
-    // Near Miss → ALWAYS ORANGE
-    document.getElementById("nearBox").style.background = "orange";
-
-    // Incident → DYNAMIC
-    let incidentBox = document.getElementById("incidentBox");
-
-    if (incident <= 1) {
-        incidentBox.style.background = "green";
-    }
-    else if (incident == 2) {
-        incidentBox.style.background = "orange";
-    }
-    else {
-        incidentBox.style.background = "red";
-    }
+function showSlide(n){
+    slides.forEach(s => s.classList.remove("active"));
+    slides[n].classList.add("active");
 }
 
-setInterval(loadData, 5000);
-loadData();
+function nextSlide(){
+    currentSlide = (currentSlide + 1) % slides.length;
+    showSlide(currentSlide);
+}
+
+function prevSlide(){
+    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(currentSlide);
+}
+
+/* AUTO SLIDE */
+setInterval(nextSlide, 40000);
+
+/* INIT */
+loadStats();
+loadCompliance();
+
+setInterval(loadStats, 30000);
+setInterval(loadCompliance, 60000);
+
+setInterval(()=>{
+    showSlide(currentSlide);
+}, 1000);
 
 </script>
 
