@@ -46,13 +46,11 @@ header {
     font-size: 35px;
 }
 
-/* PIE CHART */
 .chartBox {
     width: 300px;
     margin: 20px auto;
 }
 
-/* TABLE */
 table {
     width: 95%;
     margin: auto;
@@ -104,8 +102,10 @@ button:hover {
 <div class="slide active" id="slide1">
 
 <div class="container">
+
     <div class="box">
-        Manhours<br><div class="value">4520</div>
+        Manhours<br>
+        <div class="value" id="manhours">0</div>
     </div>
 
     <div class="box">
@@ -117,9 +117,9 @@ button:hover {
         Incident (<span id="month2"></span>)<br>
         <div class="value" id="incident">0</div>
     </div>
+
 </div>
 
-<!-- PIE CHART ADDED ONLY HERE -->
 <div class="chartBox">
     <canvas id="ehsPie"></canvas>
 </div>
@@ -145,7 +145,6 @@ button:hover {
 
 </div>
 
-<!-- BUTTONS -->
 <div class="controls">
     <button onclick="prevSlide()">⬅ Prev</button>
     <button onclick="nextSlide()">Next ➡</button>
@@ -157,14 +156,16 @@ button:hover {
 setInterval(()=>{
     let now = new Date();
 
-    let day = now.toLocaleString('en-IN', { weekday: 'long' });
-    let date = now.getDate();
-    let month = now.toLocaleString('en-IN', { month: 'long' });
-    let year = now.getFullYear();
-    let time = now.toLocaleTimeString('en-IN');
-
     document.getElementById("time").innerText =
-        `${day} | ${date} ${month} ${year} | ${time}`;
+        now.toLocaleString('en-IN', {
+            weekday:'long',
+            year:'numeric',
+            month:'long',
+            day:'numeric',
+            hour:'2-digit',
+            minute:'2-digit',
+            second:'2-digit'
+        });
 },1000);
 
 /* MONTH */
@@ -181,6 +182,9 @@ setMonthNames();
 const nearSheet = "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
 const incidentSheet = "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
 const compSheet = "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
+
+/* MANHOURS SHEET (NEW) */
+const manhoursSheet = "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145";
 
 /* CSV */
 async function getCSV(url){
@@ -206,7 +210,7 @@ function parseDate(v){
     return null;
 }
 
-/* PIE CHART (NEW ONLY) */
+/* PIE CHART */
 let pieChart;
 
 function updatePie(near, inc){
@@ -225,6 +229,31 @@ function updatePie(near, inc){
         pieChart.data.datasets[0].data = [near, inc];
         pieChart.update();
     }
+}
+
+/* MANHOURS AUTO (NEW) */
+async function loadManhoursWorked(){
+
+    let data = await getCSV(manhoursSheet);
+
+    let total = 0;
+
+    for(let i=0;i<data.length;i++){
+
+        let row = (data[i][0] || "").toLowerCase();
+
+        if(row.includes("manhours worked")){
+
+            let values = data[i];
+
+            // last column = cumulative
+            total = parseFloat(values[values.length - 1]) || 0;
+
+            break;
+        }
+    }
+
+    document.getElementById("manhours").innerText = total;
 }
 
 /* STATS */
@@ -255,7 +284,6 @@ async function loadStats(){
     document.getElementById("near").innerText = nearCount;
     document.getElementById("incident").innerText = incCount;
 
-    /* UPDATE PIE CHART */
     updatePie(nearCount, incCount);
 }
 
@@ -284,11 +312,6 @@ async function loadCompliance(){
 
     let tbody = document.getElementById("table");
     tbody.innerHTML = "";
-
-    if(list.length === 0){
-        tbody.innerHTML = "<tr><td colspan='4'>No compliance due in 90 days</td></tr>";
-        return;
-    }
 
     list.forEach(r=>{
         let tr = document.createElement("tr");
@@ -329,9 +352,11 @@ setInterval(nextSlide, 40000);
 /* INIT */
 loadStats();
 loadCompliance();
+loadManhoursWorked();
 
 setInterval(loadStats, 30000);
 setInterval(loadCompliance, 60000);
+setInterval(loadManhoursWorked, 60000);
 
 setInterval(()=>{
     showSlide(currentSlide);
