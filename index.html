@@ -2,91 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>EHS Dashboard FIXED</title>
+<title>EHS Dashboard FINAL PERFECT</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial;
-    background: #f4f4f4;
-}
+body { margin:0; font-family:Arial; background:#f4f4f4; }
 
 header {
-    background: linear-gradient(to right, #1e3c72, #2a5298);
-    color: white;
-    text-align: center;
-    padding: 15px;
+    background: linear-gradient(to right,#1e3c72,#2a5298);
+    color:white;
+    text-align:center;
+    padding:15px;
 }
 
-#time {
-    margin-top: 5px;
-}
-
-.slide { display: none; }
-.active { display: block; }
+.slide { display:none; }
+.active { display:block; }
 
 .container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 20px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:10px;
+    margin:20px;
 }
 
 .box {
-    background: black;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    border-radius: 8px;
+    background:black;
+    color:white;
+    padding:20px;
+    text-align:center;
+    border-radius:8px;
 }
 
-.value {
-    font-size: 35px;
-}
+.value { font-size:35px; }
 
-.chartBox {
-    width: 300px;
-    margin: 20px auto;
-}
+.chartBox { width:300px; margin:auto; }
 
 table {
-    width: 95%;
-    margin: auto;
-    border-collapse: collapse;
-    background: white;
+    width:95%;
+    margin:auto;
+    border-collapse:collapse;
+    background:white;
 }
 
 th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
+    border:1px solid #ccc;
+    padding:10px;
+    text-align:center;
 }
 
 th {
-    background: #1e3c72;
-    color: white;
+    background:#1e3c72;
+    color:white;
 }
 
-.red { background: red; color: white; }
+.red { background:red; color:white; }
 
-.controls {
-    text-align: center;
-    margin: 15px;
-}
+.controls { text-align:center; margin:15px; }
 
 button {
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    background: #1e3c72;
-    color: white;
-    cursor: pointer;
-    border-radius: 5px;
-}
-button:hover {
-    background: #2a5298;
+    padding:10px 15px;
+    margin:5px;
+    border:none;
+    background:#1e3c72;
+    color:white;
+    cursor:pointer;
+    border-radius:5px;
 }
 </style>
 </head>
@@ -99,36 +80,35 @@ button:hover {
 </header>
 
 <!-- SLIDE 1 -->
-<div class="slide active" id="slide1">
+<div class="slide active">
 
 <div class="container">
 
-    <div class="box">
-        Manhours<br>
-        <div class="value" id="manhours">0</div>
-    </div>
+<div class="box">
+Manhours (<span id="mMonth"></span>)<br>
+<div class="value" id="manhours">0</div>
+</div>
 
-    <div class="box">
-        Near Miss (<span id="month1"></span>)<br>
-        <div class="value" id="near">0</div>
-    </div>
+<div class="box">
+Near Miss (<span id="month1"></span>)<br>
+<div class="value" id="near">0</div>
+</div>
 
-    <div class="box">
-        Incident (<span id="month2"></span>)<br>
-        <div class="value" id="incident">0</div>
-    </div>
+<div class="box">
+Incident (<span id="month2"></span>)<br>
+<div class="value" id="incident">0</div>
+</div>
 
 </div>
 
 <div class="chartBox">
-    <canvas id="ehsPie"></canvas>
+<canvas id="ehsPie"></canvas>
 </div>
 
 </div>
 
 <!-- SLIDE 2 -->
-<div class="slide" id="slide2">
-
+<div class="slide">
 <h3 style="text-align:center;">Compliance (≤ 90 Days Only)</h3>
 
 <table>
@@ -142,225 +122,219 @@ button:hover {
 </thead>
 <tbody id="table"></tbody>
 </table>
-
 </div>
 
 <div class="controls">
-    <button onclick="prevSlide()">⬅ Prev</button>
-    <button onclick="nextSlide()">Next ➡</button>
+<button onclick="prevSlide()">⬅ Prev</button>
+<button onclick="nextSlide()">Next ➡</button>
 </div>
 
 <script>
 
 /* TIME */
 setInterval(()=>{
-    let now = new Date();
-
-    document.getElementById("time").innerText =
-        now.toLocaleString('en-IN', {
-            weekday:'long',
-            year:'numeric',
-            month:'long',
-            day:'numeric',
-            hour:'2-digit',
-            minute:'2-digit',
-            second:'2-digit'
-        });
+document.getElementById("time").innerText =
+new Date().toLocaleString('en-IN',{
+weekday:'long',
+year:'numeric',
+month:'long',
+day:'numeric',
+hour:'2-digit',
+minute:'2-digit',
+second:'2-digit'
+});
 },1000);
 
-/* MONTH */
-function setMonthNames(){
-    let now = new Date();
-    let month = now.toLocaleString('en-IN', { month: 'long' });
+/* MONTH NAME */
+let currentMonth = new Date().toLocaleString('en-IN',{month:'long'});
+document.getElementById("month1").innerText = currentMonth;
+document.getElementById("month2").innerText = currentMonth;
+document.getElementById("mMonth").innerText = currentMonth;
 
-    document.getElementById("month1").innerText = month;
-    document.getElementById("month2").innerText = month;
+/* SLIDES */
+let current=0;
+const slides=document.querySelectorAll(".slide");
+
+function show(n){
+slides.forEach(s=>s.classList.remove("active"));
+slides[n].classList.add("active");
 }
-setMonthNames();
+
+function nextSlide(){
+current=(current+1)%slides.length;
+show(current);
+}
+
+function prevSlide(){
+current=(current-1+slides.length)%slides.length;
+show(current);
+}
+
+setInterval(nextSlide,15000);
 
 /* SHEETS */
-const nearSheet = "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
-const incidentSheet = "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
-const compSheet = "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
-
-/* MANHOURS SHEET (NEW) */
-const manhoursSheet = "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145";
+const nearSheet="https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
+const incidentSheet="https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
+const compSheet="https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
+const manhoursSheet="https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145";
 
 /* CSV */
-async function getCSV(url){
-    let res = await fetch(url);
-    let text = await res.text();
-
-    return text.trim().split("\n").map(r =>
-        r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/)
-    );
+async function csv(url){
+let r=await fetch(url+"&_="+Date.now());
+let t=await r.text();
+return t.trim().split("\n").map(x=>x.split(","));
 }
 
-/* DATE */
+/* DATE FIX */
 function parseDate(v){
-    if(!v) return null;
+if(!v) return null;
 
-    let d = new Date(v);
-    if(!isNaN(d)) return d;
+let d=new Date(v);
+if(!isNaN(d)) return d;
 
-    let p = v.split("/");
-    if(p.length === 3){
-        return new Date(p[2], p[1]-1, p[0]);
-    }
-    return null;
+let p=v.split("/");
+if(p.length===3){
+return new Date(p[2],p[1]-1,p[0]);
+}
+return null;
 }
 
-/* PIE CHART */
-let pieChart;
-
-function updatePie(near, inc){
-
-    if(!pieChart){
-        pieChart = new Chart(document.getElementById("ehsPie"), {
-            type: 'pie',
-            data: {
-                labels: ['Near Miss', 'Incident'],
-                datasets: [{
-                    data: [near, inc]
-                }]
-            }
-        });
-    } else {
-        pieChart.data.datasets[0].data = [near, inc];
-        pieChart.update();
-    }
+/* PIE */
+let pie;
+function updatePie(a,b){
+if(!pie){
+pie=new Chart(document.getElementById("ehsPie"),{
+type:"pie",
+data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b]}]}
+});
+}else{
+pie.data.datasets[0].data=[a,b];
+pie.update();
+}
 }
 
-/* MANHOURS AUTO (NEW) */
+/* ✅ MANHOURS (YOUR ORIGINAL WORKING LOGIC — SAFE) */
 async function loadManhoursWorked(){
 
-    let data = await getCSV(manhoursSheet);
+let data = await csv(manhoursSheet);
 
-    let total = 0;
+let headerRowIndex = -1;
 
-    for(let i=0;i<data.length;i++){
-
-        let row = (data[i][0] || "").toLowerCase();
-
-        if(row.includes("manhours worked")){
-
-            let values = data[i];
-
-            // last column = cumulative
-            total = parseFloat(values[values.length - 1]) || 0;
-
-            break;
-        }
-    }
-
-    document.getElementById("manhours").innerText = total;
+for(let i=0;i<data.length;i++){
+let row = data[i].join("").toLowerCase();
+if(row.includes("january") && row.includes("february")){
+headerRowIndex = i;
+break;
+}
 }
 
-/* STATS */
+if(headerRowIndex === -1) return;
+
+let header = data[headerRowIndex];
+
+let aprilIndex = header.findIndex(h =>
+(h || "").toLowerCase().includes(currentMonth.toLowerCase())
+);
+
+let value = 0;
+
+for(let i=headerRowIndex+1;i<data.length;i++){
+
+let name = (data[i][0] || "")
+.toLowerCase()
+.replace(/[^a-z]/g,'');
+
+if(name.includes("manhoursworked")){
+
+value = parseFloat(
+(data[i][aprilIndex] || "0")
+.toString()
+.replace(/,/g,'')
+) || 0;
+
+break;
+}
+}
+
+document.getElementById("manhours").innerText = value;
+}
+
+/* ✅ FIXED NEAR + INCIDENT */
 async function loadStats(){
-    let near = await getCSV(nearSheet);
-    let inc = await getCSV(incidentSheet);
 
-    let today = new Date();
+let near=await csv(nearSheet);
+let inc=await csv(incidentSheet);
 
-    function countThisMonth(data){
-        let count = 0;
+let now=new Date();
 
-        for(let i=1;i<data.length;i++){
-            let d = parseDate(data[i][0]);
-            if(!d) continue;
+function findDate(row){
+for(let i=0;i<row.length;i++){
+let d=parseDate(row[i]);
+if(d) return d;
+}
+return null;
+}
 
-            if(d.getMonth() === today.getMonth() &&
-               d.getFullYear() === today.getFullYear()){
-                count++;
-            }
-        }
-        return count;
-    }
+function count(data){
+let c=0;
+for(let i=1;i<data.length;i++){
+let d=findDate(data[i]);
+if(!d) continue;
 
-    let nearCount = countThisMonth(near);
-    let incCount = countThisMonth(inc);
+if(d.getMonth()===now.getMonth() &&
+d.getFullYear()===now.getFullYear()){
+c++;
+}
+}
+return c;
+}
 
-    document.getElementById("near").innerText = nearCount;
-    document.getElementById("incident").innerText = incCount;
+let nearCount=count(near);
+let incCount=count(inc);
 
-    updatePie(nearCount, incCount);
+document.getElementById("near").innerText=nearCount;
+document.getElementById("incident").innerText=incCount;
+
+updatePie(nearCount,incCount);
 }
 
 /* COMPLIANCE */
 async function loadCompliance(){
 
-    let data = await getCSV(compSheet);
-    let list = [];
+let data=await csv(compSheet);
+let tb=document.getElementById("table");
+tb.innerHTML="";
 
-    for(let i=1;i<data.length;i++){
+let now=new Date();
 
-        let sl = data[i][0];
-        let compliance = data[i][1];
-        let nextDue = data[i][8];
+for(let i=1;i<data.length;i++){
 
-        let date = parseDate(nextDue);
-        if(!date) continue;
+let d=parseDate(data[i][8]);
+if(!d) continue;
 
-        let today = new Date();
-        let days = Math.ceil((date - today)/(1000*60*60*24));
+let days=Math.ceil((d-now)/86400000);
 
-        if(days >= 0 && days <= 90){
-            list.push({ sl, compliance, days, date });
-        }
-    }
+if(days>=0 && days<=90){
 
-    let tbody = document.getElementById("table");
-    tbody.innerHTML = "";
-
-    list.forEach(r=>{
-        let tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${r.sl}</td>
-            <td>${r.compliance}</td>
-            <td class="red">${r.days}</td>
-            <td>${r.date.toLocaleDateString()}</td>
-        `;
-
-        tbody.appendChild(tr);
-    });
+tb.innerHTML+=`
+<tr>
+<td>${data[i][0]}</td>
+<td>${data[i][1]}</td>
+<td class="red">${days}</td>
+<td>${d.toLocaleDateString()}</td>
+</tr>`;
 }
-
-/* SLIDES */
-let currentSlide = 0;
-const slides = document.querySelectorAll(".slide");
-
-function showSlide(n){
-    slides.forEach(s => s.classList.remove("active"));
-    slides[n].classList.add("active");
 }
-
-function nextSlide(){
-    currentSlide = (currentSlide + 1) % slides.length;
-    showSlide(currentSlide);
 }
-
-function prevSlide(){
-    currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-    showSlide(currentSlide);
-}
-
-/* AUTO SLIDE */
-setInterval(nextSlide, 40000);
 
 /* INIT */
+loadManhoursWorked();
 loadStats();
 loadCompliance();
-loadManhoursWorked();
 
-setInterval(loadStats, 30000);
-setInterval(loadCompliance, 60000);
-setInterval(loadManhoursWorked, 60000);
-
-setInterval(()=>{
-    showSlide(currentSlide);
-}, 1000);
+setInterval(loadManhoursWorked,60000);
+setInterval(loadStats,30000);
+setInterval(loadCompliance,60000);
 
 </script>
 
