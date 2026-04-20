@@ -295,40 +295,66 @@ tb.innerHTML+=`
 }
 }
 
-/* WATER DATA (FIXED DYNAMIC MONTH) */
-let waterDataCache = [];
-
+/* ✅ FINAL WATER FIX */
 async function loadWater(){
-let res = await fetch(waterSheet + "&_=" + Date.now());
-let text = await res.text();
-let rows = text.trim().split("\n").map(r=>r.split(","));
 
-let header = rows.find(r=>r.join(" ").includes("Apr'25"));
+let data = await csv(waterSheet);
+
+let header = data.find(r => r.join(" ").includes("Apr'25"));
 let months = header.slice(2);
 
-let selectedIndex = months.length - 1; // default latest
+let selectedIndex = months.length - 1;
 
 for(let i=months.length-1;i>=0;i--){
-let ok=false;
-for(let r=1;r<rows.length;r++){
-if(parseFloat(rows[r][i+2])>0){ ok=true; break; }
-}
-if(ok){ selectedIndex=i; break; }
-}
+let found=false;
 
-let selectedMonth = months[selectedIndex];
-document.getElementById("waterMonth").innerText = selectedMonth;
-
-/* values from selected month */
-let values=[];
-for(let i=1;i<=8;i++){
-values.push(parseFloat(rows[i][selectedIndex+2])||0);
+for(let r=1;r<data.length;r++){
+let val = parseFloat(data[r][i+2]);
+if(val && val>0){
+found=true;
+break;
+}
 }
 
-["wtp","bwssb","stp","rain","school","ro","cwtp","cstp"]
-.forEach((id,i)=>document.getElementById(id).innerText=values[i]);
+if(found){
+selectedIndex=i;
+break; // ⭐ FIX
+}
+}
 
-updateWaterPie(values);
+document.getElementById("waterMonth").innerText = months[selectedIndex];
+
+let values = {WTP:0,BWSSB:0,STP:0,Rain:0,School:0,RO:0,CWTP:0,CSTP:0};
+
+for(let i=1;i<data.length;i++){
+
+let name = (data[i][1]||"").toLowerCase();
+let val = parseFloat(data[i][selectedIndex+2])||0;
+
+if(name.includes("wtp reading")) values.WTP = val;
+else if(name.includes("bwssb")) values.BWSSB = val;
+else if(name.includes("stp treated")) values.STP = val;
+else if(name.includes("rain")) values.Rain = val;
+else if(name.includes("school")) values.School = val;
+else if(name.includes("ro")) values.RO = val;
+else if(name.includes("chiller wtp")) values.CWTP = val;
+else if(name.includes("chiller stp")) values.CSTP = val;
+}
+
+document.getElementById("wtp").innerText = values.WTP;
+document.getElementById("bwssb").innerText = values.BWSSB;
+document.getElementById("stp").innerText = values.STP;
+document.getElementById("rain").innerText = values.Rain;
+document.getElementById("school").innerText = values.School;
+document.getElementById("ro").innerText = values.RO;
+document.getElementById("cwtp").innerText = values.CWTP;
+document.getElementById("cstp").innerText = values.CSTP;
+
+updateWaterPie([
+values.WTP,values.BWSSB,values.STP,values.Rain,
+values.School,values.RO,values.CWTP,values.CSTP
+]);
+
 }
 
 /* INIT */
