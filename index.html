@@ -58,7 +58,14 @@ th {
 
 .red { background:red; color:white; }
 
-.controls { text-align:center; margin:15px; }
+.controls { 
+  text-align:center; 
+  margin:15px; 
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+}
 
 button {
   padding:10px 15px;
@@ -68,6 +75,13 @@ button {
   color:white;
   cursor:pointer;
   border-radius:5px;
+  min-width:110px;
+  font-weight:bold;
+  transition:0.2s;
+}
+
+button:hover{
+  transform:scale(1.05);
 }
 
 /* ✅ SLIDE 4 CSS */
@@ -89,6 +103,7 @@ button {
 .card canvas {
   height:180px !important;
 }
+
 #fsBtn{
   position:fixed;
   bottom:20px;
@@ -96,10 +111,21 @@ button {
   z-index:9999;
   padding:12px 15px;
   border-radius:50px;
-  background:#000;
-  color:#fff;
+  background:#FF8C00;
+  color:#000;
   font-weight:bold;
   cursor:pointer;
+}
+
+#holdBtn {
+  background:#ff9800 !important;
+  color:#000 !important;
+  font-weight:bold;
+}
+
+#holdBtn.active {
+  background:#4caf50 !important;
+  color:#fff !important;
 }
 </style>
 </head>
@@ -107,9 +133,8 @@ button {
 <body>
 
 <header>
-  
-<h2>EHS Dashboard</h2>
-<div id="time"></div>
+  <h2>EHS Dashboard</h2>
+  <div id="time"></div>
 </header>
 
 <!-- SLIDE 1 -->
@@ -165,7 +190,6 @@ Water Summary - <span id="waterMonth"></span>
 <h3 style="text-align:center;">EHS WATER DASHBOARD</h3>
 
 <div class="waterGroup">
-
 <div class="card"><canvas id="wtpChart"></canvas><p>WTP</p></div>
 <div class="card"><canvas id="bwssbChart"></canvas><p>BWSSB</p></div>
 <div class="card"><canvas id="stpChart"></canvas><p>STP</p></div>
@@ -173,15 +197,16 @@ Water Summary - <span id="waterMonth"></span>
 <div class="card"><canvas id="rainChart"></canvas><p>RAIN</p></div>
 <div class="card"><canvas id="cwtpChart"></canvas><p>CHILLER WTP</p></div>
 <div class="card"><canvas id="cstpChart"></canvas><p>CHILLER STP</p></div>
-
 </div>
 </div>
 
 <div class="controls">
-<button onclick="prevSlide()">⬅ Prev</button>
-<button onclick="nextSlide()">Next ➡</button>
-<button id="fsBtn" onclick="toggleFullScreen()">⛶ Full Screen</button>
+  <button onclick="prevSlide()">⬅ Prev</button>
+  <button onclick="toggleHold()" id="holdBtn">⏸ Hold</button>
+  <button onclick="nextSlide()">Next ➡</button>
 </div>
+
+<button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen </button>
 
 <script>
 
@@ -203,20 +228,76 @@ document.getElementById("mMonth").innerText = currentMonth;
 /* SLIDES */
 let current=0;
 const slides=document.querySelectorAll(".slide");
+let slideTimer = null;
+let isPaused = false;
 
+/* ✅ FIXED SLIDE FUNCTIONS */
 function show(n){
-slides.forEach(s=>s.classList.remove("active"));
-slides[n].classList.add("active");
+  slides.forEach(s=>s.classList.remove("active"));
+  slides[n].classList.add("active");
 }
-function nextSlide(){ current=(current+1)%slides.length; show(current); }
-function prevSlide(){ current=(current-1+slides.length)%slides.length; show(current); }
-setInterval(nextSlide,15000);
+
+function nextSlide(){
+  current = (current + 1) % slides.length;
+  show(current);
+}
+
+function prevSlide(){
+  current = (current - 1 + slides.length) % slides.length;
+  show(current);
+}
+
+/* ✅ FIXED SLIDE TIMER - 40 SECONDS */
+function startSlides(){
+  // Clear existing timer
+  if(slideTimer) {
+    clearInterval(slideTimer);
+  }
+  
+  // Start new 40-second timer
+  slideTimer = setInterval(() => {
+    if(!isPaused) {
+      nextSlide();
+    }
+  }, 40000); // 40 seconds
+}
+
+/* ✅ FIXED HOLD/RESUME BUTTON */
+function toggleHold(){
+  const btn = document.getElementById("holdBtn");
+  
+  isPaused = !isPaused;
+  
+  if(isPaused){
+    // PAUSED - Stop timer and show resume
+    if(slideTimer) {
+      clearInterval(slideTimer);
+      slideTimer = null;
+    }
+    btn.innerText = "▶ Resume";
+    btn.classList.add("active");
+  } else {
+    // RESUME - Restart timer
+    startSlides();
+    btn.innerText = "⏸ Hold";
+    btn.classList.remove("active");
+  }
+}
+
+/* FULLSCREEN */
+function toggleFullScreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  }else{
+    document.exitFullscreen();
+  }
+}
 
 /* CSV */
 async function csv(url){
-let r=await fetch(url+"&_="+Date.now());
-let t=await r.text();
-return t.trim().split("\n").map(x=>x.split(","));
+  let r=await fetch(url+"&_="+Date.now());
+  let t=await r.text();
+  return t.trim().split("\n").map(x=>x.split(","));
 }
 
 /* SHEETS */
@@ -229,238 +310,241 @@ const waterSheet="https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpC
 /* PIE */
 let pie;
 function updatePie(a,b){
-if(!pie){
-pie=new Chart(document.getElementById("ehsPie"),{
-type:"pie",
-data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b]}]}
-});
-}else{
-pie.data.datasets[0].data=[a,b];
-pie.update();
-}
+  if(!pie){
+    pie=new Chart(document.getElementById("ehsPie"),{
+      type:"pie",
+      data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b]}]}
+    });
+  }else{
+    pie.data.datasets[0].data=[a,b];
+    pie.update();
+  }
 }
 
 /* WATER PIE */
 let waterPie;
 function updateWaterPie(values){
-if(!waterPie){
-waterPie=new Chart(document.getElementById("waterPie"),{
-type:"pie",
-data:{
-labels:["WTP","BWSSB","STP","Rain","School","RO","CWTP","CSTP"],
-datasets:[{data:values}]
-}
-});
-}else{
-waterPie.data.datasets[0].data=values;
-waterPie.update();
-}
+  if(!waterPie){
+    waterPie=new Chart(document.getElementById("waterPie"),{
+      type:"pie",
+      data:{
+        labels:["WTP","BWSSB","STP","Rain","School","RO","CWTP","CSTP"],
+        datasets:[{data:values}]
+      }
+    });
+  }else{
+    waterPie.data.datasets[0].data=values;
+    waterPie.update();
+  }
 }
 
 /* MANHOURS */
 async function loadManhoursWorked(){
-let data = await csv(manhoursSheet);
-let headerRowIndex = data.findIndex(r =>
-r.join(" ").toLowerCase().includes("april")
-);
+  let data = await csv(manhoursSheet);
+  let headerRowIndex = data.findIndex(r =>
+    r.join(" ").toLowerCase().includes("april")
+  );
 
-if(headerRowIndex === -1) return;
+  if(headerRowIndex === -1) return;
 
-let header = data[headerRowIndex];
-let month = new Date().toLocaleString('en-IN',{month:'long'}).toLowerCase();
+  let header = data[headerRowIndex];
+  let month = new Date().toLocaleString('en-IN',{month:'long'}).toLowerCase();
 
-let monthIndex = header.findIndex(h =>
-(h||"").toLowerCase().trim() === month
-);
+  let monthIndex = header.findIndex(h =>
+    (h||"").toLowerCase().trim() === month
+  );
 
-if(monthIndex === -1) return;
+  if(monthIndex === -1) return;
 
-let value = 0;
+  let value = 0;
 
-for(let i=headerRowIndex+1;i<data.length;i++){
-let name = (data[i][0]||"").toLowerCase();
+  for(let i=headerRowIndex+1;i<data.length;i++){
+    let name = (data[i][0]||"").toLowerCase();
 
-if(name.includes("manhours worked")){
-value = parseFloat((data[i][monthIndex]||0).toString().replace(/,/g,'')) || 0;
-break;
-}
-}
+    if(name.includes("manhours worked")){
+      value = parseFloat((data[i][monthIndex]||0).toString().replace(/,/g,'')) || 0;
+      break;
+    }
+  }
 
-document.getElementById("manhours").innerText = value;
+  document.getElementById("manhours").innerText = value;
 }
 
 /* STATS */
 async function loadStats(){
-let near=await csv(nearSheet);
-let inc=await csv(incidentSheet);
-let now=new Date();
+  let near=await csv(nearSheet);
+  let inc=await csv(incidentSheet);
+  let now=new Date();
 
-function findDate(row){
-for(let i=0;i<row.length;i++){
-let d=new Date(row[i]);
-if(!isNaN(d)) return d;
-}
-return null;
-}
+  function findDate(row){
+    for(let i=0;i<row.length;i++){
+      let d=new Date(row[i]);
+      if(!isNaN(d)) return d;
+    }
+    return null;
+  }
 
-function count(data){
-let c=0;
-for(let i=1;i<data.length;i++){
-let d=findDate(data[i]);
-if(!d) continue;
-if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){
-c++;
-}
-}
-return c;
-}
+  function count(data){
+    let c=0;
+    for(let i=1;i<data.length;i++){
+      let d=findDate(data[i]);
+      if(!d) continue;
+      if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){
+        c++;
+      }
+    }
+    return c;
+  }
 
-document.getElementById("near").innerText=count(near);
-document.getElementById("incident").innerText=count(inc);
+  document.getElementById("near").innerText=count(near);
+  document.getElementById("incident").innerText=count(inc);
 
-updatePie(count(near),count(inc));
+  updatePie(count(near),count(inc));
 }
 
 /* COMPLIANCE */
 async function loadCompliance(){
-let data=await csv(compSheet);
-let tb=document.getElementById("table");
-tb.innerHTML="";
-let now=new Date();
+  let data=await csv(compSheet);
+  let tb=document.getElementById("table");
+  tb.innerHTML="";
+  let now=new Date();
 
-for(let i=1;i<data.length;i++){
-let d=new Date(data[i][8]);
-if(isNaN(d)) continue;
+  for(let i=1;i<data.length;i++){
+    let d=new Date(data[i][8]);
+    if(isNaN(d)) continue;
 
-let days=Math.ceil((d-now)/86400000);
+    let days=Math.ceil((d-now)/86400000);
 
-if(days>=0 && days<=90){
-tb.innerHTML+=`
-<tr>
-<td>${data[i][0]}</td>
-<td>${data[i][1]}</td>
-<td class="red">${days}</td>
-<td>${d.toLocaleDateString()}</td>
-</tr>`;
-}
-}
+    if(days>=0 && days<=90){
+      tb.innerHTML+=`
+        <tr>
+          <td>${data[i][0]}</td>
+          <td>${data[i][1]}</td>
+          <td class="red">${days}</td>
+          <td>${d.toLocaleDateString()}</td>
+        </tr>`;
+    }
+  }
 }
 
 /* WATER SUMMARY */
 async function loadWater(){
+  let data = await csv(waterSheet);
 
-let data = await csv(waterSheet);
+  let header = data.find(r => r.join(" ").includes("Apr'25"));
+  let months = header.slice(2);
 
-let header = data.find(r => r.join(" ").includes("Apr'25"));
-let months = header.slice(2);
+  let selectedIndex = months.length - 1;
 
-let selectedIndex = months.length - 1;
+  for(let i=months.length-1;i>=0;i--){
+    let found=false;
 
-for(let i=months.length-1;i>=0;i--){
-let found=false;
+    for(let r=1;r<data.length;r++){
+      let val = parseFloat(data[r][i+2]);
+      if(val && val>0){
+        found=true;
+        break;
+      }
+    }
 
-for(let r=1;r<data.length;r++){
-let val = parseFloat(data[r][i+2]);
-if(val && val>0){
-found=true;
-break;
-}
-}
+    if(found){
+      selectedIndex=i;
+      break;
+    }
+  }
 
-if(found){
-selectedIndex=i;
-break;
-}
-}
+  document.getElementById("waterMonth").innerText = months[selectedIndex];
 
-document.getElementById("waterMonth").innerText = months[selectedIndex];
+  let values = {WTP:0,BWSSB:0,STP:0,Rain:0,School:0,RO:0,CWTP:0,CSTP:0};
 
-let values = {WTP:0,BWSSB:0,STP:0,Rain:0,School:0,RO:0,CWTP:0,CSTP:0};
+  for(let i=1;i<data.length;i++){
+    let name = (data[i][1]||"").toLowerCase();
+    let val = parseFloat(data[i][selectedIndex+2])||0;
 
-for(let i=1;i<data.length;i++){
+    if(name.includes("wtp reading")) values.WTP = val;
+    else if(name.includes("bwssb")) values.BWSSB = val;
+    else if(name.includes("stp treated")) values.STP = val;
+    else if(name.includes("rain")) values.Rain = val;
+    else if(name.includes("school")) values.School = val;
+    else if(name.includes("ro")) values.RO = val;
+    else if(name.includes("chiller wtp")) values.CWTP = val;
+    else if(name.includes("chiller stp")) values.CSTP = val;
+  }
 
-let name = (data[i][1]||"").toLowerCase();
-let val = parseFloat(data[i][selectedIndex+2])||0;
+  document.getElementById("wtp").innerText = values.WTP;
+  document.getElementById("bwssb").innerText = values.BWSSB;
+  document.getElementById("stp").innerText = values.STP;
+  document.getElementById("rain").innerText = values.Rain;
+  document.getElementById("school").innerText = values.School;
+  document.getElementById("ro").innerText = values.RO;
+  document.getElementById("cwtp").innerText = values.CWTP;
+  document.getElementById("cstp").innerText = values.CSTP;
 
-if(name.includes("wtp reading")) values.WTP = val;
-else if(name.includes("bwssb")) values.BWSSB = val;
-else if(name.includes("stp treated")) values.STP = val;
-else if(name.includes("rain")) values.Rain = val;
-else if(name.includes("school")) values.School = val;
-else if(name.includes("ro")) values.RO = val;
-else if(name.includes("chiller wtp")) values.CWTP = val;
-else if(name.includes("chiller stp")) values.CSTP = val;
-}
-
-document.getElementById("wtp").innerText = values.WTP;
-document.getElementById("bwssb").innerText = values.BWSSB;
-document.getElementById("stp").innerText = values.STP;
-document.getElementById("rain").innerText = values.Rain;
-document.getElementById("school").innerText = values.School;
-document.getElementById("ro").innerText = values.RO;
-document.getElementById("cwtp").innerText = values.CWTP;
-document.getElementById("cstp").innerText = values.CSTP;
-
-updateWaterPie([
-values.WTP,values.BWSSB,values.STP,values.Rain,
-values.School,values.RO,values.CWTP,values.CSTP
-]);
-
+  updateWaterPie([
+    values.WTP,values.BWSSB,values.STP,values.Rain,
+    values.School,values.RO,values.CWTP,values.CSTP
+  ]);
 }
 
 /* ✅ SLIDE 4 CHARTS */
 let charts={};
 
 function drawChart(id,type,labels,data){
-if(charts[id]) charts[id].destroy();
-charts[id]=new Chart(document.getElementById(id),{
-type:type,
-data:{labels:labels,datasets:[{data:data,backgroundColor:"#1e3c72"}]},
-options:{responsive:true,maintainAspectRatio:false}
-});
+  if(charts[id]) charts[id].destroy();
+  charts[id]=new Chart(document.getElementById(id),{
+    type:type,
+    data:{labels:labels,datasets:[{data:data,backgroundColor:"#1e3c72"}]},
+    options:{responsive:true,maintainAspectRatio:false}
+  });
 }
 
 async function loadWaterCharts(){
-let data = await csv(waterSheet);
-data = data.filter(r=>r.length>2);
+  let data = await csv(waterSheet);
+  data = data.filter(r=>r.length>2);
 
-let header = data[1] || data[0];
-let months = header.slice(2).map(m=>(m||"").replace("'"," "));
+  let header = data[1] || data[0];
+  let months = header.slice(2).map(m=>(m||"").replace("'"," "));
 
-function findRow(key){
-return data.find(r=>(r[1]||"").toLowerCase().trim()===key.toLowerCase());
-}
-
-function getValues(row){
-if(!row) return [];
-return row.slice(2).map(v=>{
-let n=parseFloat(v);
-return isNaN(n)?0:n;
-});
-}
-
-drawChart("wtpChart","bar",months,getValues(findRow("WTP READING")));
-drawChart("bwssbChart","line",months,getValues(findRow("BWSSB")));
-drawChart("stpChart","line",months,getValues(findRow("STP Treated")));
-drawChart("rainChart","pie",months,getValues(findRow("Rain Water")));
-drawChart("cwtpChart","doughnut",months,getValues(findRow("Chiller WTP")));
-drawChart("cstpChart","polarArea",months,getValues(findRow("Chiller STP")));
-}
-function toggleFullScreen(){
-  if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen();
-  }else{
-    document.exitFullscreen();
+  function findRow(key){
+    return data.find(r=>(r[1]||"").toLowerCase().trim()===key.toLowerCase());
   }
+
+  function getValues(row){
+    if(!row) return [];
+    return row.slice(2).map(v=>{
+      let n=parseFloat(v);
+      return isNaN(n)?0:n;
+    });
+  }
+
+  drawChart("wtpChart","bar",months,getValues(findRow("WTP READING")));
+  drawChart("bwssbChart","line",months,getValues(findRow("BWSSB")));
+  drawChart("stpChart","line",months,getValues(findRow("STP Treated")));
+  drawChart("rainChart","pie",months,getValues(findRow("Rain Water")));
+  drawChart("cwtpChart","doughnut",months,getValues(findRow("Chiller WTP")));
+  drawChart("cstpChart","polarArea",months,getValues(findRow("Chiller STP")));
 }
 
-/* INIT */
-loadStats();
-loadManhoursWorked();
-loadCompliance();
-loadWater();
-loadWaterCharts();
+/* INIT - START EVERYTHING */
+async function init(){
+  // Load all data
+  loadStats();
+  loadManhoursWorked();
+  loadCompliance();
+  loadWater();
+  loadWaterCharts();
+  
+  // Show first slide
+  show(0);
+  
+  // Start 40-second slide timer
+  startSlides();
+}
 
+// Run init
+init();
+
+// Refresh data periodically
 setInterval(loadStats,30000);
 setInterval(loadManhoursWorked,60000);
 setInterval(loadCompliance,60000);
