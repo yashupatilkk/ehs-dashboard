@@ -89,12 +89,25 @@ button {
 .card canvas {
   height:180px !important;
 }
+#fsBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:9999;
+  padding:12px 15px;
+  border-radius:50px;
+  background:#000;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
 <header>
+  
 <h2>EHS Dashboard</h2>
 <div id="time"></div>
 </header>
@@ -167,6 +180,7 @@ Water Summary - <span id="waterMonth"></span>
 <div class="controls">
 <button onclick="prevSlide()">⬅ Prev</button>
 <button onclick="nextSlide()">Next ➡</button>
+<button id="fsBtn" onclick="toggleFullScreen()">⛶ Full Screen</button>
 </div>
 
 <script>
@@ -431,6 +445,13 @@ drawChart("stpChart","line",months,getValues(findRow("STP Treated")));
 drawChart("rainChart","pie",months,getValues(findRow("Rain Water")));
 drawChart("cwtpChart","doughnut",months,getValues(findRow("Chiller WTP")));
 drawChart("cstpChart","polarArea",months,getValues(findRow("Chiller STP")));
+}
+function toggleFullScreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  }else{
+    document.exitFullscreen();
+  }
 }
 
 /* INIT */
