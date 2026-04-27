@@ -101,7 +101,7 @@ th {
   letter-spacing:0.5px;
 }
 
-/* KPI Row: Responsive Grid - EDITED FOR 6 ITEMS */
+/* KPI Row: Responsive Grid */
 .s4-kpi-row {
   display:grid;
   grid-template-columns:repeat(6,1fr); /* Desktop: 6 Columns */
@@ -114,7 +114,7 @@ th {
   color:white;
   border-radius:6px;
   box-shadow:0 4px 6px rgba(0,0,0,0.3);
-  border-top: 4px solid #2a5298; /* Accent color */
+  border-top: 4px solid #2a5298;
   text-align:center;
   padding:15px 5px;
   display:flex;
@@ -191,10 +191,10 @@ th {
   height:200px !important; /* Desktop height */
 }
 
-/* SLIDE 4 SECOND ROW - SUMMARY BAR (EDITED: Only Total Group) */
+/* SLIDE 4 SECOND ROW - SUMMARY BAR */
 .s4-summary-row {
   display:flex;
-  justify-content:center; /* Center the single box */
+  justify-content:center; /* Center single item */
   margin-top:10px;
 }
 
@@ -204,7 +204,7 @@ th {
   padding:12px;
   box-shadow:0 2px 6px rgba(0,0,0,0.08);
   text-align:center;
-  width: 50%; /* Occupy half width */
+  width: 50%;
   min-width: 300px;
   border-left: 5px solid #1e3c72; /* Blue border */
 }
@@ -300,17 +300,17 @@ button:hover { transform:scale(1.05); }
 
 /* ✅ RESPONSIVE MEDIA QUERIES ✅ */
 @media (max-width: 1024px) {
-  /* Tablet: 3 columns for charts */
-  .s4-charts-grid { grid-template-columns: repeat(3, 1fr); }
-  .s4-kpi-row { grid-template-columns: repeat(3, 1fr); } /* 3x2 grid */
+  /* Tablet: 3 columns for top, 2 for charts */
+  .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
+  .s4-kpi-row { grid-template-columns: repeat(3, 1fr); }
   .s4-sum-card { width: 80%; }
   .s4-chart-card canvas { height: 180px !important; }
 }
 
 @media (max-width: 600px) {
-  /* Mobile: 2 columns */
-  .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
-  .s4-kpi-row { grid-template-columns: repeat(2, 1fr); } /* 2x3 grid */
+  /* Mobile: 1 column */
+  .s4-charts-grid { grid-template-columns: 1fr; }
+  .s4-kpi-row { grid-template-columns: repeat(2, 1fr); }
   .s4-sum-card { width: 90%; }
   .header h2 { font-size: 18px; }
   .s4-chart-card canvas { height: 200px !important; }
@@ -373,7 +373,7 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
-<!-- ✅ SLIDE 4 - 6 ITEMS + TOTAL GROUP + RO 3D CHART -->
+<!-- ✅ SLIDE 4 - EDITED (AUTO UPDATE + HORIZONTAL BAR CHART) -->
 <div class="slide">
 <div class="s4-wrapper">
 
@@ -382,7 +382,7 @@ Water Summary - <span id="waterMonth"></span>
     📊 EHS WATER MONTHLY DASHBOARD — <span id="s4Month"></span>
   </div>
 
-  <!-- KPI CARDS ROW (6 ITEMS: WTP, BWSSB, STP, RAIN, RO, CWTP) -->
+  <!-- KPI CARDS ROW (6 ITEMS - AUTO UPDATE) -->
   <div class="s4-kpi-row">
     <div class="s4-kpi">
       <div class="s4-kpi-head">WTP</div>
@@ -426,10 +426,9 @@ Water Summary - <span id="waterMonth"></span>
         <div class="s4-kpi-unit">KLD</div>
       </div>
     </div>
-    <!-- CSTP Removed -->
   </div>
 
-  <!-- SUMMARY CARDS (ONLY TOTAL SOURCES GROUP) -->
+  <!-- SUMMARY CARD (TOTAL ONLY - AUTO UPDATE) -->
   <div class="s4-summary-row">
     <div class="s4-sum-card">
       <div class="s4-sum-label">Total Sources Group</div>
@@ -446,7 +445,7 @@ Water Summary - <span id="waterMonth"></span>
   <!-- ✅ 7 CHARTS GRID (Responsive) -->
   <div class="s4-charts-grid">
     
-    <!-- 1. TOTAL SOURCES GROUP (Doughnut) -->
+    <!-- 1. TOTAL SOURCES GROUP (HORIZONTAL SIDE-BY-SIDE) -->
     <div class="s4-chart-card">
       <div class="chart-label">Total Sources Group</div>
       <div style="height:200px; display:flex; justify-content:center; align-items:center;">
@@ -484,7 +483,7 @@ Water Summary - <span id="waterMonth"></span>
       <canvas id="chart_cwtp"></canvas>
     </div>
 
-    <!-- 7. RO (3D Bar - SPECIFIC REQUEST) -->
+    <!-- 7. RO (3D Bar) -->
     <div class="s4-chart-card">
       <div class="chart-label">RO Trend (3D)</div>
       <canvas id="chart_ro"></canvas>
@@ -749,7 +748,7 @@ async function loadWater(){
   }catch(e){}
 }
 
-/* ============ ✅ SLIDE 4 - LOGIC (6 ITEMS + RO 3D) ============ */
+/* ============ ✅ SLIDE 4 - LOGIC (AUTO UPDATE + HORIZONTAL BAR) ============ */
 let charts4 = {};
 
 const chartColors = {
@@ -758,11 +757,10 @@ const chartColors = {
   stp:   { bg:"rgba(76,175,80,0.7)",  border:"#4caf50" },
   rain:  { bg:"rgba(0,188,212,0.7)",  border:"#00bcd4" },
   cwtp:  { bg:"rgba(255,152,0,0.7)",  border:"#ff9800" },
-  cstp:  { bg:"rgba(156,39,176,0.7)", border:"#9c27b0" },
-  pie:   ["#1e3c72", "#2196f3", "#4caf50", "#00bcd4", "#ff9800", "#9c27b0"]
+  cstp:  { bg:"rgba(156,39,176,0.7)", border:"#9c27b0" }
 };
 
-/* Generic Chart Drawer */
+/* Generic Trend Chart Drawer */
 function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
   if(charts4[id]) charts4[id].destroy();
   let c = chartColors[colorKey];
@@ -785,7 +783,7 @@ function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      elements: is3D ? { bar: { borderColor: 'black' } } : {}, // 3D Border
+      elements: is3D ? { bar: { borderColor: 'black' } } : {},
       scales: {
         x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
         y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(0,0,0,0.05)" }, beginAtZero: true }
@@ -796,42 +794,61 @@ function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
   charts4[id] = new Chart(document.getElementById(id), config);
 }
 
-/* Doughnut Chart */
-function drawDoughnut(id, dataValues){
+/* ✅ HORIZONTAL BAR CHART (Side-by-Side like Medal Tally) */
+function drawHorizontalGroupedChart(id, labels, data1, data2, label1, label2){
   if(charts4[id]) charts4[id].destroy();
   
-  let nonZeroIndices = dataValues.map((val, idx) => val > 0 ? idx : -1).filter(idx => idx !== -1);
-  let filteredData = nonZeroIndices.map(i => dataValues[i]);
-  let filteredLabels = ["WTP","BWSSB","STP","Rain","CWTP","CSTP"].filter((_, i) => dataValues[i] > 0);
-  let filteredColors = chartColors.pie.filter((_, i) => dataValues[i] > 0);
+  // Colors: Purple (Olympics/BWSSB) vs Cyan (Paralympics/Internal)
+  const colorPurple = 'rgba(136, 132, 216, 0.8)'; 
+  const borderPurple = 'rgba(136, 132, 216, 1)';
+  const colorCyan = 'rgba(75, 192, 192, 0.8)';   
+  const borderCyan = 'rgba(75, 192, 192, 1)';
 
   charts4[id] = new Chart(document.getElementById(id),{
-    type:"doughnut",
+    type:"bar", // Use 'bar' type
     data:{
-      labels: filteredLabels,
-      datasets:[{
-        data: filteredData,
-        backgroundColor: filteredColors,
-        borderWidth:1
-      }]
+      labels: labels, // Y-Axis Labels (Months)
+      datasets:[
+        {
+          label: label1, // BWSSB (External)
+          data: data1,
+          backgroundColor: colorPurple,
+          borderColor: borderPurple,
+          borderWidth: 1,
+          barPercentage: 0.6
+        },
+        {
+          label: label2, // Internal Sources
+          data: data2,
+          backgroundColor: colorCyan,
+          borderColor: borderCyan,
+          borderWidth: 1,
+          barPercentage: 0.6
+        }
+      ]
     },
     options:{
+      indexAxis: 'y', // ✅ THIS MAKES IT HORIZONTAL (Side-by-side)
       responsive:true,
       maintainAspectRatio:false,
       plugins:{
-        legend:{ position:'right', labels:{ boxWidth:10, font:{ size:10 } } },
-        tooltip: {
-           callbacks: {
-             label: function(context) {
-               let label = context.label || '';
-               if (label) { label += ': '; }
-               let value = context.raw;
-               let total = context.chart._metasets[context.datasetIndex].total;
-               let percentage = Math.round((value / total) * 100) + '%';
-               return label + value + ' KLD (' + percentage + ')';
-             }
-           }
-        }
+        legend: { 
+          display: true, 
+          position: 'top', 
+          labels: { boxWidth: 15, font: { size: 11, weight: 'bold' } } 
+        },
+        title: { display: false }
+      },
+      scales: {
+        x: { 
+          stacked: false, 
+          beginAtZero: true,
+          grid: { display: true, color: "rgba(0,0,0,0.05)" }
+        },
+        y: { 
+          stacked: false, 
+          grid: { display: false } // Clean look like Medal Tally
+        } 
       }
     }
   });
@@ -846,7 +863,7 @@ async function loadWaterDashboard(){
 
     let months = header.slice(2).map(m=>(m||"").replace("'",""));
     
-    /* Find selected month index */
+    /* Find selected month index (Latest: Apr26) */
     let selectedIndex = months.length - 1;
     for(let i=months.length-1;i>=0;i--){
       let found=false;
@@ -873,14 +890,15 @@ async function loadWaterDashboard(){
       return vals[selectedIndex] || 0;
     }
 
-    /* KPI VALUES (6 ITEMS) */
+    /* KPI VALUES (AUTO UPDATE) */
     let v = {
       WTP:   getLatest(findRow("WTP READING")),
       BWSSB: getLatest(findRow("BWSSB")),
       STP:   getLatest(findRow("STP Treated")),
       Rain:  getLatest(findRow("Rain Water")),
       RO:    getLatest(findRow("RO")),
-      CWTP:  getLatest(findRow("Chiller WTP"))
+      CWTP:  getLatest(findRow("Chiller WTP")),
+      CSTP:  getLatest(findRow("Chiller STP"))
     };
 
     /* Animate KPI numbers */
@@ -891,34 +909,46 @@ async function loadWaterDashboard(){
     animateValue("s4_ro",    v.RO);
     animateValue("s4_cwtp",  v.CWTP);
 
-    /* SUMMARY CARDS (TOTAL ONLY) */
-    let total    = v.WTP + v.BWSSB + v.STP + v.Rain + v.RO + v.CWTP;
-    
+    /* SUMMARY CARD (TOTAL ONLY) */
+    let total = v.WTP + v.BWSSB + v.STP + v.Rain + v.RO + v.CWTP + v.CSTP;
     animateValue("s4_total", total);
 
-    /* ✅ DRAW 7 CHARTS ✅ */
+    /* ✅ DRAW CHARTS ✅ */
     
-    // 1. TOTAL SOURCES GROUP (Doughnut)
-    let pieData = [v.WTP, v.BWSSB, v.STP, v.Rain, v.CWTP];
-    drawDoughnut("chart_total", pieData);
+    // 1. TOTAL SOURCES GROUP (HORIZONTAL SIDE-BY-SIDE)
+    // Get historical data for Horizontal Chart
+    let bwssbArr = getValues(findRow("BWSSB"));
+    let wtpArr   = getValues(findRow("WTP READING"));
+    let stpArr   = getValues(findRow("STP Treated"));
+    let cwtpArr  = getValues(findRow("Chiller WTP"));
+    let roArr    = getValues(findRow("RO"));
+    let rainArr  = getValues(findRow("Rain Water"));
+    
+    // Calculate Internal Total for every month
+    let internalArr = bwssbArr.map((_, i) => 
+        (wtpArr[i]||0) + (stpArr[i]||0) + (cwtpArr[i]||0) + (roArr[i]||0) + (rainArr[i]||0)
+    );
+
+    // Draw Horizontal Chart: Months on Left, Bars go Right
+    drawHorizontalGroupedChart("chart_total", months, bwssbArr, internalArr, "External (BWSSB)", "Internal Sources");
 
     // 2. WTP Trend (Bar)
-    drawTrendChart("chart_wtp",   months, getValues(findRow("WTP READING")),   "bar", "wtp");
+    drawTrendChart("chart_wtp",   months, wtpArr,   "bar", "wtp");
     
     // 3. BWSSB Trend (Line)
-    drawTrendChart("chart_bwssb", months, getValues(findRow("BWSSB")),         "line", "bwssb");
+    drawTrendChart("chart_bwssb", months, bwssbArr, "line", "bwssb");
     
     // 4. STP Trend (Bar)
-    drawTrendChart("chart_stp",   months, getValues(findRow("STP Treated")),   "bar", "stp");
+    drawTrendChart("chart_stp",   months, stpArr,   "bar", "stp");
     
     // 5. Rain Trend (Line)
-    drawTrendChart("chart_rain",  months, getValues(findRow("Rain Water")),    "line", "rain");
+    drawTrendChart("chart_rain",  months, rainArr,  "line", "rain");
     
     // 6. CWTP Trend (Bar)
-    drawTrendChart("chart_cwtp",  months, getValues(findRow("Chiller WTP")),   "bar", "cwtp");
+    drawTrendChart("chart_cwtp",  months, cwtpArr,  "bar", "cwtp");
     
-    // 7. RO Trend (3D BAR - SPECIFIC REQUEST)
-    drawTrendChart("chart_ro", months, getValues(findRow("RO")),   "bar", "rain", true);
+    // 7. RO Trend (3D Bar)
+    drawTrendChart("chart_ro",    months, roArr,    "bar", "rain", true);
 
   }catch(e){ console.log("Water Dashboard Error:", e); }
 }
@@ -937,7 +967,7 @@ function animateValue(elementId, target){
     /* Ease out cubic */
     let eased = 1 - Math.pow(1 - progress, 3);
     let current = Math.floor(eased * target);
-    el.innerText = current.toLocaleString();
+    el.innerText = current.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 1});
     if(progress < 1) requestAnimationFrame(step);
     else el.innerText = target.toLocaleString();
   }
@@ -962,7 +992,7 @@ setInterval(loadStats,           30000);
 setInterval(loadManhoursWorked,  60000);
 setInterval(loadCompliance,      60000);
 setInterval(loadWater,           60000);
-setInterval(loadWaterDashboard,  60000);
+setInterval(loadWaterDashboard, 60000);
 
 </script>
 </body>
