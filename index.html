@@ -7,18 +7,24 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-body { margin:0; font-family:Arial; background:#f4f4f4; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:Arial, sans-serif; background:#f0f2f5; }
 
 header {
   background: linear-gradient(to right,#1e3c72,#2a5298);
   color:white;
   text-align:center;
   padding:15px;
+  position:relative;
 }
+
+header h2 { font-size:22px; letter-spacing:1px; }
+#time { font-size:13px; opacity:0.9; margin-top:4px; }
 
 .slide { display:none; }
 .active { display:block; }
 
+/* SLIDE 1 */
 .container {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -34,10 +40,11 @@ header {
   border-radius:8px;
 }
 
-.value { font-size:35px; }
+.value { font-size:35px; font-weight:bold; }
 
 .chartBox { width:300px; margin:auto; }
 
+/* SLIDE 2 */
 table {
   width:95%;
   margin:auto;
@@ -56,8 +63,173 @@ th {
   color:white;
 }
 
-.red { background:red; color:white; }
+.red { background:#ff4444; color:white; font-weight:bold; }
 
+/* SLIDE 3 WATER SUMMARY */
+.waterLayout {
+  display: grid;
+  grid-template-columns: 1fr 300px 1fr;
+  gap: 20px;
+  margin: 20px;
+  align-items: start;
+}
+
+.waterLeft, .waterRight {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.waterCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ✅ SLIDE 4 - HSE DASHBOARD STYLE (RESPONSIVE) */
+.s4-wrapper {
+  padding:12px 16px;
+}
+
+.s4-top-bar {
+  background: linear-gradient(to right,#1e3c72,#2a5298);
+  color:white;
+  padding:8px 16px;
+  font-size:15px;
+  font-weight:bold;
+  border-radius:6px 6px 0 0;
+  letter-spacing:0.5px;
+}
+
+/* KPI Row: Responsive Grid - EDITED FOR 6 ITEMS */
+.s4-kpi-row {
+  display:grid;
+  grid-template-columns:repeat(6,1fr); /* Desktop: 6 Columns */
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.s4-kpi {
+  background:#1a1a1a; /* BLACK BOX STYLE */
+  color:white;
+  border-radius:6px;
+  box-shadow:0 4px 6px rgba(0,0,0,0.3);
+  border-top: 4px solid #2a5298; /* Accent color */
+  text-align:center;
+  padding:15px 5px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.s4-kpi-head {
+  background: transparent;
+  color: #aaa;
+  padding:0;
+  font-size:11px;
+  font-weight:bold;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:5px;
+}
+
+.s4-kpi-body {
+  padding:0;
+}
+
+.s4-kpi-val {
+  font-size:26px;
+  font-weight:bold;
+  color: #fff;
+  line-height:1;
+}
+
+.s4-kpi-unit {
+  font-size:10px;
+  color:#2a5298;
+  margin-top:2px;
+  font-weight:bold;
+}
+
+.s4-section-title {
+  background:#1e3c72;
+  color:white;
+  padding:8px 14px;
+  font-size:13px;
+  font-weight:bold;
+  border-radius:6px 6px 0 0;
+  margin-top:6px;
+  letter-spacing:0.5px;
+}
+
+/* Charts Grid: Responsive */
+.s4-charts-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr); /* Desktop/TV: 4 columns */
+  gap:10px;
+}
+
+.s4-chart-card {
+  background:#fff;
+  border-radius:0 0 6px 6px;
+  padding:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.s4-chart-card .chart-label {
+  font-size:12px;
+  font-weight:bold;
+  color:#1e3c72;
+  text-align:center;
+  margin-bottom:6px;
+  padding-bottom:5px;
+  border-bottom:2px solid #e0e0e0;
+}
+
+.s4-chart-card canvas {
+  width:100% !important;
+  height:200px !important; /* Desktop height */
+}
+
+/* SLIDE 4 SECOND ROW - SUMMARY BAR (EDITED: Only Total Group) */
+.s4-summary-row {
+  display:flex;
+  justify-content:center; /* Center the single box */
+  margin-top:10px;
+}
+
+.s4-sum-card {
+  background:#fff;
+  border-radius:6px;
+  padding:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.08);
+  text-align:center;
+  width: 50%; /* Occupy half width */
+  min-width: 300px;
+  border-left: 5px solid #1e3c72; /* Blue border */
+}
+
+.s4-sum-label {
+  font-size:11px;
+  color:#666;
+  font-weight:bold;
+  text-transform:uppercase;
+}
+
+.s4-sum-val {
+  font-size:24px;
+  font-weight:bold;
+  color:#333;
+  margin-top:4px;
+}
+
+.s4-sum-sub {
+  font-size:10px;
+  color:#999;
+  margin-top:2px;
+}
+
+/* CONTROLS */
 .controls { 
   text-align:center; 
   margin:15px; 
@@ -80,52 +252,9 @@ button {
   transition:0.2s;
 }
 
-button:hover{
-  transform:scale(1.05);
-}
+button:hover { transform:scale(1.05); }
 
-/* ✅ NEW WATER SUMMARY LAYOUT FOR SLIDE 3 */
-.waterLayout {
-  display: grid;
-  grid-template-columns: 1fr 300px 1fr;
-  gap: 20px;
-  margin: 20px;
-  align-items: start;
-}
-
-.waterLeft, .waterRight {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-
-.waterCenter {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* SLIDE 4 CSS */
-.waterGroup {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:15px;
-  padding:20px;
-}
-
-.card {
-  background:white;
-  padding:10px;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  text-align:center;
-}
-
-.card canvas {
-  height:180px !important;
-}
-
-#fsBtn{
+#fsBtn {
   position:fixed;
   bottom:20px;
   right:20px;
@@ -141,12 +270,50 @@ button:hover{
 #holdBtn {
   background:#ff9800 !important;
   color:#000 !important;
-  font-weight:bold;
 }
 
 #holdBtn.active {
   background:#4caf50 !important;
   color:#fff !important;
+}
+
+/* SLIDE INDICATOR */
+.slide-indicator {
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.slide-dot {
+  width:10px; height:10px;
+  border-radius:50%;
+  background:#ccc;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.slide-dot.active {
+  background:#1e3c72;
+  transform:scale(1.3);
+}
+
+/* ✅ RESPONSIVE MEDIA QUERIES ✅ */
+@media (max-width: 1024px) {
+  /* Tablet: 3 columns for charts */
+  .s4-charts-grid { grid-template-columns: repeat(3, 1fr); }
+  .s4-kpi-row { grid-template-columns: repeat(3, 1fr); } /* 3x2 grid */
+  .s4-sum-card { width: 80%; }
+  .s4-chart-card canvas { height: 180px !important; }
+}
+
+@media (max-width: 600px) {
+  /* Mobile: 2 columns */
+  .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
+  .s4-kpi-row { grid-template-columns: repeat(2, 1fr); } /* 2x3 grid */
+  .s4-sum-card { width: 90%; }
+  .header h2 { font-size: 18px; }
+  .s4-chart-card canvas { height: 200px !important; }
 }
 </style>
 </head>
@@ -158,6 +325,8 @@ button:hover{
   <div id="time"></div>
 </header>
 
+<div class="slide-indicator" id="dots"></div>
+
 <!-- SLIDE 1 -->
 <div class="slide active">
 <div class="container">
@@ -165,7 +334,6 @@ button:hover{
 <div class="box">Near Miss (<span id="month1"></span>)<br><div class="value" id="near">0</div></div>
 <div class="box">Incident (<span id="month2"></span>)<br><div class="value" id="incident">0</div></div>
 </div>
-
 <div class="chartBox">
 <canvas id="ehsPie"></canvas>
 </div>
@@ -182,29 +350,21 @@ button:hover{
 </table>
 </div>
 
-<!-- ✅ SLIDE 3 - NEW LAYOUT: LEFT(WTP,STP,RO,CSTP) | CENTER(PIE) | RIGHT(BWSSB,RAIN,CWTP) -->
+<!-- SLIDE 3 -->
 <div class="slide">
 <h3 style="text-align:center;">
 Water Summary - <span id="waterMonth"></span>
 </h3>
-
 <div class="waterLayout">
-  <!-- LEFT SIDE: WTP, STP, RO, CSTP -->
   <div class="waterLeft">
     <div class="box">WTP<br><div class="value" id="wtp">0</div></div>
     <div class="box">STP<br><div class="value" id="stp">0</div></div>
     <div class="box">RO<br><div class="value" id="ro">0</div></div>
     <div class="box">CSTP<br><div class="value" id="cstp">0</div></div>
   </div>
-
-  <!-- CENTER: PIE CHART -->
   <div class="waterCenter">
-    <div class="chartBox">
-      <canvas id="waterPie"></canvas>
-    </div>
+    <div class="chartBox"><canvas id="waterPie"></canvas></div>
   </div>
-
-  <!-- RIGHT SIDE: BWSSB, RAIN, CWTP -->
   <div class="waterRight">
     <div class="box">BWSSB<br><div class="value" id="bwssb">0</div></div>
     <div class="box">Rain<br><div class="value" id="rain">0</div></div>
@@ -213,55 +373,184 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
-<!-- SLIDE 4 -->
+<!-- ✅ SLIDE 4 - 6 ITEMS + TOTAL GROUP + RO 3D CHART -->
 <div class="slide">
-<h3 style="text-align:center;">EHS WATER DASHBOARD</h3>
+<div class="s4-wrapper">
 
-<div class="waterGroup">
-<div class="card"><canvas id="wtpChart"></canvas><p>WTP</p></div>
-<div class="card"><canvas id="bwssbChart"></canvas><p>BWSSB</p></div>
-<div class="card"><canvas id="stpChart"></canvas><p>STP</p></div>
+  <!-- TOP BAR -->
+  <div class="s4-top-bar">
+    📊 EHS WATER MONTHLY DASHBOARD — <span id="s4Month"></span>
+  </div>
 
-<div class="card"><canvas id="rainChart"></canvas><p>RAIN</p></div>
-<div class="card"><canvas id="cwtpChart"></canvas><p>CHILLER WTP</p></div>
-<div class="card"><canvas id="cstpChart"></canvas><p>CHILLER STP</p></div>
+  <!-- KPI CARDS ROW (6 ITEMS: WTP, BWSSB, STP, RAIN, RO, CWTP) -->
+  <div class="s4-kpi-row">
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">WTP</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_wtp">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">BWSSB</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_bwssb">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">STP</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_stp">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">RAIN</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_rain">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">RO</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_ro">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <div class="s4-kpi">
+      <div class="s4-kpi-head">CWTP</div>
+      <div class="s4-kpi-body">
+        <div class="s4-kpi-val" id="s4_cwtp">0</div>
+        <div class="s4-kpi-unit">KLD</div>
+      </div>
+    </div>
+    <!-- CSTP Removed -->
+  </div>
+
+  <!-- SUMMARY CARDS (ONLY TOTAL SOURCES GROUP) -->
+  <div class="s4-summary-row">
+    <div class="s4-sum-card">
+      <div class="s4-sum-label">Total Sources Group</div>
+      <div class="s4-sum-val" id="s4_total">0</div>
+      <div class="s4-sum-sub">KLD Combined</div>
+    </div>
+  </div>
+
+  <!-- CHART SECTION TITLE -->
+  <div class="s4-section-title">
+    📈 7-CHART DETAILED ANALYSIS
+  </div>
+
+  <!-- ✅ 7 CHARTS GRID (Responsive) -->
+  <div class="s4-charts-grid">
+    
+    <!-- 1. TOTAL SOURCES GROUP (Doughnut) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">Total Sources Group</div>
+      <div style="height:200px; display:flex; justify-content:center; align-items:center;">
+        <canvas id="chart_total"></canvas>
+      </div>
+    </div>
+
+    <!-- 2. WTP TREND (Bar) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">WTP Reading Trend</div>
+      <canvas id="chart_wtp"></canvas>
+    </div>
+
+    <!-- 3. BWSSB TREND (Line) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">BWSSB Trend</div>
+      <canvas id="chart_bwssb"></canvas>
+    </div>
+
+    <!-- 4. STP TREATED (Bar) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">STP Treated Trend</div>
+      <canvas id="chart_stp"></canvas>
+    </div>
+
+    <!-- 5. RAIN WATER (Line) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">Rain Water Trend</div>
+      <canvas id="chart_rain"></canvas>
+    </div>
+
+    <!-- 6. CHILLER WTP (Bar) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">Chiller WTP Trend</div>
+      <canvas id="chart_cwtp"></canvas>
+    </div>
+
+    <!-- 7. RO (3D Bar - SPECIFIC REQUEST) -->
+    <div class="s4-chart-card">
+      <div class="chart-label">RO Trend (3D)</div>
+      <canvas id="chart_ro"></canvas>
+    </div>
+
+  </div>
+
 </div>
 </div>
 
+<!-- CONTROLS -->
 <div class="controls">
   <button onclick="prevSlide()">⬅ Prev</button>
   <button onclick="toggleHold()" id="holdBtn">⏸ Hold</button>
   <button onclick="nextSlide()">Next ➡</button>
 </div>
 
-<button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen </button>
+<button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen</button>
 
 <script>
 
-/* TIME */
+/* ============ TIME ============ */
 setInterval(()=>{
-document.getElementById("time").innerText =
-new Date().toLocaleString('en-IN',{
-weekday:'long',year:'numeric',month:'long',day:'numeric',
-hour:'2-digit',minute:'2-digit',second:'2-digit'
-});
+  document.getElementById("time").innerText =
+    new Date().toLocaleString('en-IN',{
+      weekday:'long',year:'numeric',month:'long',day:'numeric',
+      hour:'2-digit',minute:'2-digit',second:'2-digit'
+    });
 },1000);
 
-/* MONTH */
+/* ============ MONTH ============ */
 let currentMonth = new Date().toLocaleString('en-IN',{month:'long'});
 document.getElementById("month1").innerText = currentMonth;
 document.getElementById("month2").innerText = currentMonth;
 document.getElementById("mMonth").innerText = currentMonth;
 
-/* SLIDES */
+/* ============ SLIDES ============ */
 let current=0;
 const slides=document.querySelectorAll(".slide");
 let slideTimer = null;
 let isPaused = false;
 
+// Build dots
+const dotsEl = document.getElementById("dots");
+slides.forEach((_,i)=>{
+  let d = document.createElement("div");
+  d.className = "slide-dot" + (i===0?" active":"");
+  d.onclick = ()=> goSlide(i);
+  dotsEl.appendChild(d);
+});
+
+function updateDots(){
+  document.querySelectorAll(".slide-dot").forEach((d,i)=>{
+    d.classList.toggle("active", i===current);
+  });
+}
+
 function show(n){
   slides.forEach(s=>s.classList.remove("active"));
   slides[n].classList.add("active");
+  updateDots();
+}
+
+function goSlide(n){
+  current = n;
+  show(n);
 }
 
 function nextSlide(){
@@ -275,13 +564,9 @@ function prevSlide(){
 }
 
 function startSlides(){
-  if(slideTimer) {
-    clearInterval(slideTimer);
-  }
-  slideTimer = setInterval(() => {
-    if(!isPaused) {
-      nextSlide();
-    }
+  if(slideTimer) clearInterval(slideTimer);
+  slideTimer = setInterval(()=>{
+    if(!isPaused) nextSlide();
   }, 40000);
 }
 
@@ -289,10 +574,7 @@ function toggleHold(){
   const btn = document.getElementById("holdBtn");
   isPaused = !isPaused;
   if(isPaused){
-    if(slideTimer) {
-      clearInterval(slideTimer);
-      slideTimer = null;
-    }
+    if(slideTimer){ clearInterval(slideTimer); slideTimer=null; }
     btn.innerText = "▶ Resume";
     btn.classList.add("active");
   } else {
@@ -305,53 +587,57 @@ function toggleHold(){
 function toggleFullScreen(){
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen();
-  }else{
+  } else {
     document.exitFullscreen();
   }
 }
 
+/* ============ CSV FETCH ============ */
 async function csv(url){
-  let r=await fetch(url+"&_="+Date.now());
-  let t=await r.text();
+  let r = await fetch(url+"&_="+Date.now());
+  let t = await r.text();
   return t.trim().split("\n").map(x=>x.split(","));
 }
 
-const nearSheet="https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
-const incidentSheet="https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
-const compSheet="https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
-const manhoursSheet="https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145";
-const waterSheet="https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=1876581317";
+const nearSheet      = "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779";
+const incidentSheet   = "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433";
+const compSheet       = "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223";
+const manhoursSheet   = "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145";
+const waterSheet      = "https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=1876581317";
 
+/* ============ EHS PIE (SLIDE 1) ============ */
 let pie;
 function updatePie(a,b){
   if(!pie){
-    pie=new Chart(document.getElementById("ehsPie"),{
+    pie = new Chart(document.getElementById("ehsPie"),{
       type:"pie",
-      data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b]}]}
+      data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b],backgroundColor:["#ff9800","#f44336"]}]},
+      options:{responsive:true}
     });
-  }else{
+  } else {
     pie.data.datasets[0].data=[a,b];
     pie.update();
   }
 }
 
-/* ✅ UPDATED WATER PIE - REMOVED SCHOOL */
+/* ============ WATER PIE (SLIDE 3) ============ */
 let waterPie;
 function updateWaterPie(values){
   if(!waterPie){
-    waterPie=new Chart(document.getElementById("waterPie"),{
+    waterPie = new Chart(document.getElementById("waterPie"),{
       type:"pie",
       data:{
         labels:["WTP","BWSSB","STP","Rain","RO","CWTP","CSTP"],
-        datasets:[{data:values}]
+        datasets:[{data:values, backgroundColor:["#1e3c72","#2196f3","#4caf50","#00bcd4","#ff9800","#9c27b0","#f44336"]}]
       }
     });
-  }else{
+  } else {
     waterPie.data.datasets[0].data=values;
     waterPie.update();
   }
 }
 
+/* ============ LOAD MANHOURS (SLIDE 1) ============ */
 async function loadManhoursWorked(){
   try{
     let data = await csv(manhoursSheet);
@@ -373,11 +659,12 @@ async function loadManhoursWorked(){
   }catch(e){}
 }
 
+/* ============ LOAD STATS (SLIDE 1) ============ */
 async function loadStats(){
   try{
-    let near=await csv(nearSheet);
-    let inc=await csv(incidentSheet);
-    let now=new Date();
+    let near = await csv(nearSheet);
+    let inc  = await csv(incidentSheet);
+    let now  = new Date();
     function findDate(row){
       for(let i=0;i<row.length;i++){
         let d=new Date(row[i]);
@@ -390,36 +677,36 @@ async function loadStats(){
       for(let i=1;i<data.length;i++){
         let d=findDate(data[i]);
         if(!d) continue;
-        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()){
-          c++;
-        }
+        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;
       }
       return c;
     }
-    document.getElementById("near").innerText=count(near);
-    document.getElementById("incident").innerText=count(inc);
-    updatePie(count(near),count(inc));
+    let nc = count(near), ic = count(inc);
+    document.getElementById("near").innerText = nc;
+    document.getElementById("incident").innerText = ic;
+    updatePie(nc, ic);
   }catch(e){}
 }
 
+/* ============ LOAD COMPLIANCE (SLIDE 2) ============ */
 async function loadCompliance(){
   try{
-    let data=await csv(compSheet);
-    let tb=document.getElementById("table");
-    tb.innerHTML="";
-    let now=new Date();
+    let data = await csv(compSheet);
+    let tb = document.getElementById("table");
+    tb.innerHTML = "";
+    let now = new Date();
     for(let i=1;i<data.length;i++){
-      let d=new Date(data[i][8]);
+      let d = new Date(data[i][8]);
       if(isNaN(d)) continue;
-      let days=Math.ceil((d-now)/86400000);
+      let days = Math.ceil((d-now)/86400000);
       if(days>=0 && days<=90){
-        tb.innerHTML+=`<tr><td>${data[i][0]}</td><td>${data[i][1]}</td><td class="red">${days}</td><td>${d.toLocaleDateString()}</td></tr>`;
+        tb.innerHTML += `<tr><td>${data[i][0]}</td><td>${data[i][1]}</td><td class="red">${days}</td><td>${d.toLocaleDateString()}</td></tr>`;
       }
     }
   }catch(e){}
 }
 
-/* ✅ UPDATED WATER SUMMARY - REMOVED SCHOOL */
+/* ============ LOAD WATER SUMMARY (SLIDE 3) ============ */
 async function loadWater(){
   try{
     let data = await csv(waterSheet);
@@ -431,17 +718,12 @@ async function loadWater(){
       let found=false;
       for(let r=1;r<data.length;r++){
         let val = parseFloat(data[r][i+2]);
-        if(val && val>0){
-          found=true;
-          break;
-        }
+        if(val && val>0){ found=true; break; }
       }
-      if(found){
-        selectedIndex=i;
-        break;
-      }
+      if(found){ selectedIndex=i; break; }
     }
     document.getElementById("waterMonth").innerText = months[selectedIndex];
+
     let values = {WTP:0,BWSSB:0,STP:0,Rain:0,RO:0,CWTP:0,CSTP:0};
     for(let i=1;i<data.length;i++){
       let name = (data[i][1]||"").toLowerCase();
@@ -454,57 +736,215 @@ async function loadWater(){
       else if(name.includes("chiller wtp")) values.CWTP = val;
       else if(name.includes("chiller stp")) values.CSTP = val;
     }
-    document.getElementById("wtp").innerText = values.WTP.toLocaleString();
+
+    document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
     document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
-    document.getElementById("stp").innerText = values.STP.toLocaleString();
-    document.getElementById("rain").innerText = values.Rain.toLocaleString();
-    document.getElementById("ro").innerText = values.RO.toLocaleString();
-    document.getElementById("cwtp").innerText = values.CWTP.toLocaleString();
-    document.getElementById("cstp").innerText = values.CSTP.toLocaleString();
-    
-    /* ✅ UPDATED PIE - 7 VALUES (NO SCHOOL) */
-    updateWaterPie([
-      values.WTP,values.BWSSB,values.STP,values.Rain,
-      values.RO,values.CWTP,values.CSTP
-    ]);
+    document.getElementById("stp").innerText   = values.STP.toLocaleString();
+    document.getElementById("rain").innerText  = values.Rain.toLocaleString();
+    document.getElementById("ro").innerText    = values.RO.toLocaleString();
+    document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
+    document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
+
+    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.Rain,values.RO,values.CWTP,values.CSTP]);
   }catch(e){}
 }
 
-let charts={};
-function drawChart(id,type,labels,data){
-  if(charts[id]) charts[id].destroy();
-  charts[id]=new Chart(document.getElementById(id),{
-    type:type,
-    data:{labels:labels,datasets:[{data:data,backgroundColor:"#1e3c72"}]},
-    options:{responsive:true,maintainAspectRatio:false}
+/* ============ ✅ SLIDE 4 - LOGIC (6 ITEMS + RO 3D) ============ */
+let charts4 = {};
+
+const chartColors = {
+  wtp:   { bg:"rgba(30,60,114,0.7)",  border:"#1e3c72" },
+  bwssb: { bg:"rgba(33,150,243,0.7)", border:"#2196f3" },
+  stp:   { bg:"rgba(76,175,80,0.7)",  border:"#4caf50" },
+  rain:  { bg:"rgba(0,188,212,0.7)",  border:"#00bcd4" },
+  cwtp:  { bg:"rgba(255,152,0,0.7)",  border:"#ff9800" },
+  cstp:  { bg:"rgba(156,39,176,0.7)", border:"#9c27b0" },
+  pie:   ["#1e3c72", "#2196f3", "#4caf50", "#00bcd4", "#ff9800", "#9c27b0"]
+};
+
+/* Generic Chart Drawer */
+function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
+  if(charts4[id]) charts4[id].destroy();
+  let c = chartColors[colorKey];
+  
+  let config = {
+    type: type, 
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: c.bg,
+        borderColor: c.border,
+        borderWidth: is3D ? 4 : 1, // 3D Effect
+        borderRadius: 4,
+        tension: 0.3,
+        fill: type === 'line'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      elements: is3D ? { bar: { borderColor: 'black' } } : {}, // 3D Border
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+        y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(0,0,0,0.05)" }, beginAtZero: true }
+      }
+    }
+  };
+  
+  charts4[id] = new Chart(document.getElementById(id), config);
+}
+
+/* Doughnut Chart */
+function drawDoughnut(id, dataValues){
+  if(charts4[id]) charts4[id].destroy();
+  
+  let nonZeroIndices = dataValues.map((val, idx) => val > 0 ? idx : -1).filter(idx => idx !== -1);
+  let filteredData = nonZeroIndices.map(i => dataValues[i]);
+  let filteredLabels = ["WTP","BWSSB","STP","Rain","CWTP","CSTP"].filter((_, i) => dataValues[i] > 0);
+  let filteredColors = chartColors.pie.filter((_, i) => dataValues[i] > 0);
+
+  charts4[id] = new Chart(document.getElementById(id),{
+    type:"doughnut",
+    data:{
+      labels: filteredLabels,
+      datasets:[{
+        data: filteredData,
+        backgroundColor: filteredColors,
+        borderWidth:1
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ position:'right', labels:{ boxWidth:10, font:{ size:10 } } },
+        tooltip: {
+           callbacks: {
+             label: function(context) {
+               let label = context.label || '';
+               if (label) { label += ': '; }
+               let value = context.raw;
+               let total = context.chart._metasets[context.datasetIndex].total;
+               let percentage = Math.round((value / total) * 100) + '%';
+               return label + value + ' KLD (' + percentage + ')';
+             }
+           }
+        }
+      }
+    }
   });
 }
 
-async function loadWaterCharts(){
+async function loadWaterDashboard(){
   try{
     let data = await csv(waterSheet);
     data = data.filter(r=>r.length>2);
-    let header = data[1] || data[0];
-    let months = header.slice(2).map(m=>(m||"").replace("'"," "));
+    let header = data.find(r => r.join(" ").includes("Apr'25"));
+    if(!header) return;
+
+    let months = header.slice(2).map(m=>(m||"").replace("'",""));
+    
+    /* Find selected month index */
+    let selectedIndex = months.length - 1;
+    for(let i=months.length-1;i>=0;i--){
+      let found=false;
+      for(let r=1;r<data.length;r++){
+        let val = parseFloat(data[r][i+2]);
+        if(val && val>0){ found=true; break; }
+      }
+      if(found){ selectedIndex=i; break; }
+    }
+
+    let selMonth = months[selectedIndex];
+    document.getElementById("s4Month").innerText = selMonth;
+
+    /* Helper */
     function findRow(key){
       return data.find(r=>(r[1]||"").toLowerCase().trim()===key.toLowerCase());
     }
     function getValues(row){
       if(!row) return [];
-      return row.slice(2).map(v=>{
-        let n=parseFloat(v);
-        return isNaN(n)?0:n;
-      });
+      return row.slice(2).map(v=>{ let n=parseFloat(v); return isNaN(n)?0:n; });
     }
-    drawChart("wtpChart","bar",months,getValues(findRow("WTP READING")));
-    drawChart("bwssbChart","line",months,getValues(findRow("BWSSB")));
-    drawChart("stpChart","line",months,getValues(findRow("STP Treated")));
-    drawChart("rainChart","pie",months,getValues(findRow("Rain Water")));
-    drawChart("cwtpChart","doughnut",months,getValues(findRow("Chiller WTP")));
-    drawChart("cstpChart","polarArea",months,getValues(findRow("Chiller STP")));
-  }catch(e){}
+    function getLatest(row){
+      let vals = getValues(row);
+      return vals[selectedIndex] || 0;
+    }
+
+    /* KPI VALUES (6 ITEMS) */
+    let v = {
+      WTP:   getLatest(findRow("WTP READING")),
+      BWSSB: getLatest(findRow("BWSSB")),
+      STP:   getLatest(findRow("STP Treated")),
+      Rain:  getLatest(findRow("Rain Water")),
+      RO:    getLatest(findRow("RO")),
+      CWTP:  getLatest(findRow("Chiller WTP"))
+    };
+
+    /* Animate KPI numbers */
+    animateValue("s4_wtp",   v.WTP);
+    animateValue("s4_bwssb", v.BWSSB);
+    animateValue("s4_stp",   v.STP);
+    animateValue("s4_rain",  v.Rain);
+    animateValue("s4_ro",    v.RO);
+    animateValue("s4_cwtp",  v.CWTP);
+
+    /* SUMMARY CARDS (TOTAL ONLY) */
+    let total    = v.WTP + v.BWSSB + v.STP + v.Rain + v.RO + v.CWTP;
+    
+    animateValue("s4_total", total);
+
+    /* ✅ DRAW 7 CHARTS ✅ */
+    
+    // 1. TOTAL SOURCES GROUP (Doughnut)
+    let pieData = [v.WTP, v.BWSSB, v.STP, v.Rain, v.CWTP];
+    drawDoughnut("chart_total", pieData);
+
+    // 2. WTP Trend (Bar)
+    drawTrendChart("chart_wtp",   months, getValues(findRow("WTP READING")),   "bar", "wtp");
+    
+    // 3. BWSSB Trend (Line)
+    drawTrendChart("chart_bwssb", months, getValues(findRow("BWSSB")),         "line", "bwssb");
+    
+    // 4. STP Trend (Bar)
+    drawTrendChart("chart_stp",   months, getValues(findRow("STP Treated")),   "bar", "stp");
+    
+    // 5. Rain Trend (Line)
+    drawTrendChart("chart_rain",  months, getValues(findRow("Rain Water")),    "line", "rain");
+    
+    // 6. CWTP Trend (Bar)
+    drawTrendChart("chart_cwtp",  months, getValues(findRow("Chiller WTP")),   "bar", "cwtp");
+    
+    // 7. RO Trend (3D BAR - SPECIFIC REQUEST)
+    drawTrendChart("chart_ro", months, getValues(findRow("RO")),   "bar", "rain", true);
+
+  }catch(e){ console.log("Water Dashboard Error:", e); }
 }
 
+/* ============ ANIMATE NUMBER ============ */
+function animateValue(elementId, target){
+  let el = document.getElementById(elementId);
+  if(!el) return;
+  let start = 0;
+  let duration = 1200;
+  let startTime = null;
+
+  function step(timestamp){
+    if(!startTime) startTime = timestamp;
+    let progress = Math.min((timestamp - startTime) / duration, 1);
+    /* Ease out cubic */
+    let eased = 1 - Math.pow(1 - progress, 3);
+    let current = Math.floor(eased * target);
+    el.innerText = current.toLocaleString();
+    if(progress < 1) requestAnimationFrame(step);
+    else el.innerText = target.toLocaleString();
+  }
+  requestAnimationFrame(step);
+}
+
+/* ============ INIT ============ */
 async function init(){
   show(0);
   startSlides();
@@ -512,15 +952,17 @@ async function init(){
   loadManhoursWorked();
   loadCompliance();
   loadWater();
-  loadWaterCharts();
+  loadWaterDashboard();
 }
 
 init();
-setInterval(loadStats,30000);
-setInterval(loadManhoursWorked,60000);
-setInterval(loadCompliance,60000);
-setInterval(loadWater,60000);
-setInterval(loadWaterCharts,30000);
+
+/* Auto refresh intervals */
+setInterval(loadStats,           30000);
+setInterval(loadManhoursWorked,  60000);
+setInterval(loadCompliance,      60000);
+setInterval(loadWater,           60000);
+setInterval(loadWaterDashboard,  60000);
 
 </script>
 </body>
