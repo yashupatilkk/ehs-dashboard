@@ -5,6 +5,7 @@
 <title>EHS Dashboard FINAL AUTO FIX</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -225,14 +226,116 @@ th {
   font-family: Arial, sans-serif;
 }
 
+/* ✅ FIXED SLIDE 5 - COMPACT VERSION */
+.s5-container {
+  max-width: 1400px;
+  margin: 10px auto;
+  background: white;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 140px); /* ✅ FIXED HEIGHT */
+  min-height: 700px;
+  max-height: 750px;
+}
+
+.s5-header {
+  background: linear-gradient(135deg, #2c3e50, #3498db);
+  color: white;
+  padding: 20px 30px; /* ✅ REDUCED PADDING */
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.s5-header h1 {
+  font-size: 1.6em; /* ✅ REDUCED FONT SIZE */
+  margin: 0;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+
+.s5-content { 
+  padding: 20px; /* ✅ REDUCED PADDING */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.s5-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* ✅ SLIGHTLY REDUCED */
+  gap: 15px;
+  margin-bottom: 20px; /* ✅ REDUCED MARGIN */
+}
+
+.s5-metric {
+  color: white;
+  padding: 20px; /* ✅ REDUCED PADDING */
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.s5-metric-value { font-size: 2em; font-weight: bold; margin-bottom: 8px; } /* ✅ REDUCED */
+.s5-metric-label { font-size: 1em; opacity: 0.95; }
+.s5-metric small { font-size: 0.85em; opacity: 0.9; display: block; margin-top: 4px; }
+
+.s5-charts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px; /* ✅ REDUCED GAP */
+  flex: 1;
+  min-height: 0;
+}
+
+.s5-chart-box {
+  background: #f8f9fa;
+  padding: 20px; /* ✅ REDUCED PADDING */
+  border-radius: 12px;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.s5-chart-box h3 {
+  margin: 0 0 15px 0; /* ✅ REDUCED MARGIN */
+  font-size: 1.1em; /* ✅ REDUCED FONT */
+  color: #2c3e50;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.s5-chart-box canvas {
+  flex: 1;
+  max-height: 280px !important; /* ✅ REDUCED CHART HEIGHT */
+}
+
+/* ✅ FIXED SLIDE 5 FOOTER - COMPACT */
+.s5-footer {
+  text-align: center;
+  padding: 12px 20px; /* ✅ REDUCED PADDING */
+  background: linear-gradient(135deg, #2c3e50, #34495e);
+  color: white;
+  font-weight: bold;
+  font-size: 13px;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  border-top: 2px solid #3498db;
+}
+
 /* CONTROLS */
 .controls { 
   text-align:center; 
-  margin:15px; 
+  margin:10px; 
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 
 button {
@@ -297,6 +400,8 @@ button:hover { transform:scale(1.05); }
   .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
   .s4-kpi-row { grid-template-columns: repeat(3, 1fr); }
   .s4-chart-card canvas { height: 180px !important; }
+  .s5-charts { grid-template-columns: 1fr; }
+  .s5-header h1 { font-size: 1.4em; }
 }
 
 @media (max-width: 600px) {
@@ -304,6 +409,11 @@ button:hover { transform:scale(1.05); }
   .s4-kpi-row { grid-template-columns: repeat(2, 1fr); }
   header h2 { font-size: 18px; }
   .s4-chart-card canvas { height: 200px !important; }
+  .s5-metrics { grid-template-columns: 1fr; }
+  .s5-header { padding: 18px 20px; }
+  .s5-header h1 { font-size: 1.3em; }
+  .s5-content { padding: 15px; }
+  .s5-container { height: calc(100vh - 120px) !important; margin: 5px; }
 }
 </style>
 </head>
@@ -452,6 +562,51 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
+<!-- ✅ FIXED SLIDE 5 - COMPACT & FULLY CONTAINED -->
+<div class="slide">
+<div class="s5-container">
+  <div class="s5-header">
+    <h1>PRESTIGE TECHNOSTAR WATER ANALYTICS</h1>
+  </div>
+
+  <div class="s5-content">
+    <div class="s5-metrics">
+      <div class="s5-metric" style="background:#2980b9;">
+        <div class="s5-metric-value" id="rainAvg">0%</div>
+        <div class="s5-metric-label">Rain Water Avg</div>
+        <div id="rainPeak" style="font-size:0.85em;">Peak: 0%</div>
+      </div>
+
+      <div class="s5-metric" style="background:#3498db;">
+        <div class="s5-metric-value" id="footfallTotal">0</div>
+        <div class="s5-metric-label">Total Footfall</div>
+        <div id="growth" style="font-size:0.85em;">Growth: 0%</div>
+      </div>
+
+      <div class="s5-metric" style="background:#1f618d;">
+        <div class="s5-metric-value" id="waterAvg">0L</div>
+        <div class="s5-metric-label">Avg Per Person</div>
+        <div id="waterMin" style="font-size:0.85em;">Min: 0L</div>
+      </div>
+    </div>
+
+    <div class="s5-charts">
+      <div class="s5-chart-box">
+        <h3>👥 Campus Footfall</h3>
+        <canvas id="footfallChart"></canvas>
+      </div>
+
+      <div class="s5-chart-box">
+        <h3>💧 Water Usage</h3>
+        <canvas id="waterChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="s5-footer" id="status">✅ Updated till: Mar'26</div>
+</div>
+</div>
+
 <!-- CONTROLS -->
 <div class="controls">
   <button onclick="prevSlide()">⬅ Prev</button>
@@ -543,7 +698,7 @@ const sheets = {
 };
 
 /* ============ CHARTS ============ */
-let pie, waterPie, charts4 = {};
+let pie, waterPie, charts4 = {}, charts5 = {};
 
 function updatePie(a,b){
   if(!pie){
@@ -934,6 +1089,132 @@ async function loadWaterDashboard(){
   }
 }
 
+/* ============ SLIDE 5 - CAMPUS WATER ANALYTICS (COMPACT & FIXED) ============ */
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=369378373";
+
+async function loadCampusAnalytics() {
+  Papa.parse(CSV_URL, {
+    download: true,
+    complete: function(res) {
+      const data = res.data;
+      const header = data[0];
+
+      // AUTO DETECT RAIN ROW
+      let rainRow = null;
+      for(let row of data){
+        let vals = row.slice(3).map(v=>{
+          if(!v) return 0;
+          let n = parseFloat(v.toString().replace("%",""));
+          return isNaN(n)?0:n;
+        });
+        let valid = vals.filter(v=>v>0 && v<=100);
+        if(valid.length>=3){ rainRow=row; break; }
+      }
+
+      // FIND ROWS
+      const footRow = data.find(r => r[1]?.toLowerCase().includes("foot"));
+      const waterRow = data.find(r => r[1]?.toLowerCase().includes("person"));
+
+      if(!rainRow || !footRow || !waterRow){
+        document.getElementById("status").innerText="❌ Data format error";
+        return;
+      }
+
+      // DATA
+      let months=[],footfall=[],water=[],rain=[];
+
+      for(let i=3;i<header.length;i++){
+        let m=header[i];
+        let f=parseInt(footRow[i])||0;
+        let w=parseFloat(waterRow[i])||0;
+
+        let raw=rainRow[i];
+        let r=raw?parseFloat(raw.toString().replace("%","")):0;
+
+        if(m && m.includes("'") && (f>0||w>0||r>0)){
+          months.push(m);
+          footfall.push(f);
+          water.push(w);
+          rain.push(r||0);
+        }
+      }
+
+      // METRICS
+      document.getElementById("footfallTotal").innerText =
+        footfall.reduce((a,b)=>a+b,0).toLocaleString();
+
+      let growth=0;
+      if(footfall.length>1){
+        let last=footfall.at(-1);
+        let prev=footfall.at(-2);
+        growth=prev?(((last-prev)/prev)*100).toFixed(1):0;
+      }
+      document.getElementById("growth").innerText="Growth: "+growth+"%";
+
+      let validWater=water.filter(v=>v>0);
+      let avg=validWater.length?(validWater.reduce((a,b)=>a+b,0)/validWater.length).toFixed(1):0;
+      let min=validWater.length?Math.min(...validWater):0;
+
+      document.getElementById("waterAvg").innerText=avg+"L";
+      document.getElementById("waterMin").innerText="Min: "+min+"L";
+
+      let validRain=rain.filter(v=>v>0 && v<=100);
+      let rainAvg=validRain.length?(validRain.reduce((a,b)=>a+b,0)/validRain.length).toFixed(1):0;
+      let rainPeak=validRain.length?Math.max(...validRain):0;
+
+      document.getElementById("rainAvg").innerText=rainAvg+"%";
+      document.getElementById("rainPeak").innerText="Peak: "+rainPeak+"%";
+
+      // DESTROY OLD CHARTS
+      if(charts5.f) charts5.f.destroy();
+      if(charts5.w) charts5.w.destroy();
+
+      // ✅ BAR WITH CURVED TOP
+      charts5.f = new Chart(document.getElementById("footfallChart"),{
+        type:"bar",
+        data:{
+          labels:months,
+          datasets:[{
+            data:footfall,
+            backgroundColor:"#3498db",
+            borderRadius:12,
+            borderSkipped:false
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      // ✅ WATER CURVE
+      charts5.w = new Chart(document.getElementById("waterChart"),{
+        type:"line",
+        data:{
+          labels:months,
+          datasets:[{
+            data:water,
+            borderColor:"#1f618d",
+            backgroundColor:"rgba(31,97,141,0.2)",
+            fill:true,
+            tension:0.4,
+            pointRadius:4
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      document.getElementById("status").innerText =
+        "✅ Updated till: " + (months.at(-1) || "Mar'26");
+    }
+  });
+}
+
 function animateValue(elementId, target){
   let el = document.getElementById(elementId);
   if(!el) return;
@@ -961,7 +1242,8 @@ async function init(){
     loadManhoursWorked(),
     loadCompliance(),
     loadWater(),
-    loadWaterDashboard()
+    loadWaterDashboard(),
+    loadCampusAnalytics()
   ]);
 }
 
@@ -973,6 +1255,7 @@ setInterval(loadManhoursWorked, 60000);
 setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboard, 60000);
+setInterval(loadCampusAnalytics, 10000);
 
 </script>
 </body>
