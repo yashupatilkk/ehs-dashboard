@@ -25,6 +25,26 @@ header h2 { font-size:22px; letter-spacing:1px; }
 .slide { display:none; }
 .active { display:block; }
 
+/* SLIDE 1 */
+.container {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:20px;
+}
+
+.box {
+  background:black;
+  color:white;
+  padding:20px;
+  text-align:center;
+  border-radius:8px;
+}
+
+.value { font-size:35px; font-weight:bold; }
+
+.chartBox { width:300px; margin:auto; }
+
 /* SLIDE 2 */
 table {
   width:95%;
@@ -66,18 +86,6 @@ th {
   justify-content: center;
   align-items: center;
 }
-
-.box {
-  background:black;
-  color:white;
-  padding:20px;
-  text-align:center;
-  border-radius:8px;
-}
-
-.value { font-size:35px; font-weight:bold; }
-
-.chartBox { width:300px; margin:auto; }
 
 /* SLIDE 4 - HSE DASHBOARD STYLE */
 .s4-wrapper {
@@ -419,8 +427,20 @@ button:hover { transform:scale(1.05); }
 
 <div class="slide-indicator" id="dots"></div>
 
-<!-- SLIDE 2 (NOW SLIDE 1) - Compliance -->
+<!-- SLIDE 1 (FIXED APRIL BREAKAGE) -->
 <div class="slide active">
+<div class="container">
+<div class="box">Manhours (<span id="mMonth"></span>)<br><div class="value" id="manhours">0</div></div>
+<div class="box">Near Miss (<span id="month1"></span>)<br><div class="value" id="near">0</div></div>
+<div class="box">Incident (<span id="month2"></span>)<br><div class="value" id="incident">0</div></div>
+</div>
+<div class="chartBox">
+<canvas id="ehsPie"></canvas>
+</div>
+</div>
+
+<!-- SLIDE 2 (KEEP ORIGINAL) -->
+<div class="slide">
 <h3 style="text-align:center;">Compliance (≤ 90 Days Only)</h3>
 <table>
 <thead>
@@ -430,7 +450,7 @@ button:hover { transform:scale(1.05); }
 </table>
 </div>
 
-<!-- SLIDE 3 (NOW SLIDE 2) - Water Summary -->
+<!-- SLIDE 3 (KEEP ORIGINAL) -->
 <div class="slide">
 <h3 style="text-align:center;">
 Water Summary - <span id="waterMonth"></span>
@@ -453,7 +473,7 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
-<!-- SLIDE 4 (NOW SLIDE 3) - FIXED RO + FULL ASCII CHART -->
+<!-- SLIDE 4 - FIXED RO + FULL ASCII CHART -->
 <div class="slide">
 <div class="s4-wrapper">
 
@@ -542,7 +562,7 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
-<!-- ✅ FIXED SLIDE 5 (NOW SLIDE 4) - COMPACT & FULLY CONTAINED -->
+<!-- ✅ FIXED SLIDE 5 - COMPACT & FULLY CONTAINED -->
 <div class="slide">
 <div class="s5-container">
   <div class="s5-header">
@@ -670,12 +690,26 @@ async function csv(url){
 }
 
 const sheets = {
+  near: "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779",
+  incident: "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433",
   comp: "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223",
+  manhours: "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145",
   water: "https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=1876581317"
 };
 
 /* ============ CHARTS ============ */
-let waterPie, charts4 = {}, charts5 = {};
+let pie, waterPie, charts4 = {}, charts5 = {};
+
+function updatePie(a,b){
+  if(!pie){
+    pie = new Chart(document.getElementById("ehsPie"),{
+      type:"pie", data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b],backgroundColor:["#ff9800","#f44336"]}]},
+      options:{responsive:true}
+    });
+  } else {
+    pie.data.datasets[0].data=[a,b]; pie.update();
+  }
+}
 
 function updateWaterPie(values){
   if(!waterPie){
@@ -769,7 +803,93 @@ function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, 
   container.innerHTML = html;
 }
 
+/* ============ FIXED MANHOURS - APRIL BREAKAGE SOLVED ============ */
+async function loadManhoursWorked(){
+  try{
+    let data = await csv(sheets.manhours);
+    
+    let headerRowIndex = -1;
+    let monthName = "";
+    
+    monthName = new Date().toLocaleString('en-IN',{month:'long'}).toLowerCase();
+    headerRowIndex = data.findIndex(r => {
+      let rowText = r.join(" ").toLowerCase();
+      return rowText.includes(monthName);
+    });
+    
+    if(headerRowIndex === -1){
+      headerRowIndex = data.findIndex(r => {
+        let rowText = r.join(" ").toLowerCase();
+        return rowText.includes("april") || rowText.includes("apr");
+      });
+      monthName = "April";
+    }
+    
+    if(headerRowIndex === -1) {
+      document.getElementById("mMonth").innerText = "No Data";
+      return;
+    }
+    
+    let header = data[headerRowIndex];
+    document.getElementById("mMonth").innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+    
+    let value = 0;
+    for(let i=headerRowIndex+1; i<data.length; i++){
+      let name = (data[i][0] || "").toLowerCase();
+      if(name.includes("manhours") || name.includes("man hours") || name.includes("mh")){
+        let monthIndex = -1;
+        for(let j=0; j<header.length; j++){
+          let cell = (header[j] || "").toLowerCase();
+          if(cell.includes(monthName) || (monthName === "april" && (cell.includes("apr") || cell.includes("4")))){
+            monthIndex = j;
+            break;
+          }
+        }
+        if(monthIndex !== -1){
+          value = parseFloat((data[i][monthIndex] || "0").toString().replace(/,/g,'')) || 0;
+          break;
+        }
+      }
+    }
+    
+    document.getElementById("manhours").innerText = value.toLocaleString();
+  }catch(e){
+    console.error("Manhours Error:", e);
+    document.getElementById("mMonth").innerText = "Error";
+  }
+}
+
 /* ============ OTHER LOAD FUNCTIONS ============ */
+async function loadStats(){
+  try{
+    let near = await csv(sheets.near);
+    let inc  = await csv(sheets.incident);
+    let now  = new Date();
+    function findDate(row){
+      for(let i=0;i<row.length;i++){
+        let d=new Date(row[i]);
+        if(!isNaN(d)) return d;
+      }
+      return null;
+    }
+    function count(data){
+      let c=0;
+      for(let i=1;i<data.length;i++){
+        let d=findDate(data[i]);
+        if(!d) continue;
+        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;
+      }
+      return c;
+    }
+    let nc = count(near), ic = count(inc);
+    document.getElementById("near").innerText = nc;
+    document.getElementById("month1").innerText = new Date().toLocaleString('en-IN',{month:'short'});
+    document.getElementById("incident").innerText = ic;
+    document.getElementById("month2").innerText = new Date().toLocaleString('en-IN',{month:'short'});
+    updatePie(nc, ic);
+  }catch(e){}
+}
+
 async function loadCompliance(){
   try{
     let data = await csv(sheets.comp);
@@ -1118,6 +1238,8 @@ async function init(){
   show(0);
   startSlides();
   await Promise.all([
+    loadStats(),
+    loadManhoursWorked(),
     loadCompliance(),
     loadWater(),
     loadWaterDashboard(),
@@ -1128,6 +1250,8 @@ async function init(){
 init();
 
 /* AUTO REFRESH */
+setInterval(loadStats, 30000);
+setInterval(loadManhoursWorked, 60000);
 setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboard, 60000);
