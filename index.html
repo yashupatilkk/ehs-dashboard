@@ -186,7 +186,7 @@ th {
   height:200px !important;
 }
 
-/* ✅ FIXED ASCII CHART - FULL HEIGHT UTILIZATION */
+/* FIXED ASCII CHART - FULL HEIGHT UTILIZATION */
 .total-kld-chart {
   background: #1a1a1a;
   color: white;
@@ -226,7 +226,7 @@ th {
   font-family: Arial, sans-serif;
 }
 
-/* ✅ FIXED SLIDE 5 - COMPACT VERSION */
+/* FIXED SLIDE 5 - COMPACT VERSION */
 .s5-container {
   max-width: 1400px;
   margin: 10px auto;
@@ -236,7 +236,7 @@ th {
   box-shadow: 0 8px 25px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 140px); /* ✅ FIXED HEIGHT */
+  height: calc(100vh - 140px); /* FIXED HEIGHT */
   min-height: 700px;
   max-height: 750px;
 }
@@ -244,20 +244,20 @@ th {
 .s5-header {
   background: linear-gradient(135deg, #2c3e50, #3498db);
   color: white;
-  padding: 20px 30px; /* ✅ REDUCED PADDING */
+  padding: 20px 30px; /* REDUCED PADDING */
   text-align: center;
   flex-shrink: 0;
 }
 
 .s5-header h1 {
-  font-size: 1.6em; /* ✅ REDUCED FONT SIZE */
+  font-size: 1.6em; /* REDUCED FONT SIZE */
   margin: 0;
   letter-spacing: 0.5px;
   font-weight: bold;
 }
 
 .s5-content { 
-  padding: 20px; /* ✅ REDUCED PADDING */
+  padding: 20px; /* REDUCED PADDING */
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -266,34 +266,34 @@ th {
 
 .s5-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* ✅ SLIGHTLY REDUCED */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* SLIGHTLY REDUCED */
   gap: 15px;
-  margin-bottom: 20px; /* ✅ REDUCED MARGIN */
+  margin-bottom: 20px; /* REDUCED MARGIN */
 }
 
 .s5-metric {
   color: white;
-  padding: 20px; /* ✅ REDUCED PADDING */
+  padding: 20px; /* REDUCED PADDING */
   border-radius: 12px;
   text-align: center;
   box-shadow: 0 6px 15px rgba(0,0,0,0.2);
 }
 
-.s5-metric-value { font-size: 2em; font-weight: bold; margin-bottom: 8px; } /* ✅ REDUCED */
+.s5-metric-value { font-size: 2em; font-weight: bold; margin-bottom: 8px; } /* REDUCED */
 .s5-metric-label { font-size: 1em; opacity: 0.95; }
 .s5-metric small { font-size: 0.85em; opacity: 0.9; display: block; margin-top: 4px; }
 
 .s5-charts {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px; /* ✅ REDUCED GAP */
+  gap: 15px; /* REDUCED GAP */
   flex: 1;
   min-height: 0;
 }
 
 .s5-chart-box {
   background: #f8f9fa;
-  padding: 20px; /* ✅ REDUCED PADDING */
+  padding: 20px; /* REDUCED PADDING */
   border-radius: 12px;
   height: 100%;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
@@ -302,8 +302,8 @@ th {
 }
 
 .s5-chart-box h3 {
-  margin: 0 0 15px 0; /* ✅ REDUCED MARGIN */
-  font-size: 1.1em; /* ✅ REDUCED FONT */
+  margin: 0 0 15px 0; /* REDUCED MARGIN */
+  font-size: 1.1em; /* REDUCED FONT */
   color: #2c3e50;
   text-align: center;
   flex-shrink: 0;
@@ -311,13 +311,13 @@ th {
 
 .s5-chart-box canvas {
   flex: 1;
-  max-height: 280px !important; /* ✅ REDUCED CHART HEIGHT */
+  max-height: 280px !important; /* REDUCED CHART HEIGHT */
 }
 
-/* ✅ FIXED SLIDE 5 FOOTER - COMPACT */
+/* FIXED SLIDE 5 FOOTER - COMPACT */
 .s5-footer {
   text-align: center;
-  padding: 12px 20px; /* ✅ REDUCED PADDING */
+  padding: 12px 20px; /* REDUCED PADDING */
   background: linear-gradient(135deg, #2c3e50, #34495e);
   color: white;
   font-weight: bold;
@@ -327,6 +327,110 @@ th {
   flex-shrink: 0;
   border-top: 2px solid #3498db;
 }
+
+/* ---------------------------------------------------------------- */
+/* SLIDE 6 (MARR DASHBOARD) - NAMESPACED TO AVOID CONFLICTS */
+/* ---------------------------------------------------------------- */
+.slide:nth-child(6) {
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    background: linear-gradient(135deg,#eef2ff,#f8fafc);
+}
+
+.slide:nth-child(6).active {
+    display: flex;
+}
+
+.s6-header{
+    background:linear-gradient(135deg,#1d4ed8,#2563eb);
+    color:white;
+    text-align:center;
+    padding:10px;
+    font-size:16px;
+    font-weight:600;
+    border-radius: 8px 8px 0 0;
+    margin: 0 10px;
+}
+
+.s6-summary{
+    display:flex;
+    justify-content:space-around;
+    padding:10px;
+    gap:10px;
+    margin: 0 10px;
+}
+
+.s6-summary div{
+    background:white;
+    padding:10px 15px;
+    border-radius:10px;
+    box-shadow:0 3px 10px rgba(0,0,0,0.08);
+    text-align:center;
+    flex: 1;
+}
+
+.s6-summary b{
+    font-size:18px;
+    color:#1d4ed8;
+}
+
+.s6-dashboard{
+    flex: 1;
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    grid-template-rows:1fr 1fr;
+    gap:10px;
+    padding:10px;
+    margin-bottom: 70px; /* Space for footer controls */
+}
+
+.s6-card{
+    background:white;
+    border-radius:14px;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    overflow:hidden;
+    border: 1px solid #e0e7ff;
+}
+
+.s6-card h4{
+    font-size:14px;
+    margin-bottom:10px;
+    color: #333;
+}
+
+.s6-chart-box{
+    flex:1;
+    width:100%;
+    height:100%;
+    position: relative;
+}
+
+.s6-modal{
+    position:fixed;
+    top:0;left:0;
+    width:100%;
+    height:100%;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,0.85);
+    z-index: 10000;
+}
+
+.s6-modal-content{
+    width:90%;
+    height:85%;
+    background:white;
+    border-radius:12px;
+    padding:15px;
+}
+/* ---------------------------------------------------------------- */
 
 /* CONTROLS */
 .controls { 
@@ -402,6 +506,7 @@ button:hover { transform:scale(1.05); }
   .s4-chart-card canvas { height: 180px !important; }
   .s5-charts { grid-template-columns: 1fr; }
   .s5-header h1 { font-size: 1.4em; }
+  .s6-dashboard { grid-template-columns: 1fr; grid-template-rows: auto; }
 }
 
 @media (max-width: 600px) {
@@ -526,7 +631,7 @@ Water Summary - <span id="waterMonth"></span>
 
   <div class="s4-charts-grid">
     
-    <!-- ✅ FIXED FULL 5-SOURCE ASCII CHART -->
+    <!-- FIXED FULL 5-SOURCE ASCII CHART -->
     <div class="s4-chart-card">
       <div class="chart-label">TOTAL KLD (Apr'25-Apr'26)</div>
       <div id="totalKldChart" class="total-kld-chart">
@@ -562,7 +667,7 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 </div>
 
-<!-- ✅ FIXED SLIDE 5 - COMPACT & FULLY CONTAINED -->
+<!-- FIXED SLIDE 5 - COMPACT & FULLY CONTAINED -->
 <div class="slide">
 <div class="s5-container">
   <div class="s5-header">
@@ -605,6 +710,25 @@ Water Summary - <span id="waterMonth"></span>
 
   <div class="s5-footer" id="status">✅ Updated till: Mar'26</div>
 </div>
+</div>
+
+<!-- SLIDE 6 (MARR DASHBOARD INTEGRATION) -->
+<div class="slide">
+    <div class="s6-header">📊 Energy Utilization Dashboard</div>
+
+    <div class="s6-summary">
+        <div><b id="s6_totalPower">0</b><br><small>Power</small></div>
+        <div><b id="s6_totalDG">0</b><br><small>DG Units</small></div>
+        <div><b id="s6_currentDGPower">0</b><br><small>Fuel</small></div>
+    </div>
+
+    <div class="s6-dashboard" id="s6_charts"></div>
+
+    <div class="s6-modal" id="s6_modal">
+        <div class="s6-modal-content">
+            <canvas id="s6_modalChart"></canvas>
+        </div>
+    </div>
 </div>
 
 <!-- CONTROLS -->
@@ -761,20 +885,20 @@ function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
   });
 }
 
-/* ✅ FIXED ASCII CHART - FULL 5 SOURCES + MAX SPACE UTILIZATION */
+/* FIXED ASCII CHART - FULL 5 SOURCES + MAX SPACE UTILIZATION */
 function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period="Apr'25-Apr'26") {
   const container = document.getElementById("asciiBars");
   
   const values = [bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal];
   const maxValue = Math.max(...values.filter(v => v > 0 || v === 1200), 1000);
-  const maxBarLength = 28; // ✅ INCREASED for full width
+  const maxBarLength = 28; // INCREASED for full width
   
   const sources = [
     { name: "BWSSB", value: bwssbTotal || 0, color: "#2196f3" },
     { name: "Rain", value: rainTotal || 0, color: "#00bcd4" },
     { name: "STP", value: stpTotal || 0, color: "#4caf50" },
     { name: "CWTP", value: cwtpTotal || 0, color: "#ff9800" },
-    { name: "RO", value: roTotal || 1200, color: "#9c27b0" } // ✅ FORCE RO
+    { name: "RO", value: roTotal || 1200, color: "#9c27b0" } // FORCE RO
   ];
   
   let html = '';
@@ -949,7 +1073,7 @@ async function loadWater(){
   }catch(e){}
 }
 
-/* ✅ SUPER FIXED - FULL 5 SOURCES + MAX VISIBILITY */
+/* SUPER FIXED - FULL 5 SOURCES + MAX VISIBILITY */
 async function loadWaterDashboard(){
   try{
     let data = await csv(sheets.water);
@@ -1020,7 +1144,7 @@ async function loadWaterDashboard(){
       return vals[selectedIndex] || 0;
     }
 
-    /* ✅ ULTRA ENHANCED - FORCE ALL 5 */
+    /* ULTRA ENHANCED - FORCE ALL 5 */
     let bwssbRow = findExactRow(["BWSSB", "BWSSB Reading"]);
     let rainRow = findExactRow(["Rain Water", "Rain", "Rainwater"]);
     let stpRow = findExactRow(["STP Treated", "STP", "STP Reading"]);
@@ -1041,10 +1165,10 @@ async function loadWaterDashboard(){
     animateValue("s4_cwtp", currentValues.CWTP);
     animateValue("s4_ro", currentValues.RO);
 
-    /* ✅ FULL YEARLY TOTALS - 12 MONTHS */
+    /* FULL YEARLY TOTALS - 12 MONTHS */
     let startIdx = Math.max(0, months.length - 12);
     function getYearlyTotal(row){
-      if(!row) return 45000; // ✅ FORCE realistic defaults
+      if(!row) return 45000; // FORCE realistic defaults
       let vals = getValues(row);
       let total = 0;
       for(let j=startIdx; j<vals.length && j < vals.length; j++){
@@ -1061,13 +1185,13 @@ async function loadWaterDashboard(){
       RO: getYearlyTotal(roRow)
     };
 
-    /* ✅ DRAW FULL 5-BAR ASCII CHART */
+    /* DRAW FULL 5-BAR ASCII CHART */
     drawAsciiTotalKld(
       yearlyTotals.BWSSB, yearlyTotals.Rain, yearlyTotals.STP, 
       yearlyTotals.CWTP, yearlyTotals.RO
     );
 
-    /* ✅ DEBUG STATUS */
+    /* DEBUG STATUS */
     document.getElementById("debugInfo").innerHTML = `
       BWSSB:${bwssbRow?'✅':'⚡'} | Rain:${rainRow?'✅':'⚡'} | 
       STP:${stpRow?'✅':'⚡'} | CWTP:${cwtpRow?'✅':'⚡'} | 
@@ -1084,7 +1208,7 @@ async function loadWaterDashboard(){
 
   }catch(e){
     console.error("Water Dashboard Error:", e);
-    // ✅ FORCE SHOW 5 BARS ON ERROR
+    // FORCE SHOW 5 BARS ON ERROR
     drawAsciiTotalKld(45894, 2278, 39905, 15000, 12000);
   }
 }
@@ -1169,7 +1293,7 @@ async function loadCampusAnalytics() {
       if(charts5.f) charts5.f.destroy();
       if(charts5.w) charts5.w.destroy();
 
-      // ✅ BAR WITH CURVED TOP
+      // BAR WITH CURVED TOP
       charts5.f = new Chart(document.getElementById("footfallChart"),{
         type:"bar",
         data:{
@@ -1188,7 +1312,7 @@ async function loadCampusAnalytics() {
         }
       });
 
-      // ✅ WATER CURVE
+      // WATER CURVE
       charts5.w = new Chart(document.getElementById("waterChart"),{
         type:"line",
         data:{
@@ -1233,6 +1357,188 @@ function animateValue(elementId, target){
   requestAnimationFrame(step);
 }
 
+/* ---------------------------------------------------------------- */
+/* SLIDE 6 - MARR DASHBOARD LOGIC (NAMESPACED) */
+/* ---------------------------------------------------------------- */
+const s6_sheetURL = "https://docs.google.com/spreadsheets/d/1SiMT6wLHaSePApR-sqYnslD3_UV0KryR/export?format=csv&gid=310659683";
+
+let s6_months=[], s6_modalChart, s6_radialChart, s6_globalData = {};
+let charts6 = {};
+
+/* LOAD DATA */
+function loadMarrData(){
+Papa.parse(s6_sheetURL,{
+download:true,
+complete:function(res){
+const rows=res.data;
+const headerIndex=rows.findIndex(r=>r.includes("Apr-25"));
+s6_months=rows[headerIndex].slice(2);
+
+let section="Power";
+let g={};
+
+for(let i=headerIndex+1;i<rows.length;i++){
+let row=rows[i];
+let name=(row[0]||"").trim();
+if(!name) continue;
+
+if(row.slice(2).every(v=>v==="")){
+section=name;
+continue;
+}
+
+g[section+" - "+name]=row.slice(2).map(v=>Number(v)||0);
+}
+
+let wheelingRow=rows.find(r=>r[0]?.trim()==="Wheeling Units");
+if(wheelingRow){
+g["Power - Wheeling Units"]=wheelingRow.slice(2).map(v=>Number(v)||0);
+}
+
+s6_globalData = g;
+
+renderMarr(g);
+updateMarrKPIs(g);
+}
+});
+}
+
+/* CARD */
+function createMarrCard(title,type,datasets){
+
+datasets.forEach(d=>{
+if(type==="bar"){
+d.borderRadius=8;
+d.borderSkipped=false;
+}
+if(type==="line"){
+d.tension=0.4;
+d.pointRadius=2;
+}
+});
+
+const div=document.createElement("div");
+div.className="s6-card";
+div.innerHTML=`<h4>${title}</h4><div class="s6-chart-box"><canvas></canvas></div>`;
+document.getElementById("s6_charts").appendChild(div);
+
+const ctx = div.querySelector("canvas");
+charts6[title] = new Chart(ctx,{
+type,
+data:{labels:s6_months,datasets},
+options:{responsive:true,maintainAspectRatio:false}
+});
+
+div.onclick=()=>openMarrModal(type,datasets);
+}
+
+/* RENDER */
+function renderMarr(g){
+document.getElementById("s6_charts").innerHTML="";
+
+/* ROW 1 */
+createMarrRadial();
+
+createMarrCard("Power","line",[
+{label:"Total Power",data:g["Power - TOTAL"],borderColor:"#6366f1",borderWidth:2},
+{label:"EB Units",data:g["HVAC - EB Units"],borderColor:"#3b82f6"},
+{label:"DG",data:g["Power - DG"],borderColor:"#10b981"},
+{label:"Wheeling",data:g["Power - Wheeling Units"],borderColor:"#f59e0b"}
+]);
+
+/* ROW 2 */
+createMarrCard("Consumption","bar",[
+{label:"Tenant",data:g["Consumption - Tenant"],backgroundColor:"#3b82f6"},
+{label:"Common",data:g["Consumption - Common Area"],backgroundColor:"#10b981"},
+{label:"Chiller",data:g["Consumption - Chiller"],backgroundColor:"#f59e0b"}
+]);
+
+createMarrCard("DG Fuel","line",[
+{label:"Fuel",data:g["DG - HSD Consumption"],borderColor:"#ef4444"}
+]);
+}
+
+/* BIG POWER SUMMARY */
+function createMarrRadial(){
+
+const div=document.createElement("div");
+div.className="s6-card";
+
+div.innerHTML=`
+<h4>Power Summary</h4>
+
+<div style="display:flex;align-items:center;justify-content:center;gap:50px;width:100%;height:100%;">
+
+    <div style="width:220px;height:220px;">
+        <canvas id="s6_circleChart"></canvas>
+    </div>
+
+    <div style="font-size:16px;line-height:2;">
+        <div>⚡ Total: <b id="s6_totalText">0</b></div>
+        <div>🟢 Wheeling: <b id="s6_whText">0</b></div>
+        <div>🔴 EB Units: <b id="s6_ebText">0</b></div>
+        <div>🟣 DG: <b id="s6_dgText">0</b></div>
+        <div>🟡 Solar: <b id="s6_solarText">0</b></div>
+    </div>
+
+</div>
+`;
+
+document.getElementById("s6_charts").appendChild(div);
+
+const total = s6_globalData["Power - TOTAL"]?.slice(-1)[0] || 0;
+const wh = s6_globalData["Power - Wheeling Units"]?.slice(-1)[0] || 0;
+const eb = s6_globalData["HVAC - EB Units"]?.slice(-1)[0] || 0;
+const dg = s6_globalData["Power - DG"]?.slice(-1)[0] || 0;
+
+const solarKey = Object.keys(s6_globalData).find(k => k.toLowerCase().includes("solar"));
+const solar = s6_globalData[solarKey]?.slice(-1)[0] || 0;
+
+document.getElementById("s6_totalText").innerText = total.toLocaleString();
+document.getElementById("s6_whText").innerText = wh.toLocaleString();
+document.getElementById("s6_ebText").innerText = eb.toLocaleString();
+document.getElementById("s6_dgText").innerText = dg.toLocaleString();
+document.getElementById("s6_solarText").innerText = solar.toLocaleString();
+
+const max = Math.max(total, wh, eb, dg, solar) || 1000000;
+
+if(s6_radialChart) s6_radialChart.destroy();
+
+s6_radialChart = new Chart(document.getElementById("s6_circleChart"), {
+type:'doughnut',
+data:{datasets:[
+{data:[total,max-total],backgroundColor:['#6366f1','rgba(0,0,0,0.05)'],weight:5},
+{data:[wh,max-wh],backgroundColor:['#22c55e','rgba(0,0,0,0.05)'],weight:4},
+{data:[eb,max-eb],backgroundColor:['#ef4444','rgba(0,0,0,0.05)'],weight:3},
+{data:[dg,max-dg],backgroundColor:['#8b5cf6','rgba(0,0,0,0.05)'],weight:2},
+{data:[solar,max-solar],backgroundColor:['#f59e0b','rgba(0,0,0,0.05)'],weight:1}
+]},
+options:{cutout:'40%',plugins:{legend:false,tooltip:false}}
+});
+}
+
+/* MODAL */
+function openMarrModal(type,datasets){
+document.getElementById("s6_modal").style.display="flex";
+if(s6_modalChart) s6_modalChart.destroy();
+
+s6_modalChart=new Chart(document.getElementById("s6_modalChart"),{
+type,data:{labels:s6_months,datasets}
+});
+}
+
+document.getElementById("s6_modal").onclick=()=>{document.getElementById("s6_modal").style.display="none";};
+
+/* KPI */
+function updateMarrKPIs(g){
+const sum=a=>a.reduce((x,y)=>x+y,0);
+
+document.getElementById("s6_totalPower").innerText=(sum(g["Power - TOTAL"]||[])/1000000).toFixed(2)+"M";
+document.getElementById("s6_totalDG").innerText=sum(g["DG Units - Total DG"]||[]);
+document.getElementById("s6_currentDGPower").innerText=((g["Power - DG"]?.slice(-1)[0]||0)/1000).toFixed(1)+"K";
+}
+/* ---------------------------------------------------------------- */
+
 /* ============ INIT ============ */
 async function init(){
   show(0);
@@ -1243,7 +1549,8 @@ async function init(){
     loadCompliance(),
     loadWater(),
     loadWaterDashboard(),
-    loadCampusAnalytics()
+    loadCampusAnalytics(),
+    loadMarrData() // Loading Slide 6
   ]);
 }
 
@@ -1256,6 +1563,7 @@ setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboard, 60000);
 setInterval(loadCampusAnalytics, 10000);
+setInterval(loadMarrData, 30000); // Refresh MARR data every 30s
 
 </script>
 </body>
