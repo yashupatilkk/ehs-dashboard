@@ -188,7 +188,7 @@ th {
 
 /* FIXED ASCII CHART - FULL HEIGHT UTILIZATION */
 .total-kld-chart {
-  background: #1a1a1a;
+  background: #fff;
   color: white;
   padding: 15px;
   border-radius: 8px;
@@ -205,7 +205,7 @@ th {
 .total-kld-title {
   font-size: 15px;
   font-weight: bold;
-  color: #2a5298;
+  color: #1655c1;
   text-align: center;
   margin-bottom: 8px;
   letter-spacing: 1px;
@@ -242,7 +242,7 @@ th {
 }
 
 .s5-header {
-  background: linear-gradient(135deg, #2c3e50, #3498db);
+  background: linear-gradient(135deg, #2c5044, #3498db);
   color: white;
   padding: 20px 30px; /* REDUCED PADDING */
   text-align: center;
@@ -325,7 +325,7 @@ th {
   border-radius: 0 0 20px 20px;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
   flex-shrink: 0;
-  border-top: 2px solid #3498db;
+  border-top: 2px solid #000000;
 }
 
 /* ---------------------------------------------------------------- */
@@ -879,54 +879,77 @@ function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
       plugins: { legend: { display: false } },
       scales: {
         x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
-        y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(0,0,0,0.05)" }, beginAtZero: true }
+        y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(88, 14, 216, 0.05)" }, beginAtZero: true }
       }
     }
   });
 }
 
 /* FIXED ASCII CHART - FULL 5 SOURCES + MAX SPACE UTILIZATION */
-function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period="Apr'25-Apr'26") {
+/* FIXED ASCII CHART - FULL 5 SOURCES + CLEAN COLORED BARS */
+function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period = "Apr'25-Apr'26") {
   const container = document.getElementById("asciiBars");
   
   const values = [bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal];
   const maxValue = Math.max(...values.filter(v => v > 0 || v === 1200), 1000);
-  const maxBarLength = 28; // INCREASED for full width
+  const maxBarLength = 28;
   
   const sources = [
     { name: "BWSSB", value: bwssbTotal || 0, color: "#2196f3" },
     { name: "Rain", value: rainTotal || 0, color: "#00bcd4" },
     { name: "STP", value: stpTotal || 0, color: "#4caf50" },
     { name: "CWTP", value: cwtpTotal || 0, color: "#ff9800" },
-    { name: "RO", value: roTotal || 1200, color: "#9c27b0" } // FORCE RO
+    { name: "RO", value: roTotal || 1200, color: "#9c27b0" }
   ];
   
   let html = '';
   
   sources.forEach((source, index) => {
     const barLength = Math.max(1, Math.floor((source.value / maxValue) * maxBarLength));
-    const bar = "█".repeat(barLength);
+    
+    // ✅ Split filled & empty parts
+    const filledBar = "█".repeat(barLength);
+    const emptyBar = "░".repeat(maxBarLength - barLength);
+    
     const percentage = ((source.value / maxValue) * 100).toFixed(1);
     
-    const formattedValue = source.value >= 1000 ? 
-      Math.round(source.value).toLocaleString() : 
-      Math.round(source.value).toLocaleString();
+    const formattedValue = Math.round(source.value).toLocaleString();
     
     html += `
       <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-size: ${index === 0 ? '14px' : '13px'};">
-        <span style="color: ${source.color}; font-weight: bold; min-width: 55px; font-size: 12px;">${source.name}:</span>
-        <span style="background: ${source.color}44; padding: 3px 8px; border-radius: 4px; 
-                     border-left: 4px solid ${source.color}; font-weight: bold; 
-                     min-width: 220px; height: 22px; display: flex; align-items: center;">${bar.padEnd(maxBarLength, '░')}</span>
-        <span style="color: #fff; font-weight: bold; font-size: 14px; min-width: 70px; text-align: right;">${formattedValue}</span>
-        <span style="color: ${source.color}; font-size: 11px; font-weight: bold;">(${percentage}%)</span>
+        
+        <!-- Source Name -->
+        <span style="color: ${source.color}; font-weight: bold; min-width: 55px; font-size: 12px;">
+          ${source.name}:
+        </span>
+        
+        <!-- ASCII BAR (NO BACKGROUND, ONLY TEXT COLOR) -->
+        <span style="padding: 3px 8px; border-radius: 4px;
+                     border-left: 4px solid ${source.color};
+                     min-width: 220px; height: 22px;
+                     display: flex; align-items: center; font-weight: bold;">
+          
+          <span style="color:${source.color};">${filledBar}</span>
+          <span style="color:#ccc;">${emptyBar}</span>
+        
+        </span>
+        
+        <!-- Value -->
+        <span style="color: #e01818; font-weight: bold; font-size: 14px; min-width: 70px; text-align: right;">
+          ${formattedValue}
+        </span>
+        
+        <!-- Percentage -->
+        <span style="color: ${source.color}; font-size: 11px; font-weight: bold;">
+          (${percentage}%)
+        </span>
+        
       </div>
     `;
   });
   
   container.innerHTML = html;
 }
-
 /* ============ FIXED MANHOURS - APRIL BREAKAGE SOLVED ============ */
 async function loadManhoursWorked(){
   try{
@@ -1320,7 +1343,7 @@ async function loadCampusAnalytics() {
           datasets:[{
             data:water,
             borderColor:"#1f618d",
-            backgroundColor:"rgba(31,97,141,0.2)",
+            backgroundColor:"#3498db",
             fill:true,
             tension:0.4,
             pointRadius:4
