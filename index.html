@@ -464,9 +464,13 @@ button {
   color:white;
   cursor:pointer;
   border-radius:5px;
-  min-width:110px;
+  width:130px;              /* ✅ FIXED SAME WIDTH */
   font-weight:bold;
   transition:0.2s;
+  display:flex;             /* ✅ CENTER CONTENT */
+  justify-content:center;
+  align-items:center;
+  gap:5px;                  /* spacing between icon & text */
 }
 
 button:hover { transform:scale(1.05); }
@@ -747,11 +751,9 @@ Water Summary - <span id="waterMonth"></span>
 </div>
 
 <!-- CONTROLS -->
-<div class="controls">
-  <button onclick="prevSlide()">⬅ Prev</button>
-  <button onclick="toggleHold()" id="holdBtn">⏸ Hold</button>
-  <button onclick="nextSlide()">Next ➡</button>
-</div>
+<button onclick="prevSlide()">⬅ <span>Prev</span></button>
+<button onclick="toggleHold()" id="holdBtn">⏸ Hold</button>
+<button onclick="nextSlide()"><span>Next</span> ➡</button>
 
 <button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen</button>
 
