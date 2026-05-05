@@ -411,6 +411,20 @@ th {
     position: relative;
 }
 
+/* NEW POWER SUMMARY MONTH STYLE */
+.s6-power-month {
+    position: absolute;
+    bottom: 10px;
+    left: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: rgba(255,255,255,0.9);
+    padding: 4px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
 .s6-modal{
     position:fixed;
     top:0;left:0;
@@ -519,6 +533,7 @@ button:hover { transform:scale(1.05); }
   .s5-header h1 { font-size: 1.3em; }
   .s5-content { padding: 15px; }
   .s5-container { height: calc(100vh - 120px) !important; margin: 5px; }
+  .s6-power-month { font-size: 11px; left: 10px; bottom: 8px; }
 }
 </style>
 </head>
@@ -1387,6 +1402,7 @@ const s6_sheetURL = "https://docs.google.com/spreadsheets/d/1SiMT6wLHaSePApR-sqY
 
 let s6_months=[], s6_modalChart, s6_radialChart, s6_globalData = {};
 let charts6 = {};
+let s6_currentMonth = "";
 
 /* LOAD DATA */
 function loadMarrData(){
@@ -1396,6 +1412,11 @@ complete:function(res){
 const rows=res.data;
 const headerIndex=rows.findIndex(r=>r.includes("Apr-25"));
 s6_months=rows[headerIndex].slice(2);
+
+// ✅ EXTRACT CURRENT MONTH FOR POWER SUMMARY
+if(s6_months.length > 0) {
+  s6_currentMonth = s6_months[s6_months.length - 1].trim();
+}
 
 let section="Power";
 let g={};
@@ -1481,7 +1502,7 @@ createMarrCard("DG Fuel","line",[
 ]);
 }
 
-/* BIG POWER SUMMARY */
+/* BIG POWER SUMMARY - MODIFIED WITH MONTH */
 function createMarrRadial(){
 
 const div=document.createElement("div");
@@ -1490,7 +1511,7 @@ div.className="s6-card";
 div.innerHTML=`
 <h4>Power Summary</h4>
 
-<div style="display:flex;align-items:center;justify-content:center;gap:50px;width:100%;height:100%;">
+<div style="display:flex;align-items:center;justify-content:center;gap:50px;width:100%;height:100%;position:relative;">
 
     <div style="width:220px;height:220px;">
         <canvas id="s6_circleChart"></canvas>
@@ -1504,6 +1525,9 @@ div.innerHTML=`
         <div>🟡 Solar: <b id="s6_solarText">0</b></div>
     </div>
 
+    <!-- ✅ NEW MONTH LABEL - LEFT BOTTOM CORNER -->
+    <div class="s6-power-month" id="s6_powerMonth">Apr-25</div>
+
 </div>
 `;
 
@@ -1516,6 +1540,9 @@ const dg = s6_globalData["Power - DG"]?.slice(-1)[0] || 0;
 
 const solarKey = Object.keys(s6_globalData).find(k => k.toLowerCase().includes("solar"));
 const solar = s6_globalData[solarKey]?.slice(-1)[0] || 0;
+
+// ✅ UPDATE MONTH DISPLAY
+document.getElementById("s6_powerMonth").innerText = s6_currentMonth || "Loading...";
 
 document.getElementById("s6_totalText").innerText = total.toLocaleString();
 document.getElementById("s6_whText").innerText = wh.toLocaleString();
