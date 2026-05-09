@@ -943,9 +943,9 @@ button:focus {
 <!-- SLIDE 1 -->
 <div class="slide active">
 <div class="container">
-<div class="box">Manhours (<span id="mMonth"></span>)<br><div class="value" id="manhours">0</div></div>
-<div class="box">Near Miss (<span id="month1"></span>)<br><div class="value" id="near">0</div></div>
-<div class="box">Incident (<span id="month2"></span>)<br><div class="value" id="incident">0</div></div>
+<div class="box">🧍‍♂️Manhours (<span id="mMonth"></span>)<br><div class="value" id="manhours">0</div></div>
+<div class="box">🟠Near Miss (<span id="month1"></span>)<br><div class="value" id="near">0</div></div>
+<div class="box">🔴Incident (<span id="month2"></span>)<br><div class="value" id="incident">0</div></div>
 </div>
 <div class="chartBox">
 <canvas id="ehsPie"></canvas>
@@ -1582,27 +1582,56 @@ function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, 
     const percentage = ((source.value / maxValue) * 100).toFixed(1);
     
     const formattedValue = Math.round(source.value).toLocaleString();
-    
-    html += `
-      <div style="margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-family: 'Courier New', monospace; font-size: ${index === 0 ? '14px' : '13px'};">
-        <span style="color: ${source.color}; font-weight: bold; min-width: 55px; font-size: 12px;">
-          ${source.name}:
-        </span>
-        <span style="padding: 3px 8px; border-radius: 4px;
-                     border-left: 4px solid ${source.color};
-                     min-width: 220px; height: 22px;
-                     display: flex; align-items: center; font-weight: bold;">
-          <span style="color:${source.color};">${filledBar}</span>
-          <span style="color:#ccc;">${emptyBar}</span>
-        </span>
-        <span style="color: #e01818; font-weight: bold; font-size: 14px; min-width: 70px; text-align: right;">
-          ${formattedValue}
-        </span>
-        <span style="color: ${source.color}; font-size: 11px; font-weight: bold;">
-          (${percentage}%)
-        </span>
-      </div>
-    `;
+   html += `
+<div style="
+    display:grid;
+    grid-template-columns:65px 210px 85px 60px;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    white-space:nowrap;
+    font-family:'Courier New', monospace;
+">
+
+    <!-- LABEL -->
+    <span style="
+        color:${source.color};
+        font-weight:bold;
+        font-size:12px;
+    ">
+        ${source.name}:
+    </span>
+
+    <!-- BAR -->
+    <div style="
+        overflow:hidden;
+        border-left:4px solid ${source.color};
+        padding-left:6px;
+    ">
+        <span style="color:${source.color};">${filledBar}</span><span style="color:#bbb;">${emptyBar}</span>
+    </div>
+
+    <!-- VALUE -->
+    <span style="
+        color:${source.color};
+        font-weight:bold;
+        text-align:right;
+    ">
+        ${formattedValue}
+    </span>
+
+    <!-- PERCENT -->
+    <span style="
+        color:${source.color};
+        font-size:11px;
+        font-weight:bold;
+        text-align:left;
+    ">
+        (${percentage}%)
+    </span>
+
+</div>
+`;
   });
   
   container.innerHTML = html;
@@ -2102,10 +2131,51 @@ document.getElementById("s6_charts").innerHTML="";
 createMarrRadial();
 
 createMarrCard("Power","line",[
-{label:"Total Power",data:g["Power - TOTAL"],borderColor:"#6366f1",borderWidth:2},
-{label:"EB Units",data:g["HVAC - EB Units"],borderColor:"#3b82f6"},
-{label:"DG",data:g["Power - DG"],borderColor:"#10b981"},
-{label:"Wheeling",data:g["Power - Wheeling Units"],borderColor:"#f59e0b"}
+
+{
+label:"Total Power",
+data:g["Power - TOTAL"],
+borderColor:"#6366f1",
+fill:false,
+borderWidth:3,
+pointRadius:4,
+pointBackgroundColor:"#6366f1",
+tension:0.4
+},
+
+{
+label:"EB Units",
+data:g["HVAC - EB Units"],
+borderColor:"#ef4444",
+fill:false,
+borderWidth:3,
+pointRadius:4,
+pointBackgroundColor:"#ef4444",
+tension:0.4
+},
+
+{
+label:"DG",
+data:g["Power - DG"],
+borderColor:"#8b5cf6",
+fill:false,
+borderWidth:3,
+pointRadius:4,
+pointBackgroundColor:"#8b5cf6",
+tension:0.4
+},
+
+{
+label:"Wheeling",
+data:g["Power - Wheeling Units"],
+borderColor:"#22c55e",
+fill:false,
+borderWidth:3,
+pointRadius:4,
+pointBackgroundColor:"#22c55e",
+tension:0.4
+}
+
 ]);
 
 createMarrCard("Consumption","bar",[
@@ -2174,7 +2244,7 @@ data:{datasets:[
 {data:[wh,max-wh],backgroundColor:['#22c55e','rgba(0,0,0,0.05)'],weight:4},
 {data:[eb,max-eb],backgroundColor:['#ef4444','rgba(0,0,0,0.05)'],weight:3},
 {data:[dg,max-dg],backgroundColor:['#8b5cf6','rgba(0,0,0,0.05)'],weight:2},
-{data:[solar,max-solar],backgroundColor:['#f59e0b','rgba(0,0,0,0.05)'],weight:1}
+{data:[solar,max-solar],backgroundColor:['#f5be0b','rgba(0,0,0,0.05)'],weight:1}
 ]},
 options:{cutout:'40%',plugins:{legend:false,tooltip:false}}
 });
