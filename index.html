@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>EHS Dashboard FINAL UNIFIED</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EHS Dashboard FINAL UNIFIED + Enterprise</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -32,7 +35,122 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
 .slide { display:none; width: 100%; }
 .active { display:block; }
 
-/* SLIDE 1 */
+/* =========================================
+   NEW SLIDE STYLES (ENTERPRISE SAFETY)
+   ========================================= */
+#es_combined-slide {
+  display:flex !important; flex-direction:column;
+  height:calc(100vh - 130px); overflow:hidden;
+}
+
+.es-wrapper {
+  flex:1; display:flex; flex-direction:column; padding:20px 24px; gap:16px;
+  overflow:hidden; color:white; font-family:'Segoe UI',Arial,sans-serif; 
+  min-height:0; box-sizing:border-box;
+}
+
+.es-top { display:flex; gap:18px; flex:0 0 44%; min-height:0; }
+.es-kpi-panel { flex:1.7; display:flex; flex-direction:column; gap:8px; min-width:0; min-height:0; }
+.es-section-label { 
+  font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; 
+  letter-spacing:1.8px; padding:0 4px; flex-shrink:0; 
+}
+.es-kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; flex:1; min-height:0; }
+.es-kpi-card {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+  border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:14px;
+  box-shadow:0 6px 24px rgba(0,0,0,0.4); transition:transform 0.3s,box-shadow 0.3s; 
+  min-height:0; overflow:hidden; cursor:pointer;
+}
+.es-kpi-card:hover { 
+  transform:translateY(-4px); box-shadow:0 14px 36px rgba(0,0,0,0.6); 
+}
+.es-kpi-icon { font-size:1.9rem; flex-shrink:0; line-height:1; }
+.es-kpi-meta { flex:1; min-width:0; }
+.es-kpi-title { 
+  font-size:11px; color:#94a3b8; text-transform:uppercase; 
+  letter-spacing:1px; margin-bottom:6px; white-space:nowrap; 
+  overflow:hidden; text-overflow:ellipsis; 
+}
+.es-kpi-value { 
+  font-size:clamp(1.5rem,2.5vw,2.4rem); font-weight:800; 
+  color:#f1f5f9; line-height:1.1; 
+}
+
+/* Color variants */
+.es-kpi-card.manhours  { border-left:4px solid #6366f1; }
+.es-kpi-card.manhours .es-kpi-value {
+  color: #000000 !important;
+}
+.es-kpi-card.near-miss { border-left:4px solid #f59e0b; }
+.es-kpi-card.incident  { border-left:4px solid #ef4444; }
+.es-kpi-card.total-nm  { border-left:4px solid #facc15; background:rgba(250,204,21,0.08); }
+.es-kpi-card.total-inc { border-left:4px solid #ef4444; background:rgba(239,68,68,0.08); }
+.es-kpi-card.combined  { border-left:4px solid #10b981; background:rgba(16,185,129,0.08); }
+.es-kpi-card.near-miss .es-kpi-value { color:#f59e0b; }
+.es-kpi-card.incident  .es-kpi-value { color:#ef4444; }
+.es-kpi-card.total-nm  .es-kpi-value { color:#facc15; }
+.es-kpi-card.total-inc .es-kpi-value { color:#ef4444; }
+.es-kpi-card.combined  .es-kpi-value { color:#10b981; }
+
+.es-pie-panel { flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; min-height:0; }
+.es-pie-box {
+  flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px; padding:18px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 24px rgba(0,0,0,0.4); min-height:0; overflow:hidden;
+}
+.es-pie-box canvas { max-width:100% !important; max-height:100% !important; }
+
+.es-bottom {
+  flex:1; display:flex; flex-direction:column; min-height:0;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px; padding:18px 22px; box-shadow:0 6px 24px rgba(0,0,0,0.4);
+}
+.es-bottom-header { 
+  display:flex; justify-content:space-between; align-items:center; 
+  margin-bottom:14px; flex-shrink:0; flex-wrap:wrap; gap:10px; 
+}
+.es-bottom-title { 
+  font-size:clamp(1rem,1.4vw,1.2rem); font-weight:700; color:#e2e8f0; 
+}
+.es-live-badge { 
+  display:flex; align-items:center; gap:8px; padding:8px 16px; 
+  border-radius:50px; background:rgba(16,185,129,0.15); 
+  border:1px solid rgba(16,185,129,0.3); color:#10b981; 
+  font-weight:600; font-size:0.85rem; 
+}
+.es-dot { 
+  width:8px; height:8px; background:#10b981; border-radius:50%; 
+  animation:esPulse 2s infinite; flex-shrink:0; 
+}
+@keyframes esPulse { 
+  0%,100%{transform:scale(1);opacity:1;} 
+  50%{transform:scale(1.8);opacity:0.5;} 
+}
+
+.es-charts-row { 
+  flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px; min-height:0; 
+}
+.es-chart-box {
+  display:flex; flex-direction:column; min-height:0;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
+  border-radius:16px; padding:14px 18px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.es-chart-box-title { 
+  font-size:12px; font-weight:700; color:#94a3b8; text-align:center; 
+  margin-bottom:12px; flex-shrink:0; text-transform:uppercase; 
+  letter-spacing:1.2px; 
+}
+.es-chart-canvas-wrap { flex:1; position:relative; min-height:0; }
+.es-chart-canvas-wrap canvas { 
+  position:absolute; top:0; left:0; width:100% !important; height:100% !important; 
+}
+
+/* =========================================
+   ORIGINAL SLIDE STYLES
+   ========================================= */
+
+/* SLIDE 1 (Now Slide 2) */
 .container {
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -52,7 +170,7 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
 
 .chartBox { width:300px; margin:auto; }
 
-/* SLIDE 2 */
+/* SLIDE 2 (Now Slide 3) */
 table {
   width:95%;
   margin:auto;
@@ -73,9 +191,7 @@ th {
 
 .red { background:#ff4444; color:white; font-weight:bold; }
 
-/* =========================================
-   SLIDE 3 - UNIFIED DESIGN (ONE STYLE)
-   ========================================= */
+/* SLIDE 3 (Now Slide 4) - UNIFIED DESIGN (ONE STYLE) */
 .slide3-wrapper {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   padding: 25px;
@@ -226,7 +342,7 @@ th {
   align-items: center;
 }
 
-/* SLIDE 4 */
+/* SLIDE 4 (Now Slide 5) */
 .s4-wrapper {
   padding:12px 16px;
 }
@@ -365,118 +481,73 @@ th {
   font-family: Arial, sans-serif;
 }
 
-/* SLIDE 5 - FIXED HEIGHT CALCULATION */
-/* =========================================
-   SLIDE 5 - FIXED PERFECT LAYOUT
-   ========================================= */
-
+/* SLIDE 5 (Now Slide 6) */
 .s5-container{
   width:98%;
   max-width:1500px;
-
   margin:10px auto;
-
   background:white;
-
   border-radius:20px;
-
   overflow:hidden;
-
   box-shadow:0 8px 25px rgba(0,0,0,0.12);
-
   display:flex;
   flex-direction:column;
-
   min-height:78vh;
-
   height:auto;
 }
 
-/* HEADER */
-
 .s5-header{
   background:linear-gradient(135deg,#2c5044,#3498db);
-
   color:white;
-
   padding:14px 20px;
-
   text-align:center;
-
   flex-shrink:0;
 }
 
 .s5-header h1{
   font-size:24px;
-
   margin:0;
-
   letter-spacing:0.5px;
-
   font-weight:700;
 }
 
-/* CONTENT */
-
 .s5-content{
   flex:1;
-
   display:flex;
-
   flex-direction:column;
-
   padding:14px;
-
   gap:14px;
-
   overflow:hidden;
 }
 
-/* METRICS */
-
 .s5-metrics{
   display:grid;
-
   grid-template-columns:repeat(3,1fr);
-
   gap:12px;
-
   flex-shrink:0;
 }
 
 .s5-metric{
   color:white;
-
   padding:18px 12px;
-
   border-radius:14px;
-
   text-align:center;
-
   box-shadow:0 5px 14px rgba(0,0,0,0.15);
-
   min-height:120px;
-
   display:flex;
-
   flex-direction:column;
-
   justify-content:center;
 }
 
 .s5-metric-value{
   font-size:34px;
-
   font-weight:bold;
-
   margin-bottom:6px;
-
   line-height:1;
 }
 
 .s5-metric-label{
   font-size:14px;
-
   opacity:0.95;
 }
 
@@ -485,142 +556,62 @@ th {
 #growth,
 #waterMin{
   font-size:12px;
-
   margin-top:5px;
-
   display:block;
 }
 
-/* CHART AREA */
-
 .s5-charts{
   flex:1;
-
   display:grid;
-
   grid-template-columns:1fr 1fr;
-
   gap:14px;
-
   min-height:360px;
 }
 
-/* CHART BOX */
-
 .s5-chart-box{
   background:#f8fafc;
-
   border-radius:14px;
-
   padding:12px;
-
   display:flex;
-
   flex-direction:column;
-
   box-shadow:0 3px 10px rgba(0,0,0,0.08);
-
   min-height:360px;
 }
 
 .s5-chart-box h3{
   margin-bottom:10px;
-
   text-align:center;
-
   color:#1e293b;
-
   font-size:16px;
-
   font-weight:700;
-
   flex-shrink:0;
 }
-
-/* IMPORTANT FIX */
 
 .s5-chart-box canvas{
   width:100% !important;
-
   height:300px !important;
-
   max-height:300px !important;
 }
 
-/* FOOTER */
-
 .s5-footer{
   background:linear-gradient(135deg,#1e293b,#334155);
-
   color:white;
-
   text-align:center;
-
   padding:10px;
-
   font-size:13px;
-
   font-weight:bold;
-
   flex-shrink:0;
 }
 
-/* =========================================
-   RESPONSIVE
-   ========================================= */
-
-@media(max-width:1100px){
-
-  .s5-charts{
-    grid-template-columns:1fr;
-  }
-
-  .s5-chart-box{
-    min-height:320px;
-  }
-
-  .s5-chart-box canvas{
-    height:260px !important;
-  }
-}
-
-@media(max-width:768px){
-
-  .s5-container{
-    width:96%;
-
-    min-height:auto;
-  }
-
-  .s5-metrics{
-    grid-template-columns:1fr;
-  }
-
-  .s5-header h1{
-    font-size:18px;
-  }
-
-  .s5-metric-value{
-    font-size:28px;
-  }
-
-  .s5-chart-box{
-    min-height:280px;
-  }
-
-  .s5-chart-box canvas{
-    height:220px !important;
-  }
-}
-/* SLIDE 6 */
-.slide:nth-child(6) {
+/* SLIDE 6 (Now Slide 7) */
+.slide:nth-child(7) {
     height: 100vh;
     display: none;
     flex-direction: column;
     background: linear-gradient(135deg,#eef2ff,#f8fafc);
 }
 
-.slide:nth-child(6).active {
+.slide:nth-child(7).active {
     display: flex;
 }
 
@@ -726,8 +717,7 @@ th {
     padding:15px;
 }
 
-/* CONTROLS - SMALLER SIZE */
-/* CONTROLS - IMPROVED DIM/BRIGHT EFFECT */
+/* CONTROLS */
 .controls { 
   text-align:center; 
   margin: 5px 0;
@@ -738,7 +728,6 @@ th {
 }
 
 button {
-  /* Base dimmed state */
   padding: 4px 10px;
   margin: 0 4px;
   border: 2px solid rgba(255,255,255,0.3);
@@ -750,15 +739,12 @@ button {
   font-size: 12px;
   font-weight:bold;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Dimmed shadow */
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   opacity: 0.8;
 }
 
 button:hover, 
 button:focus {
-  /* Bright state */
   background: #1e3c72 !important;
   color: white !important;
   border-color: rgba(255,255,255,0.9) !important;
@@ -793,7 +779,6 @@ button:active {
   border-color: #fff !important;
 }
 
-/* Keyboard focus outline */
 button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5);
@@ -823,42 +808,28 @@ button:focus {
   opacity: 1;
   box-shadow: 0 0 5px rgba(255,255,255,0.8);
 }
-/* =========================
-   FULL SCREEN BUTTON
-   ========================= */
 
+/* FULL SCREEN BUTTON */
 #fsBtn{
   position:fixed;
-
   bottom:15px;
   right:15px;
-
   z-index:9999;
-
   padding:10px 18px;
-
   border:none;
   border-radius:12px;
-
   background:linear-gradient(135deg,#f59e0b,#facc15);
-
   color:#111;
-
   font-size:13px;
   font-weight:bold;
-
   cursor:pointer;
-
   box-shadow:0 6px 18px rgba(0,0,0,0.25);
-
   transition:0.3s;
 }
 
 #fsBtn:hover{
   transform:translateY(-3px) scale(1.05);
-
   background:linear-gradient(135deg,#facc15,#fde047);
-
   box-shadow:0 10px 22px rgba(245,158,11,0.5);
 }
 
@@ -866,18 +837,19 @@ button:focus {
   transform:scale(0.98);
 }
 
-/* MOBILE */
+/* RESPONSIVE */
 @media(max-width:768px){
-
   #fsBtn{
     bottom:10px;
     right:10px;
-
     padding:8px 14px;
-
     font-size:11px;
   }
-
+  .es-top { flex-direction:column; } 
+  .es-kpi-panel { flex:1; }
+  .es-wrapper { padding:16px; } 
+  .es-charts-row { grid-template-columns:1fr; } 
+  .es-kpi-row { grid-template-columns:1fr 1fr; gap:10px; }
 }
 
 @media (max-width: 1400px) {
@@ -911,7 +883,6 @@ button:focus {
   .s5-content { padding: 10px; }
   .s5-container { height: calc(100vh - 180px); margin: 5px; }
   .s6-power-month { font-size: 11px; left: 10px; bottom: 8px; }
-  
   button {
     padding: 4px 8px;
     font-size: 11px;
@@ -926,33 +897,114 @@ button:focus {
 <header>
   <h2>EHS Dashboard</h2>
   
-  <!-- CONTROLS (Small Size) -->
+  <!-- CONTROLS -->
   <div class="controls">
     <button onclick="prevSlide()">◀ Prev</button>
     <button onclick="toggleHold()" id="holdBtn">⏸ Hold</button>
     <button onclick="nextSlide()">Next ▶</button>
   </div>
 
-  <!-- SLIDE INDICATORS (White) -->
-
   <!-- DATE DISPLAY -->
   <div id="time"></div>
   <div class="slide-indicator" id="dots"></div>
 </header>
 
-<!-- SLIDE 1 -->
+<!-- ========================================= -->
+<!-- NEW SLIDE 1: ENTERPRISE SAFETY DASHBOARD -->
+<!-- ========================================= -->
 <div class="slide active">
-<div class="container">
-<div class="box">🧍‍♂️Manhours (<span id="mMonth"></span>)<br><div class="value" id="manhours">0</div></div>
-<div class="box">🟠Near Miss (<span id="month1"></span>)<br><div class="value" id="near">0</div></div>
-<div class="box">🔴Incident (<span id="month2"></span>)<br><div class="value" id="incident">0</div></div>
-</div>
-<div class="chartBox">
-<canvas id="ehsPie"></canvas>
-</div>
+  <div class="es-wrapper" id="es_combined-slide">
+
+    <!-- TOP: KPI Cards (left) + Pie Chart (right) -->
+    <div class="es-top">
+
+      <!-- LEFT: All KPI Cards -->
+      <div class="es-kpi-panel">
+        <div class="es-section-label">📊 Monthly EHS Overview</div>
+        <div class="es-kpi-row">
+          <div class="es-kpi-card manhours">
+            <div class="es-kpi-icon">👷</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Manhours — <span id="es_mMonth">Loading...</span></div>
+              <div class="es-kpi-value" id="es_manhours">0</div>
+            </div>
+          </div>
+          <div class="es-kpi-card near-miss">
+            <div class="es-kpi-icon">⚠️</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Near Miss — <span id="es_month1">Loading...</span></div>
+              <div class="es-kpi-value" id="es_near">0</div>
+            </div>
+          </div>
+          <div class="es-kpi-card incident">
+            <div class="es-kpi-icon">🚨</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Incident — <span id="es_month2">Loading...</span></div>
+              <div class="es-kpi-value" id="es_incident">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="es-section-label" style="margin-top:8px;">🏢 Enterprise Safety Totals (Apr'25 – Present)</div>
+        <div class="es-kpi-row">
+          <div class="es-kpi-card total-nm">
+            <div class="es-kpi-icon">⚠️</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Total Near Miss</div>
+              <div class="es-kpi-value" id="esNearTotal">0</div>
+            </div>
+          </div>
+          <div class="es-kpi-card total-inc">
+            <div class="es-kpi-icon">🚨</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Total Incident</div>
+              <div class="es-kpi-value" id="esIncidentTotal">0</div>
+            </div>
+          </div>
+          <div class="es-kpi-card combined">
+            <div class="es-kpi-icon">📊</div>
+            <div class="es-kpi-meta">
+              <div class="es-kpi-title">Combined Total</div>
+              <div class="es-kpi-value" id="esCombinedTotal">0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Pie Chart -->
+      <div class="es-pie-panel">
+        <div class="es-section-label">📈 Near Miss vs Incident</div>
+        <div class="es-pie-box">
+          <canvas id="es_ehsPie"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM: Two Charts Side-by-Side -->
+    <div class="es-bottom">
+      <div class="es-bottom-header">
+        <span class="es-bottom-title">📊 Apr'25 to Current Month — Monthly Safety Trends</span>
+        <span class="es-live-badge">
+          <span class="es-dot"></span> 
+          Auto Updating Every 30s
+        </span>
+      </div>
+      <div class="es-charts-row">
+        <div class="es-chart-box">
+          <div class="es-chart-box-title">⚠️ Near Miss Monthly Trend</div>
+          <div class="es-chart-canvas-wrap"><canvas id="es_csNmChart"></canvas></div>
+        </div>
+        <div class="es-chart-box">
+          <div class="es-chart-box-title">🚨 Incident Monthly Trend</div>
+          <div class="es-chart-canvas-wrap"><canvas id="es_csIncChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<!-- SLIDE 2 -->
+<!-- ORIGINAL SLIDE 2 (Now Slide 3) -->
 <div class="slide">
 <h3 style="text-align:center;">Compliance (≤ 90 Days Only)</h3>
 <table>
@@ -963,7 +1015,7 @@ button:focus {
 </table>
 </div>
 
-<!-- SLIDE 3 -->
+<!-- ORIGINAL SLIDE 3 (Now Slide 4) -->
 <div class="slide">
   <div class="slide3-wrapper">
     
@@ -999,7 +1051,7 @@ button:focus {
   </div>
 </div>
 
-<!-- SLIDE 4 -->
+<!-- ORIGINAL SLIDE 4 (Now Slide 5) -->
 <div class="slide">
 <div class="s4-wrapper">
   <div class="s4-top-bar">
@@ -1080,7 +1132,7 @@ button:focus {
 </div>
 </div>
 
-<!-- SLIDE 5 (ADJUSTED) -->
+<!-- ORIGINAL SLIDE 5 (Now Slide 6) -->
 <div class="slide">
 <div class="s5-container">
   <div class="s5-header">
@@ -1125,7 +1177,7 @@ button:focus {
 </div>
 </div>
 
-<!-- SLIDE 6 -->
+<!-- ORIGINAL SLIDE 6 (Now Slide 7) -->
 <div class="slide">
     <div class="s6-header">📊 Energy Utilization Dashboard</div>
 
@@ -1147,6 +1199,609 @@ button:focus {
 <button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen</button>
 
 <script>
+
+/* =========================================
+   ENTERPRISE SAFETY DASHBOARD LOGIC (New)
+   ========================================= */
+const ES_SHEETS = {
+  near: "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779",
+  incident: "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433",
+  manhours: "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145"
+};
+
+const ES_NEAR_SHEET =
+  'https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/gviz/tq?tqx=out:csv&sheet=Form%20Responses%201';
+
+const ES_INCIDENT_SHEET =
+  'https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/gviz/tq?tqx=out:csv';
+
+let es_pie, es_csNmChart, es_csIncChart;
+
+async function es_csv(url) {
+  const response = await fetch(url + "&_=" + Date.now());
+  const text = await response.text();
+  return text.trim().split("\n").map(row => row.split(","));
+}
+
+function es_updatePie(nearValue, incidentValue) {
+  const pieEl = document.getElementById("es_ehsPie");
+  if (!es_pie) {
+    es_pie = new Chart(pieEl, {
+      type: "doughnut",
+      data: {
+        labels: ["Near Miss", "Incident"],
+        datasets: [{
+          data: [nearValue, incidentValue],
+          backgroundColor: ["rgba(250,204,21,0.9)", "rgba(239,68,68,0.9)"],
+          borderColor: ["#facc15", "#ef4444"],
+          borderWidth: 3,
+          hoverOffset: 12
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#94a3b8',
+              font: { size: 13, weight: '600' },
+              padding: 20,
+              usePointStyle: true
+            }
+          },
+          tooltip: {
+            backgroundColor: '#0f172a',
+            titleColor: '#fff',
+            bodyColor: '#94a3b8',
+            borderColor: '#334155',
+            borderWidth: 1,
+            padding: 12
+          },
+          datalabels: {
+            color: '#fff',
+            font: { weight: 'bold', size: 14 },
+            formatter: (v, ctx) => {
+              let total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+              return total ? Math.round(v / total * 100) + '%' : v;
+            }
+          }
+        },
+        animation: {
+          animateRotate: true,
+          animateScale: true,
+          duration: 2000
+        }
+      },
+      plugins: [ChartDataLabels]
+    });
+  } else {
+    es_pie.data.datasets[0].data = [nearValue, incidentValue];
+    es_pie.update('none');
+  }
+}
+
+async function es_loadStats() {
+  try {
+    const near = await es_csv(ES_SHEETS.near);
+    const inc = await es_csv(ES_SHEETS.incident);
+    const now = new Date();
+
+    function findDate(row) {
+      for (let i = 0; i < row.length; i++) {
+        let d = new Date(row[i]);
+        if (!isNaN(d)) return d;
+      }
+      return null;
+    }
+
+    function count(data) {
+      let total = 0;
+      for (let i = 1; i < data.length; i++) {
+        let d = findDate(data[i]);
+        if (!d) continue;
+        if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+          total++;
+        }
+      }
+      return total;
+    }
+
+    let nearCount = count(near);
+    let incidentCount = count(inc);
+
+    document.getElementById("es_near").innerText = nearCount;
+    document.getElementById("es_incident").innerText = incidentCount;
+    document.getElementById("es_month1").innerText = now.toLocaleString('en-IN', { month: 'short' });
+    document.getElementById("es_month2").innerText = now.toLocaleString('en-IN', { month: 'short' });
+
+    es_updatePie(nearCount, incidentCount);
+  } catch (e) {
+    console.error("ES Stats Error:", e);
+  }
+}
+
+async function es_loadManhoursWorked() {
+  try {
+    let data = await es_csv(ES_SHEETS.manhours);
+    let monthName = new Date().toLocaleString('en-IN', { month: 'long' }).toLowerCase();
+    let headerRowIndex = data.findIndex(r => r.join(" ").toLowerCase().includes(monthName));
+
+    if (headerRowIndex === -1) {
+      headerRowIndex = data.findIndex(r => r.join(" ").toLowerCase().includes("april"));
+      monthName = "april";
+    }
+
+    if (headerRowIndex === -1) {
+      document.getElementById("es_mMonth").innerText = "No Data";
+      document.getElementById("es_manhours").innerText = "0";
+      return;
+    }
+
+    let header = data[headerRowIndex];
+    document.getElementById("es_mMonth").innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+    let value = 0;
+    for (let i = headerRowIndex + 1; i < data.length; i++) {
+      let name = (data[i][0] || "").toLowerCase();
+      if (name.includes("manhours") || name.includes("man hours") || name.includes("mh")) {
+        let monthIndex = -1;
+        for (let j = 0; j < header.length; j++) {
+          let cell = (header[j] || "").toLowerCase();
+          if (cell.includes(monthName)) {
+            monthIndex = j;
+            break;
+          }
+        }
+        if (monthIndex !== -1) {
+          value = parseFloat((data[i][monthIndex] || "0").toString().replace(/,/g, '')) || 0;
+          break;
+        }
+      }
+    }
+    document.getElementById("es_manhours").innerText = value.toLocaleString();
+  } catch (e) {
+    console.error("ES Manhours Error:", e);
+    document.getElementById("es_manhours").innerText = "0";
+  }
+}
+
+async function es_loadEnterpriseDashboard() {
+  try {
+    const [nearCSV, incidentCSV] = await Promise.all([
+      fetch(ES_NEAR_SHEET + "&_=" + Date.now()).then(r => r.text()),
+      fetch(ES_INCIDENT_SHEET + "&_=" + Date.now()).then(r => r.text())
+    ]);
+    const nearData = Papa.parse(nearCSV, { header: true }).data;
+    const incidentData = Papa.parse(incidentCSV, { header: true }).data;
+    es_processSafetyData(nearData, incidentData);
+  } catch (e) {
+    console.error("ES Dashboard Error:", e);
+  }
+}
+
+function es_processSafetyData(nearData, incidentData) {
+  let monthMap = {};
+  let nearTotal = 0;
+  let incidentTotal = 0;
+
+  function addToMap(row, field) {
+    const values = Object.values(row);
+    const date = values[3];
+    if (date) {
+      const d = new Date(date);
+      if (isNaN(d)) return;
+      const startDate = new Date(2025, 3, 1); // Apr 2025
+      if (d < startDate) return;
+
+      const key = d.toLocaleString('default', { month: 'short' }) + "'" + d.getFullYear().toString().slice(2);
+      if (!monthMap[key]) {
+        monthMap[key] = { near: 0, incident: 0, sortDate: new Date(d.getFullYear(), d.getMonth(), 1) };
+      }
+      monthMap[key][field]++;
+      if (field === 'near') nearTotal++;
+      else incidentTotal++;
+    }
+  }
+
+  nearData.forEach(r => addToMap(r, 'near'));
+  incidentData.forEach(r => addToMap(r, 'incident'));
+
+  document.getElementById("esNearTotal").innerHTML = nearTotal.toLocaleString();
+  document.getElementById("esIncidentTotal").innerHTML = incidentTotal.toLocaleString();
+  document.getElementById("esCombinedTotal").innerHTML = (nearTotal + incidentTotal).toLocaleString();
+
+  const filtered = Object.entries(monthMap).sort((a, b) => a[1].sortDate - b[1].sortDate);
+  const labels = filtered.map(m => m[0]);
+  const nearValues = filtered.map(m => m[1].near);
+  const incidentValues = filtered.map(m => m[1].incident);
+
+  es_drawCsNmChart(labels, nearValues);
+  es_drawCsIncChart(labels, incidentValues);
+}
+
+const ES_CHART_OPTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  animation: { duration: 2000 },
+  plugins: {
+    legend: { display: false },
+    datalabels: {
+      color: '#fff', anchor: 'end', align: 'top', offset: 4,
+      font: { weight: 'bold', size: 12 },
+      formatter: (v) => v > 0 ? v : ''
+    }
+  },
+  scales: {
+    x: { ticks: { color: '#94a3b8', font: { size: 11, weight: '600' } }, grid: { display: false } },
+    y: { beginAtZero: true, ticks: { color: '#64748b', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.06)' } }
+  }
+};
+
+function es_drawCsNmChart(labels, data) {
+  const ctx = document.getElementById("es_csNmChart").getContext('2d');
+  if (es_csNmChart) es_csNmChart.destroy();
+  es_csNmChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Near Miss', data, backgroundColor: 'rgba(250,204,21,0.85)', borderColor: '#facc15', borderWidth: 3, borderRadius: 10 }] },
+    plugins: [ChartDataLabels],
+    options: ES_CHART_OPTS
+  });
+}
+
+function es_drawCsIncChart(labels, data) {
+  const ctx = document.getElementById("es_csIncChart").getContext('2d');
+  if (es_csIncChart) es_csIncChart.destroy();
+  es_csIncChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets: [{ label: 'Incident', data, backgroundColor: 'rgba(239,68,68,0.85)', borderColor: '#ef4444', borderWidth: 3, borderRadius: 10 }] },
+    plugins: [ChartDataLabels],
+    options: ES_CHART_OPTS
+  });
+}
+
+async function es_init() {
+  await Promise.all([es_loadStats(), es_loadManhoursWorked(), es_loadEnterpriseDashboard()]);
+  console.log("✅ Enterprise Slide Initialized");
+}
+
+es_init();
+
+setInterval(() => { es_loadStats(); es_loadEnterpriseDashboard(); }, 30000);
+setInterval(() => { es_loadManhoursWorked(); }, 60000);
+
+
+/* =========================================
+   ORIGINAL DASHBOARD LOGIC
+   ========================================= */
+setInterval(()=>{
+  document.getElementById("time").innerText =
+    new Date().toLocaleString('en-IN',{
+      weekday:'long',year:'numeric',month:'long',day:'numeric',
+      hour:'2-digit',minute:'2-digit',second:'2-digit'
+    });
+},1000);
+
+let current=0;
+const slides=document.querySelectorAll(".slide");
+let slideTimer = null;
+let isPaused = false;
+
+const dotsEl = document.getElementById("dots");
+slides.forEach((_,i)=>{
+  let d = document.createElement("div");
+  d.className = "slide-dot" + (i===0?" active":"");
+  d.onclick = ()=> goSlide(i);
+  dotsEl.appendChild(d);
+});
+
+function updateDots(){
+  document.querySelectorAll(".slide-dot").forEach((d,i)=>{
+    d.classList.toggle("active", i===current);
+  });
+}
+
+function show(n){
+  slides.forEach(s=>s.classList.remove("active"));
+  slides[n].classList.add("active");
+  updateDots();
+}
+
+function goSlide(n){ current = n; show(n); }
+function nextSlide(){ current = (current + 1) % slides.length; show(current); }
+function prevSlide(){ current = (current - 1 + slides.length) % slides.length; show(current); }
+
+function startSlides(){
+  if(slideTimer) clearInterval(slideTimer);
+  slideTimer = setInterval(()=>{ if(!isPaused) nextSlide(); }, 40000);
+}
+
+function toggleHold(){
+  const btn = document.getElementById("holdBtn");
+  isPaused = !isPaused;
+  if(isPaused){
+    if(slideTimer) clearInterval(slideTimer);
+    btn.innerText = "▶ Resume"; btn.classList.add("active");
+  } else {
+    startSlides();
+    btn.innerText = "⏸ Hold"; btn.classList.remove("active");
+  }
+}
+
+function toggleFullScreen(){
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+async function csv(url){
+  let r = await fetch(url+"&_="+Date.now());
+  let t = await r.text();
+  return t.trim().split("\n").map(x=>x.split(","));
+}
+
+const sheets = {
+  near: "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779",
+  incident: "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433",
+  comp: "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223",
+  manhours: "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145",
+  water: "https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=1876581317"
+};
+
+let pie, waterPie, charts4 = {}, charts5 = {};
+
+function updatePie(a,b){
+  if(!pie){
+    pie = new Chart(document.getElementById("ehsPie"),{
+      type:"pie", data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b],backgroundColor:["#ff9800","#f44336"]}]},
+      options:{responsive:true}
+    });
+  } else {
+    pie.data.datasets[0].data=[a,b]; pie.update();
+  }
+}
+
+function updateWaterPie(values){
+  if(!waterPie){
+    waterPie = new Chart(document.getElementById("waterPie"),{
+      type:"pie",
+      data:{labels:["WTP","BWSSB","STP","Rain","RO","CWTP","CSTP"],datasets:[{data:values, backgroundColor:["#1e3c72","#2196f3","#4caf50","#00bcd4","#ff9800","#9c27b0","#f44336"]}]}
+    });
+  } else {
+    waterPie.data.datasets[0].data=values; waterPie.update();
+  }
+}
+
+const chartColors = {
+  bwssb: { bg:"rgba(33,150,243,0.8)", border:"#2196f3" },
+  rain:  { bg:"rgba(0,188,212,0.7)", border:"#00bcd4" },
+  stp:   { bg:"rgba(76,175,80,0.7)", border:"#4caf50" },
+  cwtp:  { bg:"rgba(255,152,0,0.7)", border:"#ff9800" },
+  ro:    { bg:"rgba(156,39,176,0.7)", border:"#9c27b0" }
+};
+
+function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
+  if(charts4[id]) charts4[id].destroy();
+  let c = chartColors[colorKey];
+  
+  charts4[id] = new Chart(document.getElementById(id),{
+    type: type, 
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data,
+        backgroundColor: c.bg,
+        borderColor: c.border,
+        borderWidth: is3D ? 4 : 1,
+        borderRadius: 4,
+        tension: 0.3,
+        fill: type === 'line'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+        y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(88, 14, 216, 0.05)" }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period = "Apr'25-Apr'26") {
+  const container = document.getElementById("asciiBars");
+  
+  const values = [bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal];
+  const maxValue = Math.max(...values.filter(v => v > 0 || v === 1200), 1000);
+  const maxBarLength = 28;
+  
+  const sources = [
+    { name: "BWSSB", value: bwssbTotal || 0, color: "#2196f3" },
+    { name: "Rain", value: rainTotal || 0, color: "#00bcd4" },
+    { name: "STP", value: stpTotal || 0, color: "#4caf50" },
+    { name: "CWTP", value: cwtpTotal || 0, color: "#ff9800" },
+    { name: "RO", value: roTotal || 1200, color: "#9c27b0" }
+  ];
+  
+  let html = '';
+  
+  sources.forEach((source, index) => {
+    const barLength = Math.max(1, Math.floor((source.value / maxValue) * maxBarLength));
+    const filledBar = "█".repeat(barLength);
+    const emptyBar = "░".repeat(maxBarLength - barLength);
+    const percentage = ((source.value / maxValue) * 100).toFixed(1);
+    const formattedValue = Math.round(source.value).toLocaleString();
+   html += `
+<div style="
+    display:grid;
+    grid-template-columns:65px 210px 85px 60px;
+    align-items:center;
+    gap:8px;
+    margin-bottom:8px;
+    white-space:nowrap;
+    font-family:'Courier New', monospace;
+">
+    <span style="color:${source.color};font-weight:bold;font-size:12px;">${source.name}:</span>
+    <div style="overflow:hidden;border-left:4px solid ${source.color};padding-left:6px;">
+        <span style="color:${source.color};">${filledBar}</span><span style="color:#bbb;">${emptyBar}</span>
+    </div>
+    <span style="color:${source.color};font-weight:bold;text-align:right;">${formattedValue}</span>
+    <span style="color:${source.color};font-size:11px;font-weight:bold;text-align:left;">(${percentage}%)</span>
+</div>
+`;
+  });
+  
+  container.innerHTML = html;
+}
+
+async function loadManhoursWorked(){
+  try{
+    let data = await csv(sheets.manhours);
+    
+    let headerRowIndex = -1;
+    let monthName = "";
+    
+    monthName = new Date().toLocaleString('en-IN',{month:'long'}).toLowerCase();
+    headerRowIndex = data.findIndex(r => {
+      let rowText = r.join(" ").toLowerCase();
+      return rowText.includes(monthName);
+    });
+    
+    if(headerRowIndex === -1){
+      headerRowIndex = data.findIndex(r => {
+        let rowText = r.join(" ").toLowerCase();
+        return rowText.includes("april") || rowText.includes("apr");
+      });
+      monthName = "April";
+    }
+    
+    if(headerRowIndex === -1) {
+      document.getElementById("mMonth").innerText = "No Data";
+      return;
+    }
+    
+    let header = data[headerRowIndex];
+    document.getElementById("mMonth").innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+    
+    let value = 0;
+    for(let i=headerRowIndex+1; i<data.length; i++){
+      let name = (data[i][0] || "").toLowerCase();
+      if(name.includes("manhours") || name.includes("man hours") || name.includes("mh")){
+        let monthIndex = -1;
+        for(let j=0; j<header.length; j++){
+          let cell = (header[j] || "").toLowerCase();
+          if(cell.includes(monthName) || (monthName === "april" && (cell.includes("apr") || cell.includes("4")))){
+            monthIndex = j;
+            break;
+          }
+        }
+        if(monthIndex !== -1){
+          value = parseFloat((data[i][monthIndex] || "0").toString().replace(/,/g,'')) || 0;
+          break;
+        }
+      }
+    }
+    
+    document.getElementById("manhours").innerText = value.toLocaleString();
+  }catch(e){
+    console.error("Manhours Error:", e);
+    document.getElementById("mMonth").innerText = "Error";
+  }
+}
+
+async function loadStats(){
+  try{
+    let near = await csv(sheets.near);
+    let inc  = await csv(sheets.incident);
+    let now  = new Date();
+    function findDate(row){
+      for(let i=0;i<row.length;i++){
+        let d=new Date(row[i]);
+        if(!isNaN(d)) return d;
+      }
+      return null;
+    }
+    function count(data){
+      let c=0;
+      for(let i=1;i<data.length;i++){
+        let d=findDate(data[i]);
+        if(!d) continue;
+        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;
+      }
+      return c;
+    }
+    let nc = count(near), ic = count(inc);
+    document.getElementById("near").innerText = nc;
+    document.getElementById("month1").innerText = new Date().toLocaleString('en-IN',{month:'short'});
+    document.getElementById("incident").innerText = ic;
+    document.getElementById("month2").innerText = new Date().toLocaleString('en-IN',{month:'short'});
+    updatePie(nc, ic);
+  }catch(e){}
+}
+
+async function loadCompliance(){
+  try{
+    let data = await csv(sheets.comp);
+    let tb = document.getElementById("table");
+    tb.innerHTML = "";
+    let now = new Date();
+    for(let i=1;i<data.length;i++){
+      let d = new Date(data[i][8]);
+      if(isNaN(d)) continue;
+      let days = Math.ceil((d-now)/86400000);
+      if(days>=0 && days<=90){
+        tb.innerHTML += `<tr><td>${data[i][0]}</td><td>${data[i][1]}</td><td class="red">${days}</td><td>${d.toLocaleDateString()}</td></tr>`;
+      }
+    }
+  }catch(e){}
+}
+
+async function loadWater(){
+  try{
+    let data = await csv(sheets.water);
+    let header = data.find(r => r.join(" ").includes("Apr'25"));
+    if(!header) return;
+    let months = header.slice(2);
+    let selectedIndex = months.length - 1;
+    for(let i=months.length-1;i>=0;i--){
+      let found=false;
+      for(let r=1;r<data.length;r++){
+        let val = parseFloat(data[r][i+2]);
+        if(val && val>0){ found=true; break; }
+      }
+      if(found){ selectedIndex=i; break; }
+    }
+    document.getElementById("waterMonth").innerText = months[selectedIndex];
+
+    let values = {WTP:0,BWSSB:0,STP:0,Rain:0,RO:0,CWTP:0,CSTP:0};
+    for(let i=1;i<data.length;i++){
+      let name = (data[i][1]||"").toLowerCase();
+      let val = parseFloat(data[i][selectedIndex+2])||0;
+      if(name.includes("wtp reading")) values.WTP = val;
+      else if(name.includes("bwssb")) values.BWSSB = val;
+      else if(name.includes("stp treated")) values.STP = val;
+      else if(name.includes("rain")) values.Rain = val;
+      else if(name.includes("ro")) values.RO = val;
+      else if(name.includes("chiller wtp")) values.CWTP = val;
+      else if(name.includes("chiller stp")) values.CSTP = val;
+    }
+
+    document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
+    document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
+    document.getElementById("stp").innerText   = values.STP.toLocaleString();
+    document.getElementById("rain").innerText  = values.Rain.toLocaleString();
+    document.getElementById("ro").innerText    = values.RO.toLocaleString();
+    document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
+    document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
+
+    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.Rain,values.RO,values.CWTP,values.CSTP]);
+  }catch(e){}
+}
 
 /* ============ WATER DASHBOARD FUNCTIONS ============ */
 const waterSheetID = "1b-8OGZK56Ejqm0SO44KzpCyo80awEODk";
@@ -1415,370 +2070,6 @@ async function loadWaterDashboardSlide3(){
     }
 
     createWaterChartsRow(sumData, treatedData, kwhData, avgData);
-}
-
-/* ============ EXISTING CODE ============ */
-setInterval(()=>{
-  document.getElementById("time").innerText =
-    new Date().toLocaleString('en-IN',{
-      weekday:'long',year:'numeric',month:'long',day:'numeric',
-      hour:'2-digit',minute:'2-digit',second:'2-digit'
-    });
-},1000);
-
-let current=0;
-const slides=document.querySelectorAll(".slide");
-let slideTimer = null;
-let isPaused = false;
-
-const dotsEl = document.getElementById("dots");
-slides.forEach((_,i)=>{
-  let d = document.createElement("div");
-  d.className = "slide-dot" + (i===0?" active":"");
-  d.onclick = ()=> goSlide(i);
-  dotsEl.appendChild(d);
-});
-
-function updateDots(){
-  document.querySelectorAll(".slide-dot").forEach((d,i)=>{
-    d.classList.toggle("active", i===current);
-  });
-}
-
-function show(n){
-  slides.forEach(s=>s.classList.remove("active"));
-  slides[n].classList.add("active");
-  updateDots();
-}
-
-function goSlide(n){ current = n; show(n); }
-function nextSlide(){ current = (current + 1) % slides.length; show(current); }
-function prevSlide(){ current = (current - 1 + slides.length) % slides.length; show(current); }
-
-function startSlides(){
-  if(slideTimer) clearInterval(slideTimer);
-  slideTimer = setInterval(()=>{ if(!isPaused) nextSlide(); }, 40000);
-}
-
-function toggleHold(){
-  const btn = document.getElementById("holdBtn");
-  isPaused = !isPaused;
-  if(isPaused){
-    if(slideTimer) clearInterval(slideTimer);
-    btn.innerText = "▶ Resume"; btn.classList.add("active");
-  } else {
-    startSlides();
-    btn.innerText = "⏸ Hold"; btn.classList.remove("active");
-  }
-}
-
-function toggleFullScreen(){
-  if(!document.fullscreenElement){
-    document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-}
-
-async function csv(url){
-  let r = await fetch(url+"&_="+Date.now());
-  let t = await r.text();
-  return t.trim().split("\n").map(x=>x.split(","));
-}
-
-const sheets = {
-  near: "https://docs.google.com/spreadsheets/d/1NDBJNjEyQOr_Pc0cJaEE1jm8lGqLZWLgiH5uQ5fAr2w/export?format=csv&gid=645044779",
-  incident: "https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/export?format=csv&gid=1861922433",
-  comp: "https://docs.google.com/spreadsheets/d/1orsK8rpDVKNbQJa8aaCczKvoASL01KcV/export?format=csv&gid=623918223",
-  manhours: "https://docs.google.com/spreadsheets/d/1HMdv_W7UcDzQrNAjRrW9e-nZZhUUA3boYk9ZfAPAv2E/export?format=csv&gid=669455145",
-  water: "https://docs.google.com/spreadsheets/d/1b-8OGZK56Ejqm0SO44KzpCyo80awEODk/export?format=csv&gid=1876581317"
-};
-
-let pie, waterPie, charts4 = {}, charts5 = {};
-
-function updatePie(a,b){
-  if(!pie){
-    pie = new Chart(document.getElementById("ehsPie"),{
-      type:"pie", data:{labels:["Near Miss","Incident"],datasets:[{data:[a,b],backgroundColor:["#ff9800","#f44336"]}]},
-      options:{responsive:true}
-    });
-  } else {
-    pie.data.datasets[0].data=[a,b]; pie.update();
-  }
-}
-
-function updateWaterPie(values){
-  if(!waterPie){
-    waterPie = new Chart(document.getElementById("waterPie"),{
-      type:"pie",
-      data:{labels:["WTP","BWSSB","STP","Rain","RO","CWTP","CSTP"],datasets:[{data:values, backgroundColor:["#1e3c72","#2196f3","#4caf50","#00bcd4","#ff9800","#9c27b0","#f44336"]}]}
-    });
-  } else {
-    waterPie.data.datasets[0].data=values; waterPie.update();
-  }
-}
-
-const chartColors = {
-  bwssb: { bg:"rgba(33,150,243,0.8)", border:"#2196f3" },
-  rain:  { bg:"rgba(0,188,212,0.7)", border:"#00bcd4" },
-  stp:   { bg:"rgba(76,175,80,0.7)", border:"#4caf50" },
-  cwtp:  { bg:"rgba(255,152,0,0.7)", border:"#ff9800" },
-  ro:    { bg:"rgba(156,39,176,0.7)", border:"#9c27b0" }
-};
-
-function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
-  if(charts4[id]) charts4[id].destroy();
-  let c = chartColors[colorKey];
-  
-  charts4[id] = new Chart(document.getElementById(id),{
-    type: type, 
-    data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        backgroundColor: c.bg,
-        borderColor: c.border,
-        borderWidth: is3D ? 4 : 1,
-        borderRadius: 4,
-        tension: 0.3,
-        fill: type === 'line'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { ticks: { font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
-        y: { ticks: { font: { size: 10 } }, grid: { color: "rgba(88, 14, 216, 0.05)" }, beginAtZero: true }
-      }
-    }
-  });
-}
-
-function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period = "Apr'25-Apr'26") {
-  const container = document.getElementById("asciiBars");
-  
-  const values = [bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal];
-  const maxValue = Math.max(...values.filter(v => v > 0 || v === 1200), 1000);
-  const maxBarLength = 28;
-  
-  const sources = [
-    { name: "BWSSB", value: bwssbTotal || 0, color: "#2196f3" },
-    { name: "Rain", value: rainTotal || 0, color: "#00bcd4" },
-    { name: "STP", value: stpTotal || 0, color: "#4caf50" },
-    { name: "CWTP", value: cwtpTotal || 0, color: "#ff9800" },
-    { name: "RO", value: roTotal || 1200, color: "#9c27b0" }
-  ];
-  
-  let html = '';
-  
-  sources.forEach((source, index) => {
-    const barLength = Math.max(1, Math.floor((source.value / maxValue) * maxBarLength));
-    
-    const filledBar = "█".repeat(barLength);
-    const emptyBar = "░".repeat(maxBarLength - barLength);
-    
-    const percentage = ((source.value / maxValue) * 100).toFixed(1);
-    
-    const formattedValue = Math.round(source.value).toLocaleString();
-   html += `
-<div style="
-    display:grid;
-    grid-template-columns:65px 210px 85px 60px;
-    align-items:center;
-    gap:8px;
-    margin-bottom:8px;
-    white-space:nowrap;
-    font-family:'Courier New', monospace;
-">
-
-    <!-- LABEL -->
-    <span style="
-        color:${source.color};
-        font-weight:bold;
-        font-size:12px;
-    ">
-        ${source.name}:
-    </span>
-
-    <!-- BAR -->
-    <div style="
-        overflow:hidden;
-        border-left:4px solid ${source.color};
-        padding-left:6px;
-    ">
-        <span style="color:${source.color};">${filledBar}</span><span style="color:#bbb;">${emptyBar}</span>
-    </div>
-
-    <!-- VALUE -->
-    <span style="
-        color:${source.color};
-        font-weight:bold;
-        text-align:right;
-    ">
-        ${formattedValue}
-    </span>
-
-    <!-- PERCENT -->
-    <span style="
-        color:${source.color};
-        font-size:11px;
-        font-weight:bold;
-        text-align:left;
-    ">
-        (${percentage}%)
-    </span>
-
-</div>
-`;
-  });
-  
-  container.innerHTML = html;
-}
-
-async function loadManhoursWorked(){
-  try{
-    let data = await csv(sheets.manhours);
-    
-    let headerRowIndex = -1;
-    let monthName = "";
-    
-    monthName = new Date().toLocaleString('en-IN',{month:'long'}).toLowerCase();
-    headerRowIndex = data.findIndex(r => {
-      let rowText = r.join(" ").toLowerCase();
-      return rowText.includes(monthName);
-    });
-    
-    if(headerRowIndex === -1){
-      headerRowIndex = data.findIndex(r => {
-        let rowText = r.join(" ").toLowerCase();
-        return rowText.includes("april") || rowText.includes("apr");
-      });
-      monthName = "April";
-    }
-    
-    if(headerRowIndex === -1) {
-      document.getElementById("mMonth").innerText = "No Data";
-      return;
-    }
-    
-    let header = data[headerRowIndex];
-    document.getElementById("mMonth").innerText = monthName.charAt(0).toUpperCase() + monthName.slice(1);
-    
-    let value = 0;
-    for(let i=headerRowIndex+1; i<data.length; i++){
-      let name = (data[i][0] || "").toLowerCase();
-      if(name.includes("manhours") || name.includes("man hours") || name.includes("mh")){
-        let monthIndex = -1;
-        for(let j=0; j<header.length; j++){
-          let cell = (header[j] || "").toLowerCase();
-          if(cell.includes(monthName) || (monthName === "april" && (cell.includes("apr") || cell.includes("4")))){
-            monthIndex = j;
-            break;
-          }
-        }
-        if(monthIndex !== -1){
-          value = parseFloat((data[i][monthIndex] || "0").toString().replace(/,/g,'')) || 0;
-          break;
-        }
-      }
-    }
-    
-    document.getElementById("manhours").innerText = value.toLocaleString();
-  }catch(e){
-    console.error("Manhours Error:", e);
-    document.getElementById("mMonth").innerText = "Error";
-  }
-}
-
-async function loadStats(){
-  try{
-    let near = await csv(sheets.near);
-    let inc  = await csv(sheets.incident);
-    let now  = new Date();
-    function findDate(row){
-      for(let i=0;i<row.length;i++){
-        let d=new Date(row[i]);
-        if(!isNaN(d)) return d;
-      }
-      return null;
-    }
-    function count(data){
-      let c=0;
-      for(let i=1;i<data.length;i++){
-        let d=findDate(data[i]);
-        if(!d) continue;
-        if(d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear()) c++;
-      }
-      return c;
-    }
-    let nc = count(near), ic = count(inc);
-    document.getElementById("near").innerText = nc;
-    document.getElementById("month1").innerText = new Date().toLocaleString('en-IN',{month:'short'});
-    document.getElementById("incident").innerText = ic;
-    document.getElementById("month2").innerText = new Date().toLocaleString('en-IN',{month:'short'});
-    updatePie(nc, ic);
-  }catch(e){}
-}
-
-async function loadCompliance(){
-  try{
-    let data = await csv(sheets.comp);
-    let tb = document.getElementById("table");
-    tb.innerHTML = "";
-    let now = new Date();
-    for(let i=1;i<data.length;i++){
-      let d = new Date(data[i][8]);
-      if(isNaN(d)) continue;
-      let days = Math.ceil((d-now)/86400000);
-      if(days>=0 && days<=90){
-        tb.innerHTML += `<tr><td>${data[i][0]}</td><td>${data[i][1]}</td><td class="red">${days}</td><td>${d.toLocaleDateString()}</td></tr>`;
-      }
-    }
-  }catch(e){}
-}
-
-async function loadWater(){
-  try{
-    let data = await csv(sheets.water);
-    let header = data.find(r => r.join(" ").includes("Apr'25"));
-    if(!header) return;
-    let months = header.slice(2);
-    let selectedIndex = months.length - 1;
-    for(let i=months.length-1;i>=0;i--){
-      let found=false;
-      for(let r=1;r<data.length;r++){
-        let val = parseFloat(data[r][i+2]);
-        if(val && val>0){ found=true; break; }
-      }
-      if(found){ selectedIndex=i; break; }
-    }
-    document.getElementById("waterMonth").innerText = months[selectedIndex];
-
-    let values = {WTP:0,BWSSB:0,STP:0,Rain:0,RO:0,CWTP:0,CSTP:0};
-    for(let i=1;i<data.length;i++){
-      let name = (data[i][1]||"").toLowerCase();
-      let val = parseFloat(data[i][selectedIndex+2])||0;
-      if(name.includes("wtp reading")) values.WTP = val;
-      else if(name.includes("bwssb")) values.BWSSB = val;
-      else if(name.includes("stp treated")) values.STP = val;
-      else if(name.includes("rain")) values.Rain = val;
-      else if(name.includes("ro")) values.RO = val;
-      else if(name.includes("chiller wtp")) values.CWTP = val;
-      else if(name.includes("chiller stp")) values.CSTP = val;
-    }
-
-    document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
-    document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
-    document.getElementById("stp").innerText   = values.STP.toLocaleString();
-    document.getElementById("rain").innerText  = values.Rain.toLocaleString();
-    document.getElementById("ro").innerText    = values.RO.toLocaleString();
-    document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
-    document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
-
-    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.Rain,values.RO,values.CWTP,values.CSTP]);
-  }catch(e){}
 }
 
 async function loadWaterDashboard(){
@@ -2268,11 +2559,9 @@ document.getElementById("s6_totalPower").innerText=(sum(g["Power - TOTAL"]||[])/
 document.getElementById("s6_totalDG").innerText=sum(g["DG Units - Total DG"]||[]);
 document.getElementById("s6_currentDGPower").innerText=((g["Power - DG"]?.slice(-1)[0]||0)/1000).toFixed(1)+"K";
 }
-// Add this after the existing slide functions (around line 650, before init())
 
 // ============= KEYBOARD NAVIGATION =============
 document.addEventListener('keydown', function(e) {
-  // Prevent default for arrow keys when fullscreen
   if (document.fullscreenElement) {
     e.preventDefault();
   }
@@ -2296,39 +2585,18 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
-// Focus management for better UX
 document.querySelectorAll('button').forEach(btn => {
   btn.addEventListener('focus', function() {
-    this.blur(); // Auto-blur for cleaner look (optional)
+    this.blur();
   });
 });
 
-// ============= IMPROVED SLIDE INDICATORS =============
-function updateDots() {
-  document.querySelectorAll(".slide-dot").forEach((d, i) => {
-    d.classList.toggle("active", i === current);
-    
-    // Add keyboard navigation to dots
-    d.tabIndex = 0; // Make focusable
-    d.onkeydown = (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        goSlide(i);
-      }
-    };
-  });
-  
-  // Focus first dot when slide changes
-  setTimeout(() => {
-    document.querySelector('.slide-dot.active').focus();
-  }, 100);
-}
 async function init(){
   show(0);
   startSlides();
   await Promise.all([
-    loadStats(),
-    loadManhoursWorked(),
+    // loadStats(), // REMOVED - Slide Deleted
+    // loadManhoursWorked(), // REMOVED - Slide Deleted
     loadCompliance(),
     loadWater(),
     loadWaterDashboardSlide3(),
@@ -2340,8 +2608,8 @@ async function init(){
 
 init();
 
-setInterval(loadStats, 30000);
-setInterval(loadManhoursWorked, 60000);
+// setInterval(loadStats, 30000); // REMOVED - Slide Deleted
+// setInterval(loadManhoursWorked, 60000); // REMOVED - Slide Deleted
 setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboardSlide3, 30000);
@@ -2350,5 +2618,5 @@ setInterval(loadCampusAnalytics, 10000);
 setInterval(loadMarrData, 30000);
 
 </script>
-</body>
+</body> 
 </html>
