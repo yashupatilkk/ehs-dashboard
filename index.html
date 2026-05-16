@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EHS Dashboard FINAL UNIFIED + Enterprise</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,19 +12,25 @@
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:Arial, sans-serif; background:#f0f2f5; overflow-x: hidden; }
+body { 
+  font-family:Arial, sans-serif; 
+  background:#f0f2f5; 
+  overflow-x: hidden; 
+  padding-bottom: 60px;
+}
 
 header {
   background: linear-gradient(to right,#1e3c72,#2a5298);
   color:white;
   text-align:center;
   padding: 10px;
-  position:relative;
+  position:sticky;
+  top:0;
+  z-index:1000;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  /* Fixed height to prevent layout jumping */
   min-height: 130px; 
   flex-shrink: 0;
 }
@@ -40,7 +46,8 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
    ========================================= */
 #es_combined-slide {
   display:flex !important; flex-direction:column;
-  height:calc(100vh - 130px); overflow:hidden;
+  height:calc(100vh - 130px);
+  overflow:hidden;
 }
 
 .es-wrapper {
@@ -77,105 +84,335 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
   color:#f1f5f9; line-height:1.1; 
 }
 
+/* =========================================================
+   BLACK TITLE
+========================================================= */
+
+.es-bottom-title{
+    color:#000000 !important;
+}
+/* =========================================================
+   AUTO UPDATE TEXT BLACK
+========================================================= */
+
+.es-dot{
+    background:#000000 !important;
+}
+
 /* Color variants */
 .es-kpi-card.manhours  { border-left:4px solid #6366f1; }
-.es-kpi-card.manhours .es-kpi-value {
-  color: #000000 !important;
-}
+.es-kpi-card.manhours .es-kpi-value { color: #000000 !important; }
 .es-kpi-card.near-miss { border-left:4px solid #f59e0b; }
-
-/* UPDATED: Incident Value to Orange */
 .es-kpi-card.incident  { border-left:4px solid #f97316; }
 .es-kpi-card.incident .es-kpi-value { color: #f97316; } 
-
 .es-kpi-card.total-nm  { border-left:4px solid #facc15; background:rgba(250,204,21,0.08); }
 .es-kpi-card.total-inc { border-left:4px solid #ef4444; background:rgba(239,68,68,0.08); }
-
-/* UPDATED: Combined Total Value to Black */
 .es-kpi-card.combined  { border-left:4px solid #10b981; background:rgba(16,185,129,0.08); }
 .es-kpi-card.combined  .es-kpi-value { color: #000000 !important; }
-
 .es-kpi-card.near-miss .es-kpi-value { color:#f59e0b; }
 .es-kpi-card.total-nm  .es-kpi-value { color:#facc15; }
 .es-kpi-card.total-inc .es-kpi-value { color:#f97316; }
 
-
-.es-pie-panel { flex:1; display:flex; flex-direction:column; gap:8px; min-width:0; min-height:0; }
-.es-pie-box {
-  flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
-  border-radius:20px; padding:18px; display:flex; align-items:center; justify-content:center;
-  box-shadow:0 6px 24px rgba(0,0,0,0.4); min-height:0; overflow:hidden;
-}
-.es-pie-box canvas { max-width:100% !important; max-height:100% !important; }
-
-.es-bottom {
-  flex:1; display:flex; flex-direction:column; min-height:0;
-  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
-  border-radius:20px; padding:18px 22px; box-shadow:0 6px 24px rgba(0,0,0,0.4);
-}
-.es-bottom-header { 
-  display:flex; justify-content:space-between; align-items:center; 
-  margin-bottom:14px; flex-shrink:0; flex-wrap:wrap; gap:10px; 
-}
-.es-bottom-title { 
-  font-size:clamp(1rem,1.4vw,1.2rem); font-weight:700; color:black; 
-}
-.es-live-badge { 
-  display:flex; align-items:center; gap:8px; padding:8px 16px; 
-  border-radius:50px; background:rgba(16,185,129,0.15); 
-  border:1px solid rgba(16,185,129,0.3); color:#10b981; 
-  font-weight:600; font-size:0.85rem; 
-}
-.es-dot { 
-  width:8px; height:8px; background:#10b981; border-radius:50%; 
-  animation:esPulse 2s infinite; flex-shrink:0; 
-}
-@keyframes esPulse { 
-  0%,100%{transform:scale(1);opacity:1;} 
-  50%{transform:scale(1.8);opacity:0.5;} 
+/* --- RIGHT PANEL: SPLIT INTO TWO VISUAL BOXES --- */
+.es-pie-panel { 
+  flex:1; 
+  display:flex; 
+  flex-direction:row; /* Side by Side */
+  gap:12px; 
+  min-width:0; 
+  min-height:0; 
 }
 
-.es-charts-row { 
-  flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px; min-height:0; 
+/* Common Style for both visual boxes */
+.es-visual-box {
+  flex:1;
+  background:rgba(255,255,255,0.05); 
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:20px; 
+  padding:10px; 
+  display:flex; 
+  flex-direction:column;
+  box-shadow:0 6px 24px rgba(0,0,0,0.4); 
+  position:relative;
 }
-.es-chart-box {
-  display:flex; flex-direction:column; min-height:0;
-  background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07);
-  border-radius:16px; padding:14px 18px; box-shadow:inset 0 1px 0 rgba(255,255,255,0.06);
+
+.es-visual-label {
+  text-align:center;
+  font-size:10px;
+  font-weight:700;
+  color:#64748b;
+  text-transform:uppercase;
+  margin-bottom:5px;
+  letter-spacing:1px;
 }
-.es-chart-box-title { 
-  font-size:12px; font-weight:700; color:#94a3b8; text-align:center; 
-  margin-bottom:12px; flex-shrink:0; text-transform:uppercase; 
-  letter-spacing:1.2px; 
+
+.es-visual-content {
+  flex:1;
+  position:relative;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-.es-chart-canvas-wrap { flex:1; position:relative; min-height:0; }
-.es-chart-canvas-wrap canvas { 
-  position:absolute; top:0; left:0; width:100% !important; height:100% !important; 
+
+/* =========================================================
+   MAIN WRAPPER (FIXED - NO MOVEMENT) - ADJUSTED FOR TRIANGLE
+========================================================= */
+
+.pyramid-container-custom{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:10px;
+    position:relative;
+
+    gap:0px; /* ✅ REMOVE SHIFT */
+    
+}
+.pyramid-stack{
+    transform: translateX(-40px);
+}
+/* =========================================================
+   INDICATORS (LEFT / RIGHT FIXED)
+========================================================= */
+
+.indicator{
+  margin-right: 2px;
+  margin-left:0px;
+    width:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:200;
+    text-transform:uppercase;
+    letter-spacing:2px;
+    color:#000;
+    text-align:center;
+    flex-shrink:0; /* Prevents indicator from squishing */
+    
+}
+
+/* LEFT */
+.indicator.left span{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    morign-to bottom:20px;
+}
+
+/* RIGHT */
+.indicator.right span{
+    writing-mode:vertical-rl;
+    morign-to bottom:20px;
+
+}
+
+/* =========================================================
+   CENTER SAFETY LINE (3 COLORS)
+========================================================= */
+
+.safety-line{
+    width:14px;
+    height:320px;
+    border-radius:0px;
+    background:linear-gradient(
+        to bottom,
+        #ef4444 0%,     /* RED - TOP (risk) */
+        #f97316 40%,    /* ORANGE - middle */
+        #facc15 70%,    /* YELLOW */
+        #22c55e 100%    /* GREEN - bottom (safe) */
+    );
+    position:relative;
+    box-shadow:0 10px 25px rgba(0,0,0,0.25);
+    flex-shrink:0; /* Prevents line from shrinking */
+}
+
+
+
+/* =========================================================
+   PYRAMID STACK & LAYERS (ADJUSTED FOR ALIGNMENT)
+========================================================= */
+
+/* This container holds the layers and centers them */
+.pyramid-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* KEY FIX: Centers all layers vertically relative to each other */
+    justify-content: center;
+    position: relative;
+    z-index: 5;
+
+}
+
+.pyr-layer{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #fff;
+    overflow: hidden;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    transition: transform 0.2s ease;
+    flex-shrink:0; /* Prevents squishing */
+}
+
+.pyr-layer:hover{ transform: scale(1.02); }
+
+.pyr-layer.red{
+    width: 115px;
+    height: 88px;
+    background: linear-gradient(to bottom, #ff4d4d, #dc2626);
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+    z-index: 3;
+    margin-bottom: 4px;
+}
+
+.pyr-layer.orange{
+    width: 255px;
+    height: 108px;
+    background: linear-gradient(to bottom, #ffb300, #f97316);
+    clip-path: polygon(27.5% 0%, 72.5% 0%, 100% 100%, 0% 100%);
+    z-index: 2;
+    margin-bottom: 4px;
+}
+
+.pyr-layer.yellow{
+    width: 380px;
+    height: 98px;
+    background: linear-gradient(to bottom, #ffe44d, #facc15);
+    clip-path: polygon(16.7% 0%, 83.3% 0%, 100% 100%, 0% 100%);
+    z-index: 1;
+}
+
+.pyr-val{
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.35);
+}
+
+.pyr-lbl{
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.1;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.28);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* =========================================================
+   CHART SECTION
+========================================================= */
+
+.es-bottom{
+    margin-top:0 !important;
+    flex:1; /* Fills remaining space */
+    min-height:0;
+    display: flex;
+    flex-direction: column;
+}
+
+.es-charts-row{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:12px !important;
+    width:100% !important;
+    height:100%;
+    margin-top:5px !important;
+}
+
+.es-chart-box{
+    position:relative !important;
+    width:100% !important;
+    height:100% !important;
+    min-height:300px;
+    overflow:hidden !important;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:8px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(4px);
+}
+
+.es-chart-box-title{
+    font-size:11px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:5px;
+    color:#94a3b8;
+    flex-shrink:0;
+}
+
+.es-chart-canvas-wrap{
+    position:relative !important;
+    width:100% !important;
+    flex:1 !important;
+    min-height:0;
+}
+
+.es-chart-canvas-wrap canvas{
+    position:absolute !important;
+    top:0;
+    left:0;
+    width:100% !important;
+    height:100% !important;
+}
+
+.es-auto-update{
+    display:inline-flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    color:#000000 !important;
+    font-size:12px !important;
+    font-weight:700 !important;
+}
+
+.es-live-badge {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+/* =========================================================
+   MOBILE FIXES
+========================================================= */
+
+@media(max-width:768px){
+
+    .pyramid-container-custom{
+        padding: 5px 0;
+    }
+
+    .pyramid-stack{
+        max-width: 280px;
+    }
+
+    .pyr-layer.red{ width: 90px; height: 60px; }
+    .pyr-layer.orange{ width: 170px; height: 82px; }
+    .pyr-layer.yellow{ width: 250px; height: 98px; }
+
+    .pyr-val{ font-size: 22px; }
+    .pyr-lbl{ font-size: 9px; }
+
+    .indicator{ font-size: 10px; letter-spacing: 1px; min-width: 30px; width: 10%; }
+
+    .es-charts-row{ grid-template-columns:1fr !important; }
+    .es-chart-box{ min-height: 250px; }
 }
 
 /* =========================================
    ORIGINAL SLIDE STYLES
    ========================================= */
-
-/* SLIDE 1 (Now Slide 2) */
-.container {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin:20px;
-}
-
-.box {
-  background:black;
-  color:white;
-  padding:20px;
-  text-align:center;
-  border-radius:8px;
-}
-
-.value { font-size:35px; font-weight:bold; }
-
-.chartBox { width:300px; margin:auto; }
 
 /* SLIDE 2 (Now Slide 3) */
 table {
@@ -184,21 +421,15 @@ table {
   border-collapse:collapse;
   background:white;
 }
-
 th, td {
   border:1px solid #ccc;
   padding:10px;
   text-align:center;
 }
-
-th {
-  background:#1e3c72;
-  color:white;
-}
-
+th { background:#1e3c72; color:white; }
 .red { background:#ff4444; color:white; font-weight:bold; }
 
-/* SLIDE 3 (Now Slide 4) - UNIFIED DESIGN (ONE STYLE) */
+/* SLIDE 3 (Now Slide 4) - UNIFIED DESIGN */
 .slide3-wrapper {
   background: linear-gradient(135deg, #1e293b, #0f172a);
   padding: 25px;
@@ -221,7 +452,6 @@ th {
   padding-bottom: 10px;
 }
 
-/* Unified Layout for Readings + Pie */
 .waterLayout {
   display: grid;
   grid-template-columns: 1fr 300px 1fr;
@@ -236,20 +466,19 @@ th {
   gap: 10px;
 }
 
-/* Unified Box Style */
 .slide3-wrapper .box {
   background: rgba(0, 0, 0, 0.6);
   border: 1px solid #38bdf8;
   box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   transition: transform 0.3s;
+  padding: 20px;
+  text-align:center;
 }
 
-.slide3-wrapper .box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 15px rgba(56,189,248,0.4);
-}
+.slide3-wrapper .box:hover { transform: translateY(-3px); }
 
-/* Unified Charts Row */
+.value { font-size:35px; font-weight:bold; }
+
 .unified-charts-row {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -301,7 +530,6 @@ th {
   width: 100%;
 }
 
-/* Daily Tracker */
 .unified-daily-tracker {
   background: rgba(0, 0, 0, 0.4);
   border-left: 4px solid #38bdf8;
@@ -349,11 +577,10 @@ th {
   align-items: center;
 }
 
-/* SLIDE 4 (Now Slide 5) */
-.s4-wrapper {
-  padding:12px 16px;
-}
+.chartBox { width:300px; margin:auto; }
 
+/* SLIDE 4 (Now Slide 5) */
+.s4-wrapper { padding:12px 16px; }
 .s4-top-bar {
   background: linear-gradient(to right,#1e3c72,#2a5298);
   color:white;
@@ -363,14 +590,12 @@ th {
   border-radius:6px 6px 0 0;
   letter-spacing:0.5px;
 }
-
 .s4-kpi-row {
   display:grid;
   grid-template-columns:repeat(5,1fr);
   gap:8px;
   margin-bottom:10px;
 }
-
 .s4-kpi {
   background:#1a1a1a;
   color:white;
@@ -383,7 +608,6 @@ th {
   flex-direction:column;
   justify-content:center;
 }
-
 .s4-kpi-head {
   color: #aaa;
   font-size:11px;
@@ -392,23 +616,19 @@ th {
   letter-spacing:0.5px;
   margin-bottom:5px;
 }
-
 .s4-kpi-body { padding:0; }
-
 .s4-kpi-val {
   font-size:26px;
   font-weight:bold;
   color: #fff;
   line-height:1;
 }
-
 .s4-kpi-unit {
   font-size:10px;
   color:#fff;
   margin-top:2px;
   font-weight:bold;
 }
-
 .s4-section-title {
   background:#1e3c72;
   color:white;
@@ -419,20 +639,17 @@ th {
   margin-top:6px;
   letter-spacing:0.5px;
 }
-
 .s4-charts-grid {
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
-
 .s4-chart-card {
   background:#fff;
   border-radius:0 0 6px 6px;
   padding:10px;
   box-shadow:0 2px 6px rgba(0,0,0,0.08);
 }
-
 .s4-chart-card .chart-label {
   font-size:12px;
   font-weight:bold;
@@ -442,13 +659,10 @@ th {
   padding-bottom:5px;
   border-bottom:2px solid #e0e0e0;
 }
-
 .s4-chart-card canvas {
   width:100% !important;
   height:200px !important;
 }
-
-/* ASCII CHART */
 .total-kld-chart {
   background: #fff;
   color: white;
@@ -463,7 +677,6 @@ th {
   display: flex;
   flex-direction: column;
 }
-
 .total-kld-title {
   font-size: 15px;
   font-weight: bold;
@@ -473,13 +686,11 @@ th {
   letter-spacing: 1px;
   flex-shrink: 0;
 }
-
 .ascii-bars-container {
   flex: 1;
   overflow-y: auto;
   padding-right: 5px;
 }
-
 .debug-info {
   font-size: 9px;
   color: #aaa;
@@ -502,7 +713,6 @@ th {
   min-height:78vh;
   height:auto;
 }
-
 .s5-header{
   background:linear-gradient(135deg,#2c5044,#3498db);
   color:white;
@@ -510,14 +720,12 @@ th {
   text-align:center;
   flex-shrink:0;
 }
-
 .s5-header h1{
   font-size:24px;
   margin:0;
   letter-spacing:0.5px;
   font-weight:700;
 }
-
 .s5-content{
   flex:1;
   display:flex;
@@ -526,14 +734,12 @@ th {
   gap:14px;
   overflow:hidden;
 }
-
 .s5-metrics{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:12px;
   flex-shrink:0;
 }
-
 .s5-metric{
   color:white;
   padding:18px 12px;
@@ -545,19 +751,16 @@ th {
   flex-direction:column;
   justify-content:center;
 }
-
 .s5-metric-value{
   font-size:34px;
   font-weight:bold;
   margin-bottom:6px;
   line-height:1;
 }
-
 .s5-metric-label{
   font-size:14px;
   opacity:0.95;
 }
-
 .s5-metric small,
 #rainPeak,
 #growth,
@@ -566,15 +769,13 @@ th {
   margin-top:5px;
   display:block;
 }
-
 .s5-charts{
   flex:1;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
-  min-height:360px;
+  min-height:400px;
 }
-
 .s5-chart-box{
   background:#f8fafc;
   border-radius:14px;
@@ -582,9 +783,9 @@ th {
   display:flex;
   flex-direction:column;
   box-shadow:0 3px 10px rgba(0,0,0,0.08);
-  min-height:360px;
+  min-height:400px;
+  height: 100%;
 }
-
 .s5-chart-box h3{
   margin-bottom:10px;
   text-align:center;
@@ -593,13 +794,11 @@ th {
   font-weight:700;
   flex-shrink:0;
 }
-
 .s5-chart-box canvas{
   width:100% !important;
-  height:300px !important;
-  max-height:300px !important;
+  height:100% !important;
+  max-height:350px !important;
 }
-
 .s5-footer{
   background:linear-gradient(135deg,#1e293b,#334155);
   color:white;
@@ -617,23 +816,19 @@ th {
     flex-direction: column;
     background: linear-gradient(135deg,#eef2ff,#f8fafc);
 }
-
 .slide:nth-child(7).active {
     display: flex;
 }
 
-/* SLIDE 6 */
 .slide:nth-child(6) {
     height: 100vh;
     display: none;
     flex-direction: column;
     background: linear-gradient(135deg,#eef2ff,#f8fafc);
 }
-
 .slide:nth-child(6).active {
     display: flex;
 }
-
 .s6-header{
     background:linear-gradient(135deg,#1d4ed8,#2563eb);
     color:white;
@@ -644,7 +839,6 @@ th {
     border-radius: 8px 8px 0 0;
     margin: 0 10px;
 }
-
 .s6-summary{
     display:flex;
     justify-content:space-around;
@@ -652,7 +846,6 @@ th {
     gap:10px;
     margin: 0 10px;
 }
-
 .s6-summary div{
     background:white;
     padding:10px 15px;
@@ -661,12 +854,10 @@ th {
     text-align:center;
     flex: 1;
 }
-
 .s6-summary b{
     font-size:18px;
     color:#1d4ed8;
 }
-
 .s6-dashboard{
     flex: 1;
     display:grid;
@@ -676,7 +867,6 @@ th {
     padding:10px;
     margin-bottom: 110px;
 }
-
 .s6-card{
     background:white;
     border-radius:14px;
@@ -689,20 +879,17 @@ th {
     overflow:hidden;
     border: 1px solid #e0e7ff;
 }
-
 .s6-card h4{
     font-size:14px;
     margin-bottom:10px;
     color: #333;
 }
-
 .s6-chart-box{
     flex:1;
     width:100%;
     height:100%;
     position: relative;
 }
-
 .s6-power-month {
     position: absolute;
     bottom: 10px;
@@ -715,7 +902,6 @@ th {
     border-radius: 6px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-
 .s6-modal{
     position:fixed;
     top:0;left:0;
@@ -727,7 +913,6 @@ th {
     background:rgba(0,0,0,0.85);
     z-index: 10000;
 }
-
 .s6-modal-content{
     width:90%;
     height:85%;
@@ -745,7 +930,6 @@ th {
   align-items:center;
   gap:5px;
 }
-
 button {
   padding: 4px 10px;
   margin: 0 4px;
@@ -761,9 +945,7 @@ button {
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   opacity: 0.8;
 }
-
-button:hover, 
-button:focus {
+button:hover, button:focus {
   background: #1e3c72 !important;
   color: white !important;
   border-color: rgba(255,255,255,0.9) !important;
@@ -771,37 +953,18 @@ button:focus {
   box-shadow: 0 6px 20px rgba(30, 60, 114, 0.6);
   opacity: 1 !important;
 }
-
-button:active {
-  transform: translateY(0) scale(1.02);
-}
-
+button:active { transform: translateY(0) scale(1.02); }
 #holdBtn {
   background: rgba(255, 152, 0, 0.6) !important;
   border-color: rgba(255, 152, 0, 0.4);
 }
-
-#holdBtn:hover,
-#holdBtn:focus {
-  background: #ff9800 !important;
-  border-color: #fff !important;
-}
-
+#holdBtn:hover, #holdBtn:focus { background: #ff9800 !important; border-color: #fff !important; }
 #holdBtn.active {
   background: rgba(76, 175, 80, 0.8) !important;
   border-color: rgba(76, 175, 80, 0.6);
 }
-
-#holdBtn.active:hover,
-#holdBtn.active:focus {
-  background: #4caf50 !important;
-  border-color: #fff !important;
-}
-
-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5);
-}
+#holdBtn.active:hover, #holdBtn.active:focus { background: #4caf50 !important; border-color: #fff !important; }
+button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 
 .slide-indicator {
   display:flex;
@@ -809,7 +972,6 @@ button:focus {
   gap:6px;
   margin-bottom: 2px;
 }
-
 .slide-dot {
   width:8px; height:8px;
   border-radius:50%;
@@ -819,7 +981,6 @@ button:focus {
   transition:0.3s;
   opacity: 0.6;
 }
-
 .slide-dot.active {
   background: white;
   transform:scale(1.3);
@@ -845,69 +1006,162 @@ button:focus {
   box-shadow:0 6px 18px rgba(0,0,0,0.25);
   transition:0.3s;
 }
-
 #fsBtn:hover{
   transform:translateY(-3px) scale(1.05);
   background:linear-gradient(135deg,#facc15,#fde047);
   box-shadow:0 10px 22px rgba(245,158,11,0.5);
 }
+#fsBtn:active{ transform:scale(0.98); }
 
-#fsBtn:active{
-  transform:scale(0.98);
+/* =========================================
+   IMPROVED RESPONSIVE BREAKPOINTS
+   ========================================= */
+
+/* Desktop Large */
+@media (min-width: 1400px) {
+  /* Optimal Layout */
 }
 
-/* RESPONSIVE */
-@media(max-width:768px){
-  #fsBtn{
-    bottom:10px;
-    right:10px;
-    padding:8px 14px;
-    font-size:11px;
+/* Tablet / Small Laptop */
+@media (max-width: 1200px) {
+  
+  /* Slide 3 Fixes */
+  .waterLayout {
+    grid-template-columns: 1fr 1fr; 
+    grid-template-rows: auto auto;
   }
-  .es-top { flex-direction:column; } 
-  .es-kpi-panel { flex:1; }
-  .es-wrapper { padding:16px; } 
-  .es-charts-row { grid-template-columns:1fr; } 
-  .es-kpi-row { grid-template-columns:1fr 1fr; gap:10px; }
-  .s6-dashboard { grid-template-columns: 1fr; grid-template-rows: auto; overflow-y: auto; }
+  .waterCenter {
+    grid-column: span 2; 
+    order: -1; 
+  }
+  .waterLeft, .waterRight {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+  }
+  .unified-charts-row {
+    grid-template-columns: repeat(2, 1fr); 
+  }
+
+  /* Slide 5 Fixes */
+  .s5-charts {
+    grid-template-columns: 1fr; 
+    gap: 20px;
+  }
+  .s5-chart-box {
+    height: 350px; 
+  }
+  .s5-chart-box canvas {
+    max-height: 300px !important;
+  }
+  
+  /* Slide 1 Fixes (Tablet) */
+  .es-top { flex-direction: column; height: auto; }
+  .es-kpi-panel { width: 100%; height: auto; }
+  .es-pie-panel { width: 100%; height: 400px; flex: none; }
 }
 
-@media (max-width: 1400px) {
-  .unified-charts-row { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 1024px) {
-  .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
-  .s4-kpi-row { grid-template-columns: repeat(3, 1fr); }
-  .s4-chart-card canvas { height: 180px !important; }
-  .s5-charts { grid-template-columns: 1fr; }
-  .s6-dashboard { grid-template-columns: 1fr; grid-template-rows: auto; }
-  .waterLayout { grid-template-columns: 1fr; }
-  .waterCenter { margin: 20px 0; }
-  .s5-container { height: calc(100vh - 170px); }
-}
-
+/* Tablet (Portrait) */
 @media (max-width: 900px) {
   .unified-charts-row { grid-template-columns: 1fr; }
-  .waterLeft, .waterRight { grid-template-columns: 1fr; }
+  .waterLeft, .waterRight { grid-template-columns: 1fr 1fr; }
+  .s4-charts-grid { grid-template-columns: repeat(2, 1fr); }
+  .s4-kpi-row { grid-template-columns: repeat(3, 1fr); }
+  .s5-metrics { grid-template-columns: 1fr; }
 }
 
-@media (max-width: 600px) {
-  .s4-charts-grid { grid-template-columns: 1fr; }
-  .s4-kpi-row { grid-template-columns: repeat(2, 1fr); }
+/* Mobile Phones */
+@media (max-width: 768px){
+  #fsBtn{ bottom:10px; right:10px; padding:8px 14px; font-size:11px; }
   header h2 { font-size: 18px; }
-  .s4-chart-card canvas { height: 200px !important; }
-  .s5-metrics { grid-template-columns: 1fr; }
-  .s5-header { padding: 15px 20px; }
+  
+  /* --- SLIDE 1 (Enterprise) --- */
+  #es_combined-slide {
+    height: auto !important;
+    min-height: calc(100vh - 140px);
+    overflow-y: auto;
+    display: block !important;
+  }
+  .es-wrapper { padding: 10px; overflow: visible; }
+  .es-top { flex-direction: column; height: auto; flex: none; }
+  .es-kpi-panel { width: 100%; height: auto; }
+  
+  /* Right Panel: Stack vertically on mobile */
+  .es-pie-panel { 
+    width: 100%; 
+    height: auto; 
+    flex: none; 
+    flex-direction: column; 
+    order: -1; 
+    margin-bottom: 20px; 
+  }
+  .es-visual-box { height: 250px; width: 100%; flex: none; }
+  
+  .es-bottom { height: auto; flex: none; }
+  .es-charts-row { display: flex; flex-direction: column; gap: 30px; }
+  .es-chart-canvas-wrap { position: relative; height: 250px !important; width: 100%; }
+  .es-chart-canvas-wrap canvas { position: relative !important; }
+  .es-kpi-row { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* --- SLIDE 3 (Water) Fixes --- */
+  .slide3-wrapper {
+    padding: 10px; margin: 5px; border-radius: 0; border: none; height: auto;
+  }
+  .slide3-header { font-size: 1.1rem; margin-bottom: 15px; }
+  
+  .waterLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .waterLeft, .waterRight {
+    grid-template-columns: 1fr 1fr; 
+    gap: 8px;
+  }
+  .chartBox {
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    margin: 0 auto;
+  }
+  .chartBox canvas {
+    height: auto !important;
+    max-width: 100%;
+  }
+  .unified-charts-row { grid-template-columns: 1fr; gap: 15px; }
+  .unified-chart-card { padding: 10px; }
+  .unified-chart-container { height: 200px; }
+  .unified-day-grid { grid-template-columns: 1fr; gap: 10px; }
+
+  /* --- SLIDE 5 (Analytics) Fixes --- */
+  .s5-container {
+    height: auto !important;
+    min-height: 100vh;
+    margin: 5px 0;
+    border-radius: 0;
+  }
+  .s5-metrics { grid-template-columns: 1fr; gap: 10px; }
+  .s5-header { padding: 15px 10px; }
   .s5-header h1 { font-size: 1.2em; }
   .s5-content { padding: 10px; }
-  .s5-container { height: calc(100vh - 180px); margin: 5px; }
+  .s5-chart-box { min-height: auto; height: auto; }
+  .s5-chart-box canvas { height: 220px !important; max-height: 220px !important; }
+  .s5-metric-value { font-size: 2rem; }
+
+  /* Slide 4 Adjustments */
+  .s4-charts-grid { grid-template-columns: 1fr; }
+  .s4-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .s4-chart-card canvas { height: 180px !important; }
+  
+  /* Slide 6 Adjustments */
   .s6-power-month { font-size: 11px; left: 10px; bottom: 8px; }
-  button {
-    padding: 4px 8px;
-    font-size: 11px;
-    min-width: 60px;
-  }
+  button { padding: 4px 8px; font-size: 11px; min-width: 60px; }
+}
+
+/* Very Small Screens */
+@media (max-width: 480px) {
+  .es-kpi-row { grid-template-columns: 1fr !important; }
+  .waterLeft, .waterRight { grid-template-columns: 1fr !important; }
 }
 </style>
 </head>
@@ -935,7 +1189,7 @@ button:focus {
 <div class="slide active">
   <div class="es-wrapper" id="es_combined-slide">
 
-    <!-- TOP: KPI Cards (left) + Pie Chart (right) -->
+    <!-- TOP: KPI Cards (left) + Visuals (right) -->
     <div class="es-top">
 
       <!-- LEFT: All KPI Cards -->
@@ -951,89 +1205,33 @@ button:focus {
           </div>
           <div class="es-kpi-card near-miss">
             <div class="es-kpi-icon"><svg width="70" height="80" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- Falling object (moved higher for distance) -->
-  <g transform="translate(6,0)">
-    <rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/>
-    <line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/>
-  </g>
-
-  <!-- Worker shifted slightly left -->
-  <g transform="translate(-4,0)">
-
-    <!-- Helmet -->
-    <path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/>
-
-    <!-- Head -->
-    <circle cx="32" cy="32" r="6" fill="#374151"/>
-
-    <!-- Body -->
-    <path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/>
-
-  </g>
-
-  <!-- Ground line -->
+  <g transform="translate(6,0)"><rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/><line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/></g>
+  <g transform="translate(-4,0)"><path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/><circle cx="32" cy="32" r="6" fill="#374151"/><path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/></g>
   <line x1="10" y1="58" x2="54" y2="58" stroke="#111827" stroke-width="2"/>
-
-</svg></div>    <!-- icon -->
+</svg></div>
             <div class="es-kpi-meta">
               <div class="es-kpi-title">Near Miss — <span id="es_month1">Loading...</span></div>
               <div class="es-kpi-value" id="es_near">0</div>
             </div>
           </div>
           <div class="es-kpi-card incident">
-            <!-- icon -->
             <div class="es-kpi-icon"><svg width="50" height="40" viewBox="0 1 54 64" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- BOARD -->
-  <rect x="6" y="4" width="52" height="56" rx="4"
-        fill="#b08f76" stroke="#333" stroke-width="3"/>
-
-  <!-- PAPER -->
-  <rect x="14" y="10" width="36" height="46" rx="2"
-        fill="#e5e7eb" stroke="#333" stroke-width="3"/>
-
-  <!-- TOP CLIP -->
-  <rect x="24" y="2" width="16" height="10" rx="2"
-        fill="#d1d5db" stroke="#333" stroke-width="3"/>
-
-  <!-- WARNING TRIANGLE 1 -->
-  <polygon points="28,18 18,34 38,34"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="23" x2="28" y2="28"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <rect x="6" y="4" width="52" height="56" rx="4" fill="#b08f76" stroke="#333" stroke-width="3"/>
+  <rect x="14" y="10" width="36" height="46" rx="2" fill="#e5e7eb" stroke="#333" stroke-width="3"/>
+  <rect x="24" y="2" width="16" height="10" rx="2" fill="#d1d5db" stroke="#333" stroke-width="3"/>
+  <polygon points="28,18 18,34 38,34" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="23" x2="28" y2="28" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="31" r="1.5" fill="#333"/>
-
-  <!-- WARNING TRIANGLE 2 -->
-  <polygon points="28,38 18,54 38,54"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="43" x2="28" y2="48"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="28,38 18,54 38,54" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="43" x2="28" y2="48" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="51" r="1.5" fill="#333"/>
-
-  <!-- TEXT LINES -->
-  <line x1="40" y1="20" x2="50" y2="20"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="25" x2="50" y2="25"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="30" x2="46" y2="30"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <line x1="40" y1="42" x2="50" y2="42"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="47" x2="50" y2="47"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="52" x2="46" y2="52"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <!-- PAGE FOLD -->
-  <polygon points="46,48 54,48 46,56"
-           fill="#cbd5e1" stroke="#333" stroke-width="2"/>
-
+  <line x1="40" y1="20" x2="50" y2="20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="25" x2="50" y2="25" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="30" x2="46" y2="30" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="42" x2="50" y2="42" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="47" x2="50" y2="47" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="52" x2="46" y2="52" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="46,48 54,48 46,56" fill="#cbd5e1" stroke="#333" stroke-width="2"/>
 </svg></div>
             <div class="es-kpi-meta">
               <div class="es-kpi-title">Incident — <span id="es_month2">Loading...</span></div>
@@ -1046,30 +1244,9 @@ button:focus {
         <div class="es-kpi-row">
           <div class="es-kpi-card total-nm">
             <div class="es-kpi-icon"><svg width="70" height="80" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- Falling object (moved higher for distance) -->
-  <g transform="translate(6,0)">
-    <rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/>
-    <line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/>
-  </g>
-
-  <!-- Worker shifted slightly left -->
-  <g transform="translate(-4,0)">
-
-    <!-- Helmet -->
-    <path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/>
-
-    <!-- Head -->
-    <circle cx="32" cy="32" r="6" fill="#374151"/>
-
-    <!-- Body -->
-    <path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/>
-
-  </g>
-
-  <!-- Ground line -->
+  <g transform="translate(6,0)"><rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/><line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/></g>
+  <g transform="translate(-4,0)"><path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/><circle cx="32" cy="32" r="6" fill="#374151"/><path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/></g>
   <line x1="10" y1="58" x2="54" y2="58" stroke="#111827" stroke-width="2"/>
-
 </svg></div>
             <div class="es-kpi-meta">
               <div class="es-kpi-title">Total Near Miss</div>
@@ -1078,56 +1255,22 @@ button:focus {
           </div>
           <div class="es-kpi-card total-inc">
             <div class="es-kpi-icon"><svg width="50" height="40" viewBox="0 1 54 64" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- BOARD -->
-  <rect x="6" y="4" width="52" height="56" rx="4"
-        fill="#b08f76" stroke="#333" stroke-width="3"/>
-
-  <!-- PAPER -->
-  <rect x="14" y="10" width="36" height="46" rx="2"
-        fill="#e5e7eb" stroke="#333" stroke-width="3"/>
-
-  <!-- TOP CLIP -->
-  <rect x="24" y="2" width="16" height="10" rx="2"
-        fill="#d1d5db" stroke="#333" stroke-width="3"/>
-
-  <!-- WARNING TRIANGLE 1 -->
-  <polygon points="28,18 18,34 38,34"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="23" x2="28" y2="28"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <rect x="6" y="4" width="52" height="56" rx="4" fill="#b08f76" stroke="#333" stroke-width="3"/>
+  <rect x="14" y="10" width="36" height="46" rx="2" fill="#e5e7eb" stroke="#333" stroke-width="3"/>
+  <rect x="24" y="2" width="16" height="10" rx="2" fill="#d1d5db" stroke="#333" stroke-width="3"/>
+  <polygon points="28,18 18,34 38,34" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="23" x2="28" y2="28" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="31" r="1.5" fill="#333"/>
-
-  <!-- WARNING TRIANGLE 2 -->
-  <polygon points="28,38 18,54 38,54"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="43" x2="28" y2="48"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="28,38 18,54 38,54" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="43" x2="28" y2="48" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="51" r="1.5" fill="#333"/>
-
-  <!-- TEXT LINES -->
-  <line x1="40" y1="20" x2="50" y2="20"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="25" x2="50" y2="25"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="30" x2="46" y2="30"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <line x1="40" y1="42" x2="50" y2="42"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="47" x2="50" y2="47"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="52" x2="46" y2="52"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <!-- PAGE FOLD -->
-  <polygon points="46,48 54,48 46,56"
-           fill="#cbd5e1" stroke="#333" stroke-width="2"/>
-
+  <line x1="40" y1="20" x2="50" y2="20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="25" x2="50" y2="25" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="30" x2="46" y2="30" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="42" x2="50" y2="42" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="47" x2="50" y2="47" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="52" x2="46" y2="52" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="46,48 54,48 46,56" fill="#cbd5e1" stroke="#333" stroke-width="2"/>
 </svg></div>
             <div class="es-kpi-meta">
               <div class="es-kpi-title">Total Incident</div>
@@ -1144,106 +1287,132 @@ button:focus {
         </div>
       </div>
 
-      <!-- RIGHT: Pie Chart -->
+      <!-- RIGHT: Split Visuals (Pie Chart + Pyramid) -->
       <div class="es-pie-panel">
-        <div class="es-section-label">📈 Near Miss vs Incident</div>
-        <div class="es-pie-box">
-          <canvas id="es_ehsPie"></canvas>
+        
+        <!-- Visual Box 1: Circle Chart -->
+        <div class="es-visual-box">
+           <div class="es-visual-label">Near Miss vs Incident</div>
+           <div class="es-visual-content">
+             <canvas id="es_ehsPie"></canvas>
+           </div>
+        </div>
+
+        <!-- Visual Box 2: Safety Triangle -->
+        <div class="es-visual-box">
+           <div class="es-visual-label">Safety Triangle</div>
+           <div class="es-visual-content">
+              <div class="pyramid-container-custom">
+                 
+                 <!-- Left Indicator -->
+                 <!-- LEFT INDICATOR -->
+<div class="indicator left">
+   <span><div style="
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#22c55e;
+    font-weight:800;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-size:12px;
+    padding:10px;
+">
+    ▲
+    
+</div>LEADING INDICATORS</span>
+</div>
+
+<!-- CENTER LINE -->
+<div class="safety-line"></div>
+
+<!-- RIGHT INDICATOR -->
+<div class="indicator right">
+   <span><div style="
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#ef4444;
+    font-weight:800;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    font-size:12px;
+    padding:10px;
+">
+    ▲
+    
+    
+</div>LAGGING INDICATORS</span>
+</div>
+
+                 <!-- Center Pyramid -->
+                 <div class="pyramid-stack">
+                    <!-- Top: Red (Major Injury) -->
+                    <div class="pyr-layer red">
+                       <span class="pyr-val">0</span>
+                       <span class="pyr-lbl">Major Injury</span>
+                    </div>
+                    
+                    <!-- Middle: Orange (Incident) -->
+                    <div class="pyr-layer orange">
+                       <span class="pyr-val" id="pyr_incident">0</span>
+                       <span class="pyr-lbl">Incident</span>
+                    </div>
+                    
+                    <!-- Bottom: Yellow (Near Miss) -->
+                    <div class="pyr-layer yellow">
+                       <span class="pyr-val" id="pyr_nearmiss">0</span>
+                       <span class="pyr-lbl">Near Miss</span>
+                    </div>
+                 </div>
+
+              </div>
+           </div>
         </div>
       </div>
+
     </div>
 
     <!-- BOTTOM: Two Charts Side-by-Side -->
     <div class="es-bottom">
-      <div class="es-bottom-header">
+      <div class="es-bottom-header" style="display:flex; justify-content:space-between; align-items:center; padding-bottom:5px; border-bottom:1px solid rgba(255,255,255,0.1);">
         <span class="es-bottom-title">📊 Apr'25 to Current Month — Monthly Safety Trends</span>
         <span class="es-live-badge">
-          <span class="es-dot"></span> 
-          Auto Updating Every 30s
+          <span class="es-auto-update">
+            <span class="es-dot"></span>
+            Auto Updating Every 30s
+          </span>
         </span>
       </div>
       <div class="es-charts-row">
         <div class="es-chart-box">
           <div class="es-chart-box-title"><svg width="25" height="25" viewBox="0 0 69 40" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- Falling object (moved higher for distance) -->
-  <g transform="translate(6,0)">
-    <rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/>
-    <line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/>
-  </g>
-
-  <!-- Worker shifted slightly left -->
-  <g transform="translate(-4,0)">
-
-    <!-- Helmet -->
-    <path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/>
-
-    <!-- Head -->
-    <circle cx="32" cy="32" r="6" fill="#374151"/>
-
-    <!-- Body -->
-    <path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/>
-
-  </g>
-
-  <!-- Ground line -->
+  <g transform="translate(6,0)"><rect x="44" y="2" width="10" height="14" transform="rotate(25 44 2)" fill="#111827"/><line x1="46" y1="0" x2="46" y2="10" stroke="#111827" stroke-width="2"/></g>
+  <g transform="translate(-4,0)"><path d="M18 22c0-6 6-11 14-11s14 5 14 11v4H18v-4z" fill="#facc15"/><circle cx="32" cy="32" r="6" fill="#374151"/><path d="M18 54c2-8 8-13 14-13s12 5 14 13" fill="#374151"/></g>
   <line x1="10" y1="58" x2="54" y2="58" stroke="#111827" stroke-width="2"/>
-
 </svg> Near Miss Monthly Trend</div>
           <div class="es-chart-canvas-wrap"><canvas id="es_csNmChart"></canvas></div>
         </div>
         <div class="es-chart-box">
           <div class="es-chart-box-title"><svg width="25" height="25" viewBox="0 0 69 40" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- BOARD -->
-  <rect x="6" y="4" width="52" height="56" rx="4"
-        fill="#b08f76" stroke="#333" stroke-width="3"/>
-
-  <!-- PAPER -->
-  <rect x="14" y="10" width="36" height="46" rx="2"
-        fill="#e5e7eb" stroke="#333" stroke-width="3"/>
-
-  <!-- TOP CLIP -->
-  <rect x="24" y="2" width="16" height="10" rx="2"
-        fill="#d1d5db" stroke="#333" stroke-width="3"/>
-
-  <!-- WARNING TRIANGLE 1 -->
-  <polygon points="28,18 18,34 38,34"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="23" x2="28" y2="28"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <rect x="6" y="4" width="52" height="56" rx="4" fill="#b08f76" stroke="#333" stroke-width="3"/>
+  <rect x="14" y="10" width="36" height="46" rx="2" fill="#e5e7eb" stroke="#333" stroke-width="3"/>
+  <rect x="24" y="2" width="16" height="10" rx="2" fill="#d1d5db" stroke="#333" stroke-width="3"/>
+  <polygon points="28,18 18,34 38,34" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="23" x2="28" y2="28" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="31" r="1.5" fill="#333"/>
-
-  <!-- WARNING TRIANGLE 2 -->
-  <polygon points="28,38 18,54 38,54"
-           fill="#fbbf24" stroke="#333" stroke-width="3"/>
-
-  <!-- EXCLAMATION -->
-  <line x1="28" y1="43" x2="28" y2="48"
-        stroke="#333" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="28,38 18,54 38,54" fill="#fbbf24" stroke="#333" stroke-width="3"/>
+  <line x1="28" y1="43" x2="28" y2="48" stroke="#333" stroke-width="3" stroke-linecap="round"/>
   <circle cx="28" cy="51" r="1.5" fill="#333"/>
-
-  <!-- TEXT LINES -->
-  <line x1="40" y1="20" x2="50" y2="20"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="25" x2="50" y2="25"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="30" x2="46" y2="30"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <line x1="40" y1="42" x2="50" y2="42"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="47" x2="50" y2="47"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-  <line x1="40" y1="52" x2="46" y2="52"
-        stroke="#333" stroke-width="2" stroke-linecap="round"/>
-
-  <!-- PAGE FOLD -->
-  <polygon points="46,48 54,48 46,56"
-           fill="#cbd5e1" stroke="#333" stroke-width="2"/>
-
+  <line x1="40" y1="20" x2="50" y2="20" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="25" x2="50" y2="25" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="30" x2="46" y2="30" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="42" x2="50" y2="42" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="47" x2="50" y2="47" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <line x1="40" y1="52" x2="46" y2="52" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="46,48 54,48 46,56" fill="#cbd5e1" stroke="#333" stroke-width="2"/>
 </svg> Incident Monthly Trend</div>
           <div class="es-chart-canvas-wrap"><canvas id="es_csIncChart"></canvas></div>
         </div>
@@ -1481,22 +1650,22 @@ function es_updatePie(nearValue, incidentValue) {
         labels: ["Near Miss", "Incident"],
         datasets: [{
           data: [nearValue, incidentValue],
-          backgroundColor: ["rgba(250,204,21,0.9)", "rgba(249, 115, 22, 0.9)"], // Incident Orange
-          borderColor: ["#facc15", "#f97316"], // Incident Orange Border
+          backgroundColor: ["rgba(250,204,21,0.9)", "rgba(249, 115, 22, 0.9)"],
+          borderColor: ["#facc15", "#f97316"],
           borderWidth: 3,
           hoverOffset: 12
         }]
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
             position: 'bottom',
             labels: {
               color: '#94a3b8',
-              font: { size: 13, weight: '600' },
-              padding: 20,
+              font: { size: 10, weight: '600' }, 
+              padding: 8,
               usePointStyle: true
             }
           },
@@ -1506,11 +1675,11 @@ function es_updatePie(nearValue, incidentValue) {
             bodyColor: '#94a3b8',
             borderColor: '#334155',
             borderWidth: 1,
-            padding: 12
+            padding: 8
           },
           datalabels: {
             color: '#fff',
-            font: { weight: 'bold', size: 14 },
+            font: { weight: 'bold', size: 10 }, 
             formatter: (v, ctx) => {
               let total = ctx.dataset.data.reduce((a, b) => a + b, 0);
               return total ? Math.round(v / total * 100) + '%' : v;
@@ -1641,7 +1810,7 @@ function es_processSafetyData(nearData, incidentData) {
     if (date) {
       const d = new Date(date);
       if (isNaN(d)) return;
-      const startDate = new Date(2025, 3, 1); // Apr 2025
+      const startDate = new Date(2025, 3, 1);
       if (d < startDate) return;
 
       const key = d.toLocaleString('default', { month: 'short' }) + "'" + d.getFullYear().toString().slice(2);
@@ -1661,6 +1830,11 @@ function es_processSafetyData(nearData, incidentData) {
   document.getElementById("esIncidentTotal").innerHTML = incidentTotal.toLocaleString();
   document.getElementById("esCombinedTotal").innerHTML = (nearTotal + incidentTotal).toLocaleString();
 
+  // UPDATE PYRAMID VALUES (Using Totals)
+  document.getElementById("pyr_nearmiss").innerText = nearTotal;
+  document.getElementById("pyr_incident").innerText = incidentTotal;
+  // Red top is hardcoded to 0 in HTML
+
   const filtered = Object.entries(monthMap).sort((a, b) => a[1].sortDate - b[1].sortDate);
   const labels = filtered.map(m => m[0]);
   const nearValues = filtered.map(m => m[1].near);
@@ -1677,7 +1851,7 @@ const ES_CHART_OPTS = {
   plugins: {
     legend: { display: false },
     datalabels: {
-      color: '#000000', // UPDATED: Bar labels to Black
+      color: '#000000',
       anchor: 'end', 
       align: 'top', 
       offset: 4,
@@ -1712,8 +1886,8 @@ function es_drawCsIncChart(labels, data) {
       datasets: [{ 
         label: 'Incident', 
         data, 
-        backgroundColor: 'rgba(249, 115, 22, 0.85)', // UPDATED: Incident Bar to Orange
-        borderColor: '#060945', // UPDATED: Incident Border to Orange
+        backgroundColor: 'rgba(249, 115, 22, 0.85)', 
+        borderColor: '#060945', 
         borderWidth: 3, 
         borderRadius: 10 
       }] 
@@ -2047,7 +2221,7 @@ async function loadWater(){
       if(name.includes("wtp reading")) values.WTP = val;
       else if(name.includes("bwssb")) values.BWSSB = val;
       else if(name.includes("stp treated")) values.STP = val;
-      else if(name.includes("rain")) values.Rain = val;
+      else if(name.includes("rain")) values.RAIN = val;
       else if(name.includes("ro")) values.RO = val;
       else if(name.includes("chiller wtp")) values.CWTP = val;
       else if(name.includes("chiller stp")) values.CSTP = val;
@@ -2056,12 +2230,12 @@ async function loadWater(){
     document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
     document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
     document.getElementById("stp").innerText   = values.STP.toLocaleString();
-    document.getElementById("rain").innerText  = values.Rain.toLocaleString();
+    document.getElementById("rain").innerText  = values.RAIN.toLocaleString();
     document.getElementById("ro").innerText    = values.RO.toLocaleString();
     document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
     document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
 
-    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.Rain,values.RO,values.CWTP,values.CSTP]);
+    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.RAIN,values.RO,values.CWTP,values.CSTP]);
   }catch(e){}
 }
 
@@ -2369,7 +2543,7 @@ async function loadWaterDashboard(){
         }
       }
       if(hasData){
-        selectedIndex = i;
+        selectedIndex=i;
         break;
       }
     }
@@ -2684,7 +2858,6 @@ document.getElementById("s6_charts").innerHTML="";
 createMarrRadial();
 
 createMarrCard("Power","line",[
-
 {
 label:"Total Power",
 data:g["Power - TOTAL"],
@@ -2695,7 +2868,6 @@ pointRadius:4,
 pointBackgroundColor:"#6366f1",
 tension:0.4
 },
-
 {
 label:"EB Units",
 data:g["HVAC - EB Units"],
@@ -2706,7 +2878,6 @@ pointRadius:4,
 pointBackgroundColor:"#ef4444",
 tension:0.4
 },
-
 {
 label:"DG",
 data:g["Power - DG"],
@@ -2717,7 +2888,6 @@ pointRadius:4,
 pointBackgroundColor:"#8b5cf6",
 tension:0.4
 },
-
 {
 label:"Wheeling",
 data:g["Power - Wheeling Units"],
@@ -2728,7 +2898,6 @@ pointRadius:4,
 pointBackgroundColor:"#22c55e",
 tension:0.4
 }
-
 ]);
 
 createMarrCard("Consumption","bar",[
@@ -2857,8 +3026,6 @@ async function init(){
   show(0);
   startSlides();
   await Promise.all([
-    // loadStats(), // REMOVED - Slide Deleted
-    // loadManhoursWorked(), // REMOVED - Slide Deleted
     loadCompliance(),
     loadWater(),
     loadWaterDashboardSlide3(),
@@ -2870,8 +3037,6 @@ async function init(){
 
 init();
 
-// setInterval(loadStats, 30000); // REMOVED - Slide Deleted
-// setInterval(loadManhoursWorked, 60000); // REMOVED - Slide Deleted
 setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboardSlide3, 30000);
