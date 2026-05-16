@@ -51,36 +51,38 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
 }
 
 .es-wrapper {
-  flex:1; display:flex; flex-direction:column; padding:20px 24px; gap:16px;
+  flex:1; display:flex; flex-direction:column; padding:15px 24px; gap:12px;
   overflow:hidden; color:white; font-family:'Segoe UI',Arial,sans-serif; 
   min-height:0; box-sizing:border-box;
 }
 
-.es-top { display:flex; gap:18px; flex:0 0 44%; min-height:0; }
-.es-kpi-panel { flex:1.7; display:flex; flex-direction:column; gap:8px; min-width:0; min-height:0; }
+.es-top { display:flex; gap:18px; flex:0 0 42%; min-height:0; }
+.es-kpi-panel { flex:1.7; display:flex; flex-direction:column; gap:6px; min-width:0; min-height:0; }
 .es-section-label { 
-  font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; 
-  letter-spacing:1.8px; padding:0 4px; flex-shrink:0; 
+  font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; 
+  letter-spacing:1.5px; padding:0 4px; flex-shrink:0; 
 }
-.es-kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; flex:1; min-height:0; }
+.es-kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; flex:1; min-height:0; }
 .es-kpi-card {
   background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
-  border-radius:16px; padding:16px 18px; display:flex; align-items:center; gap:14px;
+  border-radius:14px; padding:10px 12px; /* REDUCED PADDING */
+  display:flex; align-items:center; gap:12px;
   box-shadow:0 6px 24px rgba(0,0,0,0.4); transition:transform 0.3s,box-shadow 0.3s; 
   min-height:0; overflow:hidden; cursor:pointer;
 }
 .es-kpi-card:hover { 
   transform:translateY(-4px); box-shadow:0 14px 36px rgba(0,0,0,0.6); 
 }
-.es-kpi-icon { font-size:1.9rem; flex-shrink:0; line-height:1; }
+.es-kpi-icon { font-size:1.4rem; flex-shrink:0; line-height:1; }
 .es-kpi-meta { flex:1; min-width:0; }
 .es-kpi-title { 
-  font-size:11px; color:#94a3b8; text-transform:uppercase; 
-  letter-spacing:1px; margin-bottom:6px; white-space:nowrap; 
+  font-size:10px; color:#94a3b8; text-transform:uppercase; 
+  letter-spacing:1px; margin-bottom:4px; white-space:nowrap; 
   overflow:hidden; text-overflow:ellipsis; 
 }
 .es-kpi-value { 
-  font-size:clamp(1.5rem,2.5vw,2.4rem); font-weight:800; 
+  font-size:clamp(1.2rem, 1.8vw, 1.8rem); /* REDUCED FONT SIZE */
+  font-weight:800; 
   color:#f1f5f9; line-height:1.1; 
 }
 
@@ -166,49 +168,46 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
     display:flex;
     align-items:center;
     justify-content:center;
-
     padding:10px;
     position:relative;
-
-    gap:0px; /* ✅ REMOVE SHIFT */
-    
+    gap:0px; /* ✅ RESTORED GAP so indicators don't touch triangle */
 }
 .pyramid-stack{
-    transform: translateX(-40px);
+    /* ✅ REMOVED transform: translateX(-40px) - It is now perfectly centered by Flexbox */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    
 }
+
 /* =========================================================
    INDICATORS (LEFT / RIGHT FIXED)
 ========================================================= */
 
 .indicator{
-  margin-right: 2px;
-  margin-left:0px;
     width:40px;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:11px;
+    font-size:10px;
     font-weight:200;
     text-transform:uppercase;
     letter-spacing:2px;
-    color:#000;
+    color:#cbd5e1; /* ✅ Changed from black to gray so it's visible on dark background */
     text-align:center;
-    flex-shrink:0; /* Prevents indicator from squishing */
-    
+    flex-shrink:0; 
 }
 
 /* LEFT */
 .indicator.left span{
     writing-mode:vertical-rl;
     transform:rotate(180deg);
-    morign-to bottom:20px;
 }
 
 /* RIGHT */
 .indicator.right span{
     writing-mode:vertical-rl;
-    morign-to bottom:20px;
-
 }
 
 /* =========================================================
@@ -231,24 +230,12 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
     flex-shrink:0; /* Prevents line from shrinking */
 }
 
-
-
 /* =========================================================
-   PYRAMID STACK & LAYERS (ADJUSTED FOR ALIGNMENT)
+   PYRAMID STACK & LAYERS (SCALED DOWN TO FIT TV)
 ========================================================= */
 
-/* This container holds the layers and centers them */
-.pyramid-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* KEY FIX: Centers all layers vertically relative to each other */
-    justify-content: center;
-    position: relative;
-    z-index: 5;
-
-}
-
 .pyr-layer{
+
     position: relative;
     display: flex;
     flex-direction: column;
@@ -259,47 +246,48 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
     overflow: hidden;
     box-shadow: 0 8px 18px rgba(0,0,0,0.22);
     transition: transform 0.2s ease;
-    flex-shrink:0; /* Prevents squishing */
+    flex-shrink:0; 
 }
 
 .pyr-layer:hover{ transform: scale(1.02); }
 
+/* ✅ SIZES REDUCED TO FIT PERFECTLY */
 .pyr-layer.red{
-    width: 115px;
-    height: 88px;
+    width: 100px;   /* Was 115px */
+    height: 75px;   /* Was 88px */
     background: linear-gradient(to bottom, #ff4d4d, #dc2626);
     clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
     z-index: 3;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .pyr-layer.orange{
-    width: 255px;
-    height: 108px;
+    width: 220px;   /* Was 255px */
+    height: 90px;   /* Was 108px */
     background: linear-gradient(to bottom, #ffb300, #f97316);
-    clip-path: polygon(27.5% 0%, 72.5% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(27% 0%, 73% 0%, 100% 100%, 0% 100%);
     z-index: 2;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .pyr-layer.yellow{
-    width: 380px;
-    height: 98px;
+    width: 320px;   /* Was 380px */
+    height: 85px;   /* Was 98px */
     background: linear-gradient(to bottom, #ffe44d, #facc15);
-    clip-path: polygon(16.7% 0%, 83.3% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(16% 0%, 84% 0%, 100% 100%, 0% 100%);
     z-index: 1;
 }
 
 .pyr-val{
-    font-size: 34px;
+    font-size: 28px; /* Adjusted for smaller box */
     font-weight: 900;
     line-height: 1;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-shadow: 0 2px 5px rgba(0,0,0,0.35);
 }
 
 .pyr-lbl{
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
     line-height: 1.1;
     text-shadow: 0 1px 4px rgba(0,0,0,0.28);
@@ -397,12 +385,12 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; }
         max-width: 280px;
     }
 
-    .pyr-layer.red{ width: 90px; height: 60px; }
-    .pyr-layer.orange{ width: 170px; height: 82px; }
-    .pyr-layer.yellow{ width: 250px; height: 98px; }
+    .pyr-layer.red{ width: 80px; height: 60px; }
+    .pyr-layer.orange{ width: 160px; height: 80px; }
+    .pyr-layer.yellow{ width: 240px; height: 80px; }
 
-    .pyr-val{ font-size: 22px; }
-    .pyr-lbl{ font-size: 9px; }
+    .pyr-val{ font-size: 20px; }
+    .pyr-lbl{ font-size: 8px; }
 
     .indicator{ font-size: 10px; letter-spacing: 1px; min-width: 30px; width: 10%; }
 
@@ -1305,7 +1293,6 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
               <div class="pyramid-container-custom">
                  
                  <!-- Left Indicator -->
-                 <!-- LEFT INDICATOR -->
 <div class="indicator left">
    <span><div style="
     display:inline-flex;
