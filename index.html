@@ -108,7 +108,7 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; color:white;
 
 /* Color variants - Light Backgrounds */
 .es-kpi-card.manhours  { border-left:5px solid #6366f1; }
-.es-kpi-card.near-miss { border-left:5px solid #f59e0b; }
+.es-kpi-card.near-miss { border-left:5px solid #facc15; }
 .es-kpi-card.incident  { border-left:5px solid #f97316; }
 .es-kpi-card.total-nm  { border-left:5px solid #facc15; background: #fffbeb; }
 .es-kpi-card.total-inc { border-left:5px solid #f97316; background: #fef2f2; }
@@ -556,7 +556,7 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 </div>
                  <!-- Center Pyramid -->
                  <div class="pyramid-stack">
-                    <div class="pyr-layer red"><span class="pyr-val">0</span><span class="pyr-lbl"><h5>Major Injury<h5></span></div>
+                    <div class="pyr-layer red"><span class="pyr-val">0</span><span class="pyr-lbl"><h6>Major Injury<h6></span></div>
                     <div class="pyr-layer orange"><span class="pyr-val" id="pyr_incident">0</span><span class="pyr-lbl">Incident</span></div>
                     <div class="pyr-layer yellow"><span class="pyr-val" id="pyr_nearmiss">0</span><span class="pyr-lbl">Near Miss</span></div>
                  </div>
@@ -2066,14 +2066,14 @@ borderColor:"#22c55e",
 fill:false,
 borderWidth:3,
 pointRadius:4,
-pointBackgroundColor:"#00FF00",
+pointBackgroundColor:"#34C759",
 tension:0.4
 }
 ]);
 
 createMarrCard("Consumption","bar",[
 {label:"Tenant",data:g["Consumption - Tenant"],backgroundColor:"#3b82f6"},
-{label:"Common",data:g["Consumption - Common Area"],backgroundColor:"#00FF00"},
+{label:"Common",data:g["Consumption - Common Area"],backgroundColor:"#34C759"},
 {label:"Chiller",data:g["Consumption - Chiller"],backgroundColor:"#f59e0b"}
 ]);
 
@@ -2134,7 +2134,7 @@ s6_radialChart = new Chart(document.getElementById("s6_circleChart"), {
 type:'doughnut',
 data:{datasets:[
 {data:[total,max-total],backgroundColor:['#6366f1','rgba(0,0,0,0.05)'],weight:5},
-{data:[wh,max-wh],backgroundColor:['#00FF00','rgba(0,0,0,0.05)'],weight:4},
+{data:[wh,max-wh],backgroundColor:['#34C759','rgba(0,0,0,0.05)'],weight:4},
 {data:[eb,max-eb],backgroundColor:['#ef4444','rgba(0,0,0,0.05)'],weight:3},
 {data:[dg,max-dg],backgroundColor:['#8b5cf6','rgba(0,0,0,0.05)'],weight:2},
 {data:[solar,max-solar],backgroundColor:['#f5be0b','rgba(0,0,0,0.05)'],weight:1}
