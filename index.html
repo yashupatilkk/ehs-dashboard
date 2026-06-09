@@ -691,7 +691,8 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 
   <div class="s4-charts-grid">
     <div class="s4-chart-card">
-      <div class="chart-label">TOTAL KLD (Apr'25-Apr'26)</div>
+      <!-- ✅ Added ID for dynamic update -->
+      <div class="chart-label" id="totalKldLabel">TOTAL KLD (Apr'25-Apr'26)</div>
       <div id="totalKldChart" class="total-kld-chart">
          <div class="ascii-bars-container" id="asciiBars">Loading...</div>
         <div id="debugInfo" class="debug-info"></div>
@@ -1218,7 +1219,7 @@ function drawTrendChart(id, labels, data, type, colorKey, is3D=false){
   });
 }
 
-function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period = "Apr'25-Apr'26") {
+function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, period = "Apr'25-Apr'26", lastUpdated = "") {
   const container = document.getElementById("asciiBars");
   
   const values = [bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal];
@@ -1262,6 +1263,14 @@ function drawAsciiTotalKld(bwssbTotal, rainTotal, stpTotal, cwtpTotal, roTotal, 
   });
   
   container.innerHTML = html;
+  
+  // Update Debug Info with Timestamp
+  document.getElementById("debugInfo").innerHTML = `
+      BWSSB:${bwssbTotal?'✅':'⚡'} | Rain:${rainTotal?'✅':'⚡'} | 
+      STP:${stpTotal?'✅':'⚡'} | CWTP:${cwtpTotal?'✅':'⚡'} | 
+      RO:${roTotal?'✅':'⚡'} | Total: ${Math.round(bwssbTotal + rainTotal + stpTotal + cwtpTotal + roTotal).toLocaleString()}
+      ${lastUpdated ? `<br><span style="color:#2196f3">Updated: ${lastUpdated}</span>` : ''}
+  `;
 }
 
 async function loadManhoursWorked(){
@@ -1363,48 +1372,6 @@ async function loadCompliance(){
         tb.innerHTML += `<tr><td>${data[i][0]}</td><td>${data[i][1]}</td><td class="red">${days}</td><td>${d.toLocaleDateString()}</td></tr>`;
       }
     }
-  }catch(e){}
-}
-
-async function loadWater(){
-  try{
-    let data = await csv(sheets.water);
-    let header = data.find(r => r.join(" ").includes("Apr'25"));
-    if(!header) return;
-    let months = header.slice(2);
-    let selectedIndex = months.length - 1;
-    for(let i=months.length-1;i>=0;i--){
-      let found=false;
-      for(let r=1;r<data.length;r++){
-        let val = parseFloat(data[r][i+2]);
-        if(val && val>0){ found=true; break; }
-      }
-      if(found){ selectedIndex=i; break; }
-    }
-    document.getElementById("waterMonth").innerText = months[selectedIndex];
-
-    let values = {WTP:0,BWSSB:0,STP:0,Rain:0,RO:0,CWTP:0,CSTP:0};
-    for(let i=1;i<data.length;i++){
-      let name = (data[i][1]||"").toLowerCase();
-      let val = parseFloat(data[i][selectedIndex+2])||0;
-      if(name.includes("wtp reading")) values.WTP = val;
-      else if(name.includes("bwssb")) values.BWSSB = val;
-      else if(name.includes("stp treated")) values.STP = val;
-      else if(name.includes("rain")) values.RAIN = val;
-      else if(name.includes("ro")) values.RO = val;
-      else if(name.includes("chiller wtp")) values.CWTP = val;
-      else if(name.includes("chiller stp")) values.CSTP = val;
-    }
-
-    document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
-    document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
-    document.getElementById("stp").innerText   = values.STP.toLocaleString();
-    document.getElementById("rain").innerText  = values.RAIN.toLocaleString();
-    document.getElementById("ro").innerText    = values.RO.toLocaleString();
-    document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
-    document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
-
-    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.RAIN,values.RO,values.CWTP,values.CSTP]);
   }catch(e){}
 }
 
@@ -1677,46 +1644,86 @@ async function loadWaterDashboardSlide3(){
     createWaterChartsRow(sumData, treatedData, kwhData, avgData);
 }
 
+// ✅ UPDATED: SLIDE 3 WATER LOGIC (Force Last Column)
+async function loadWater(){
+  try{
+    let data = await csv(sheets.water);
+    
+    // Try to find the header row, fallback to first row if needed
+    let header = data.find(r => r.join(" ").includes("Apr'25"));
+    if(!header) header = data[0]; // Fallback to first row if standard header not found
+    
+    if(!header) return;
+
+    let months = header.slice(2);
+    
+    // ✅ FIX: FORCE SELECT THE LAST AVAILABLE MONTH
+    let selectedIndex = months.length - 1;
+    
+    document.getElementById("waterMonth").innerText = months[selectedIndex];
+
+    let values = {WTP:0,BWSSB:0,STP:0,Rain:0,RO:0,CWTP:0,CSTP:0};
+    for(let i=1;i<data.length;i++){
+      let name = (data[i][1]||"").toLowerCase();
+      let val = parseFloat(data[i][selectedIndex+2])||0; // Handle empty cells as 0
+      if(name.includes("wtp reading")) values.WTP = val;
+      else if(name.includes("bwssb")) values.BWSSB = val;
+      else if(name.includes("stp treated")) values.STP = val;
+      else if(name.includes("rain")) values.RAIN = val;
+      else if(name.includes("ro")) values.RO = val;
+      else if(name.includes("chiller wtp")) values.CWTP = val;
+      else if(name.includes("chiller stp")) values.CSTP = val;
+    }
+
+    document.getElementById("wtp").innerText   = values.WTP.toLocaleString();
+    document.getElementById("bwssb").innerText = values.BWSSB.toLocaleString();
+    document.getElementById("stp").innerText   = values.STP.toLocaleString();
+    document.getElementById("rain").innerText  = values.RAIN.toLocaleString();
+    document.getElementById("ro").innerText    = values.RO.toLocaleString();
+    document.getElementById("cwtp").innerText  = values.CWTP.toLocaleString();
+    document.getElementById("cstp").innerText  = values.CSTP.toLocaleString();
+
+    updateWaterPie([values.WTP,values.BWSSB,values.STP,values.RAIN,values.RO,values.CWTP,values.CSTP]);
+  }catch(e){
+    console.error("Water Load Error:", e);
+  }
+}
+
+// ✅ UPDATED: SLIDE 4 WATER DASHBOARD LOGIC (Sum ALL Months)
 async function loadWaterDashboard(){
   try{
     let data = await csv(sheets.water);
     data = data.filter(r=>r.length>2);
     
+    // Find header row
     let headerRow = null;
     for(let i=0; i<data.length; i++){
       let rowText = (data[i].join(" ") || "").toLowerCase();
-      if(rowText.includes("apr'26") || rowText.includes("apr26")){
+      if(rowText.includes("apr'26") || rowText.includes("apr26") || rowText.includes("apr'25")){
         headerRow = data[i];
         break;
       }
-      if(rowText.includes("apr'25") || rowText.includes("apr25")){
-        headerRow = data[i];
-      }
     }
     
-    if(!headerRow){
-      headerRow = data.find(r => (r.join(" ") || "").toLowerCase().includes("apr"));
-    }
-    
+    // Fallback to first row if no header found
+    if(!headerRow && data.length > 0) headerRow = data[0];
     if(!headerRow) return;
     
     let months = headerRow.slice(2).map(m=>(m||"").trim().replace(/['"]/g,""));
+    
+    // Force select the last available month
     let selectedIndex = months.length - 1;
-    for(let i=months.length-1; i>=0; i--){
-      let hasData = false;
-      for(let r=1; r<data.length; r++){
-        let val = parseFloat((data[r][i+2] || "0").toString().replace(/,/g, ''));
-        if(!isNaN(val) && val > 0){
-          hasData = true;
-          break;
-        }
-      }
-      if(hasData){
-        selectedIndex=i;
-        break;
-      }
-    }
 
+    // Calculate Start/End months for the title (Start from Index 0 = ALL MONTHS)
+    let startIdx = 0; 
+    let startMonth = months[startIdx] || "...";
+    let endMonth = months[months.length-1] || "...";
+    
+    // Update the HTML Title dynamically
+    let titleEl = document.getElementById("totalKldLabel");
+    if(titleEl) titleEl.innerText = `TOTAL KLD (${startMonth}-${endMonth})`;
+
+    // Update the Header Month
     document.getElementById("s4Month").innerText = months[selectedIndex] || "Loading...";
 
     function findExactRow(searchTerms){
@@ -1753,11 +1760,11 @@ async function loadWaterDashboard(){
     let roRow = findExactRow(["RO", "R.O.", "ro", "Ro Plant", "RO Treated", "RO plant", "RO Reading", "RO Plant"]);
 
     let currentValues = {
-      BWSSB: getLatest(data.indexOf(bwssbRow)) || 45894,
-      Rain: getLatest(data.indexOf(rainRow)) || 2278,
-      STP: getLatest(data.indexOf(stpRow)) || 39905,
-      CWTP: getLatest(data.indexOf(cwtpRow)) || 15000,
-      RO: getLatest(data.indexOf(roRow)) || 12000
+      BWSSB: getLatest(data.indexOf(bwssbRow)) || 0,
+      Rain: getLatest(data.indexOf(rainRow)) || 0,
+      STP: getLatest(data.indexOf(stpRow)) || 0,
+      CWTP: getLatest(data.indexOf(cwtpRow)) || 0,
+      RO: getLatest(data.indexOf(roRow)) || 0
     };
 
     animateValue("s4_bwssb", currentValues.BWSSB);
@@ -1766,36 +1773,36 @@ async function loadWaterDashboard(){
     animateValue("s4_cwtp", currentValues.CWTP);
     animateValue("s4_ro", currentValues.RO);
 
-    let startIdx = Math.max(0, months.length - 12);
-    function getYearlyTotal(row){
-      if(!row) return 45000;
-      let vals = getValues(row);
-      let total = 0;
-      for(let j=startIdx; j<vals.length && j < vals.length; j++){
-        total += (vals[j] || 0);
-      }
-      return total || 45000;
-    }
-
+    // Calculate Yearly Totals (ALL AVAILABLE MONTHS)
     let yearlyTotals = {
-      BWSSB: getYearlyTotal(bwssbRow),
-      Rain: getYearlyTotal(rainRow),
-      STP: getYearlyTotal(stpRow),
-      CWTP: getYearlyTotal(cwtpRow),
-      RO: getYearlyTotal(roRow)
+      BWSSB: 0, Rain: 0, STP: 0, CWTP: 0, RO: 0
     };
+    
+    // Sum the available months for each row
+    const rowsToSum = [bwssbRow, rainRow, stpRow, cwtpRow, roRow];
+    const keys = ["BWSSB", "Rain", "STP", "CWTP", "RO"];
 
+    rowsToSum.forEach((row, idx) => {
+      if(row) {
+        let vals = getValues(row);
+        let total = 0;
+        // Sum from the very start (index 0) to the end
+        for(let j=startIdx; j<Math.min(vals.length, months.length); j++){
+          total += (vals[j] || 0);
+        }
+        yearlyTotals[keys[idx]] = total;
+      }
+    });
+
+    // Pass the current time to drawAsciiTotalKld for the timestamp
     drawAsciiTotalKld(
       yearlyTotals.BWSSB, yearlyTotals.Rain, yearlyTotals.STP, 
-      yearlyTotals.CWTP, yearlyTotals.RO
+      yearlyTotals.CWTP, yearlyTotals.RO,
+      `${startMonth}-${endMonth}`, // Pass the dynamic period string
+      new Date().toLocaleTimeString()
     );
 
-    document.getElementById("debugInfo").innerHTML = `
-      BWSSB:${bwssbRow?'✅':'⚡'} | Rain:${rainRow?'✅':'⚡'} | 
-      STP:${stpRow?'✅':'⚡'} | CWTP:${cwtpRow?'✅':'⚡'} | 
-      RO:${roRow?'✅':'⚡'} | Total: ${Math.round(yearlyTotals.BWSSB + yearlyTotals.Rain + yearlyTotals.STP + yearlyTotals.CWTP + yearlyTotals.RO).toLocaleString()}
-    `;
-
+    // Trends remain as "Last 12 Months" for cleaner visuals
     let months12 = months.slice(Math.max(0, months.length-12));
     drawTrendChart("chart_bwssb", months12, getValues(bwssbRow || []).slice(-12), "line", "bwssb");
     drawTrendChart("chart_rain", months12, getValues(rainRow || []).slice(-12), "line", "rain");
@@ -1805,7 +1812,6 @@ async function loadWaterDashboard(){
 
   }catch(e){
     console.error("Water Dashboard Error:", e);
-    drawAsciiTotalKld(45894, 2278, 39905, 15000, 12000);
   }
 }
 
@@ -2211,7 +2217,7 @@ init();
 setInterval(loadCompliance, 60000);
 setInterval(loadWater, 60000);
 setInterval(loadWaterDashboardSlide3, 30000); // Auto Update
-setInterval(loadWaterDashboard, 60000);
+setInterval(loadWaterDashboard, 20000); // ✅ UPDATED: Auto Update Total KLD every 20s
 setInterval(loadCampusAnalytics, 10000); // Auto Update
 setInterval(loadMarrData, 30000); // Auto Update
 
