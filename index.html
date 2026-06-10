@@ -1377,7 +1377,10 @@ async function loadCompliance(){
 
 /* ============ WATER DASHBOARD FUNCTIONS ============ */
 const waterSheetID = "1b-8OGZK56Ejqm0SO44KzpCyo80awEODk";
-const waterSheets = ["Mar26","Apr26","May26"];
+
+// ✅ UPDATED: Added "Jun26" to the array.
+// If your sheet tab is named "Jun'26" (with apostrophe), change "Jun26" to "Jun'26" below.
+const waterSheets = ["Mar26","Apr26","May26","Jun26"];
 
 async function fetchWaterSheet(sheet){
     let url = `https://docs.google.com/spreadsheets/d/${waterSheetID}/gviz/tq?sheet=${sheet}&tqx=out:json`;
@@ -1458,10 +1461,11 @@ function createWaterChartsRow(sumData, treatedData, kwhData, avgData){
 
     let card3 = document.createElement("div");
     card3.className = "unified-chart-card";
+    // ✅ FIXED: Dynamic division (/kwhData.length) instead of hardcoded /3
     card3.innerHTML = `
         <div class="unified-chart-title">⚡ AVG KWH / KL</div>
         <div class="unified-value-box">
-            <h3>${(kwhData.reduce((a,b)=>a+b,0)/3).toFixed(2)}</h3>
+            <h3>${kwhData.length ? (kwhData.reduce((a,b)=>a+b,0)/kwhData.length).toFixed(2) : 0}</h3>
         </div>
         <div class="unified-chart-container">
             <canvas id="waterChart3"></canvas>
@@ -1471,10 +1475,11 @@ function createWaterChartsRow(sumData, treatedData, kwhData, avgData){
 
     let card4 = document.createElement("div");
     card4.className = "unified-chart-card";
+    // ✅ FIXED: Dynamic division (/avgData.length) instead of hardcoded /3
     card4.innerHTML = `
-        <div class="unified-chart-title">📈 AVG KWH / DAY </div>
+        <div class="unified-chart-title">📈 AVG KWH / DAY</div>
         <div class="unified-value-box">
-            <h3>${(avgData.reduce((a,b)=>a+b,0)/3).toFixed(1)}</h3>
+            <h3>${avgData.length ? (avgData.reduce((a,b)=>a+b,0)/avgData.length).toFixed(1) : 0}</h3>
         </div>
         <div class="unified-chart-container">
             <canvas id="waterChart4"></canvas>
@@ -1499,7 +1504,8 @@ function createWaterSingleChart(id, data, labels){
                 backgroundColor:[
                     'rgba(56,189,248,0.9)',
                     'rgba(14,165,233,0.9)', 
-                    'rgba(6,182,212,0.9)'
+                    'rgba(6,182,212,0.9)',
+                    'rgba(8,145,178,0.9)' // Added color for 4th bar (Jun)
                 ],
                 borderColor:'rgba(56,189,248,1)',
                 borderWidth:2,
