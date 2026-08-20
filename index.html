@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>EHS Dashboard FINAL UNIFIED + Enterprise</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -209,7 +213,7 @@ header h2 { font-size:22px; letter-spacing:1px; margin-bottom: 5px; color:white;
 }
 .es-chart-box-title{ font-size:11px; font-weight:700; text-align:center; margin-bottom:4px; color:#64748b; flex-shrink:0; display:flex; align-items:center; justify-content:center; gap:5px; }
 .es-chart-canvas-wrap{ position:relative !important; width:100% !important; flex:1 !important; min-height:0; }
-.es-chart-canvas-wrap canvas{ position:absolute !important; top:0; left:0; width:100% !important; height:100% !important; }
+.es-chart-canvas-wrap canvas{ position:absolute !important; top:0; left:0; width:100% !important; height:100% !important; cursor:pointer !important; }
 
 /* =========================================
    ORIGINAL SLIDE STYLES
@@ -304,6 +308,26 @@ th { background:#1e3c72; color:white; }
 .s6-modal{ position:fixed; top:0;left:0; width:100%; height:100%; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.85); z-index: 10000; }
 .s6-modal-content{ width:90%; height:85%; background:white; border-radius:12px; padding:15px; }
 
+/* ES Monthly Detail Modal */
+.es-month-modal{ position:fixed; top:0; left:0; width:100%; height:100%; display:none; align-items:flex-start; justify-content:center; background:rgba(0,0,0,0.8); z-index: 10001; overflow-y:auto; padding:20px 10px; }
+.es-month-modal-content{ width:95%; max-width:700px; background:white; border-radius:12px; padding:0; overflow:hidden; }
+.es-month-modal-header{ background:linear-gradient(to right,#1e3c72,#2a5298); color:white; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; position:sticky; top:0; z-index:2; }
+.es-month-modal-header h3{ font-size:16px; font-weight:700; }
+.es-month-modal-close{ background:none; border:none; color:white; font-size:24px; cursor:pointer; width:32px; height:32px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:background 0.2s; }
+.es-month-modal-close:hover{ background:rgba(255,255,255,0.2); }
+.es-month-modal-body{ padding:12px 15px; max-height:70vh; overflow-y:auto; }
+.es-month-modal-body::-webkit-scrollbar{ width:5px; }
+.es-month-modal-body::-webkit-scrollbar-thumb{ background:#cbd5e1; border-radius:10px; }
+.es-month-record{ background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:10px 12px; margin-bottom:8px; }
+.es-month-record:hover{ background:#f1f5f9; }
+.es-month-record-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+.es-month-record-date{ font-size:12px; font-weight:700; color:#1e3c72; background:#e0e7ff; padding:2px 8px; border-radius:4px; }
+.es-month-record-name{ font-size:13px; font-weight:600; color:#1f2937; }
+.es-month-record-location{ font-size:11px; color:#64748b; margin-top:3px; }
+.es-month-record-location i{ color:#f59e0b; margin-right:4px; }
+.es-month-record-obs{ font-size:12px; color:#374151; margin-top:5px; line-height:1.4; border-top:1px solid #e2e8f0; padding-top:5px; }
+.es-month-modal-footer{ padding:10px 15px; text-align:center; font-size:12px; color:#94a3b8; border-top:1px solid #e5e7eb; }
+
 /* CONTROLS */
 .controls { text-align:center; margin: 5px 0; display:flex; justify-content:center; align-items:center; gap:5px; }
 button { padding: 4px 10px; margin: 0 4px; border: 2px solid rgba(255,255,255,0.3); background: rgba(30, 60, 114, 0.6); color: rgba(255,255,255,0.7); cursor:pointer; border-radius: 6px; min-width: 75px; font-size: 12px; font-weight:bold; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px rgba(0,0,0,0.3); opacity: 0.8; }
@@ -395,6 +419,237 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 @media (max-width: 480px) {
   .es-kpi-row { grid-template-columns: 1fr !important; }
   .waterLeft, .waterRight { grid-template-columns: 1fr !important; }
+}
+
+/* =========================================
+   BIRTHDAY SLIDE (Slide 7) - SCOPED
+   ========================================= */
+.bday-slide { height: 100vh; display: none; flex-direction: column; background: #0a1a2e; position: relative; overflow: hidden; }
+.bday-slide.active { display: flex; }
+.bday-slide.bday-hidden { display: none !important; }
+
+.bday-slide .bday-bg-gradient {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(201, 165, 92, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(61, 111, 165, 0.12) 0%, transparent 60%),
+        linear-gradient(180deg, #0a1a2e 0%, #0d2240 50%, #0a1a2e 100%);
+}
+
+.bday-slide .bday-bg-pattern {
+    position: absolute; inset: 0; z-index: 1;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+}
+
+.bday-slide .bday-frame-outer {
+    position: absolute; left: 40px; right: 40px; top: 40px; bottom: 40px;
+    border: 1px solid rgba(201,165,92,0.25); z-index: 2; pointer-events: none;
+}
+.bday-slide .bday-frame-inner {
+    position: absolute; left: 50px; right: 50px; top: 50px; bottom: 50px;
+    border: 1px solid rgba(201,165,92,0.10); z-index: 2; pointer-events: none;
+}
+
+.bday-slide .bday-corner {
+    position: absolute; width: 30px; height: 30px; z-index: 3; pointer-events: none;
+}
+.bday-slide .bday-corner::before, .bday-slide .bday-corner::after {
+    content: ''; position: absolute; background: #c9a55c;
+}
+.bday-slide .bday-corner::before { width: 30px; height: 2px; }
+.bday-slide .bday-corner::after { width: 2px; height: 30px; }
+.bday-slide .bday-corner.tl { left: 30px; top: 30px; }
+.bday-slide .bday-corner.tl::before, .bday-slide .bday-corner.tl::after { top: 0; left: 0; }
+.bday-slide .bday-corner.tr { right: 30px; top: 30px; }
+.bday-slide .bday-corner.tr::before { top: 0; right: 0; }
+.bday-slide .bday-corner.tr::after { top: 0; right: 0; }
+.bday-slide .bday-corner.bl { left: 30px; bottom: 30px; }
+.bday-slide .bday-corner.bl::before, .bday-slide .bday-corner.bl::after { bottom: 0; left: 0; }
+.bday-slide .bday-corner.br { right: 30px; bottom: 30px; }
+.bday-slide .bday-corner.br::before { bottom: 0; right: 0; }
+.bday-slide .bday-corner.br::after { bottom: 0; right: 0; }
+
+.bday-slide .bday-header {
+    position: absolute; top: 80px; left: 0; right: 0; text-align: center; z-index: 10; padding: 0 40px;
+    animation: bdayFadeInDown 1s ease;
+}
+@keyframes bdayFadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
+.bday-slide .bday-company {
+    font-size: 18px; font-weight: 700; letter-spacing: 10px; color: #c9a55c;
+    text-transform: uppercase; font-family: 'Montserrat', sans-serif;
+}
+.bday-slide .bday-header-divider {
+    width: 80px; height: 2px; margin: 16px auto 0;
+    background: linear-gradient(90deg, transparent, #c9a55c, transparent);
+}
+.bday-slide .bday-title {
+    margin-top: 28px; font-size: 64px; line-height: 1; font-weight: 800; letter-spacing: 2px;
+    color: #ffffff; font-family: 'Montserrat', sans-serif; text-transform: uppercase;
+    text-shadow: 0 4px 30px rgba(201,165,92,0.3);
+}
+.bday-slide .bday-subtitle {
+    margin-top: 14px; font-size: 16px; font-weight: 400; letter-spacing: 5px;
+    color: rgba(255,255,255,0.7); text-transform: uppercase; font-family: 'Inter', sans-serif;
+}
+.bday-slide .bday-subtitle::before, .bday-slide .bday-subtitle::after { content: '\2014'; margin: 0 16px; color: #c9a55c; }
+
+.bday-slide #birthdayContent {
+    position: absolute; top: 280px; left: 5%; right: 5%; bottom: 110px;
+    display: flex; align-items: center; justify-content: center; z-index: 5;
+}
+
+.bday-slide .bday-employee {
+    width: 100%; max-width: 1500px; display: flex; align-items: center; justify-content: center;
+    gap: 80px; padding: 50px 70px;
+    background: rgba(20,40,70,0.4); border: 1px solid rgba(201,165,92,0.20); border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 50px rgba(61,111,165,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+    animation: bdayCardIn 0.9s cubic-bezier(0.16,1,0.3,1); will-change: opacity, transform;
+}
+.bday-slide .bday-employee.fade-out { animation: bdayCardOut 0.5s ease forwards; }
+@keyframes bdayCardIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes bdayCardOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-10px) scale(0.98); } }
+
+.bday-slide .bday-photo-container { position: relative; width: 360px; height: 360px; flex-shrink: 0; }
+.bday-slide .bday-photo-glow {
+    position: absolute; inset: -25px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,165,92,0.35), rgba(61,111,165,0.15) 50%, transparent 70%);
+    filter: blur(8px); animation: bdayPhotoGlow 4s ease-in-out infinite; will-change: transform, opacity;
+}
+@keyframes bdayPhotoGlow { 0%,100% { transform: scale(0.92); opacity: 0.6; } 50% { transform: scale(1.08); opacity: 1; } }
+
+.bday-slide .bday-photo-ring {
+    position: absolute; inset: -6px; border-radius: 50%;
+    background: conic-gradient(from 0deg, #c9a55c, #ffffff, #c9a55c, #3d6fa5, #c9a55c, #ffffff, #c9a55c);
+    animation: bdayRotateRing 20s linear infinite;
+    box-shadow: 0 0 30px rgba(201,165,92,0.3), 0 10px 30px rgba(0,0,0,0.3); will-change: transform;
+}
+@keyframes bdayRotateRing { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+.bday-slide .bday-photo-inner-ring {
+    position: absolute; inset: 0; border-radius: 50%; border: 2px solid rgba(255,255,255,0.95); z-index: 4; pointer-events: none;
+}
+.bday-slide .bday-employee-photo {
+    position: absolute; z-index: 3; left: 4px; top: 4px; width: 352px; height: 352px;
+    object-fit: cover; border-radius: 50%; background: #1a2a40;
+}
+
+.bday-slide .bday-details { max-width: 720px; }
+.bday-slide .bday-special-label {
+    font-size: 14px; font-weight: 600; letter-spacing: 5px; color: #c9a55c;
+    text-transform: uppercase; margin-bottom: 24px; font-family: 'Montserrat', sans-serif;
+}
+.bday-slide .bday-special-label::after {
+    content: ''; display: inline-block; width: 40px; height: 1px; background: #c9a55c; margin-left: 16px; vertical-align: middle;
+}
+.bday-slide .bday-name {
+    font-size: 72px; line-height: 1.05; font-weight: 800; color: #ffffff; margin-bottom: 24px;
+    font-family: 'Montserrat', sans-serif; text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.bday-slide .bday-employee-id {
+    display: inline-block; padding: 10px 24px; border: 1px solid rgba(201,165,92,0.5); border-radius: 4px;
+    background: rgba(201,165,92,0.08); font-size: 15px; font-weight: 600; letter-spacing: 2px;
+    color: #d4b673; text-transform: uppercase; font-family: 'Inter', sans-serif;
+}
+.bday-slide .bday-message {
+    margin-top: 32px; font-size: 20px; line-height: 1.65; color: rgba(255,255,255,0.78);
+    font-family: 'Inter', sans-serif; font-weight: 400; max-width: 600px;
+}
+.bday-slide .bday-message strong { color: #ffffff; font-weight: 600; }
+.bday-slide .bday-tags { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 32px; }
+.bday-slide .bday-tag {
+    padding: 10px 22px; border: 1px solid rgba(201,165,92,0.35); border-radius: 30px;
+    background: rgba(201,165,92,0.05); font-size: 13px; font-weight: 600; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.85); text-transform: uppercase; font-family: 'Inter', sans-serif; transition: all 0.3s ease;
+}
+.bday-slide .bday-tag:hover { background: rgba(201,165,92,0.15); border-color: rgba(201,165,92,0.6); color: #fff; }
+
+.bday-slide .bday-progress-indicator {
+    position: absolute; bottom: 60px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 10px; z-index: 10; animation: bdayFadeIn 1s ease 0.5s both;
+}
+@keyframes bdayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+.bday-slide .bday-progress-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.25); transition: all 0.4s ease;
+}
+.bday-slide .bday-progress-dot.active { background: #c9a55c; width: 28px; border-radius: 4px; }
+
+.bday-slide .bday-footer {
+    position: absolute; left: 0; right: 0; bottom: 30px; text-align: center; z-index: 10;
+    color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500; letter-spacing: 3px;
+    font-family: 'Inter', sans-serif; animation: bdayFadeInUp 1s ease 0.3s both; text-transform: uppercase;
+}
+@keyframes bdayFadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.bday-slide .bday-footer-line {
+    width: 50px; height: 1px; margin: 0 auto 14px;
+    background: linear-gradient(90deg, transparent, #c9a55c, transparent);
+}
+.bday-slide .bday-footer strong { color: #c9a55c; font-weight: 700; margin-left: 8px; letter-spacing: 4px; }
+
+.bday-slide .bday-loading {
+    font-size: 20px; font-weight: 500; color: rgba(255,255,255,0.85); text-align: center;
+    letter-spacing: 3px; text-transform: uppercase; font-family: 'Montserrat', sans-serif; animation: bdayFadeIn 1s ease;
+}
+.bday-slide .bday-loading::after {
+    content: ''; display: block; width: 36px; height: 36px; margin: 24px auto 0;
+    border: 2px solid rgba(201,165,92,0.2); border-top-color: #c9a55c; border-radius: 50%;
+    animation: bdaySpin 1s linear infinite;
+}
+@keyframes bdaySpin { to { transform: rotate(360deg); } }
+
+.bday-slide .bday-no-birthday {
+    text-align: center; animation: bdayFadeIn 1s ease; max-width: 600px; padding: 60px;
+    background: rgba(20,40,70,0.4); border: 1px solid rgba(201,165,92,0.20); border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.bday-slide .bday-no-icon { font-size: 70px; color: #c9a55c; margin-bottom: 24px; font-family: 'Montserrat', sans-serif; font-weight: 200; }
+.bday-slide .bday-no-title { font-size: 44px; font-weight: 700; color: #ffffff; font-family: 'Montserrat', sans-serif; margin-bottom: 18px; letter-spacing: 1px; }
+.bday-slide .bday-no-divider { width: 50px; height: 1px; margin: 0 auto 18px; background: linear-gradient(90deg, transparent, #c9a55c, transparent); }
+.bday-slide .bday-no-text { font-size: 17px; color: rgba(255,255,255,0.75); font-family: 'Inter', sans-serif; font-weight: 400; letter-spacing: 1px; line-height: 1.7; }
+.bday-slide .bday-no-text strong { color: #c9a55c; font-weight: 600; letter-spacing: 2px; }
+
+.bday-slide .bday-error {
+    text-align: center; animation: bdayFadeIn 1s ease; max-width: 600px; padding: 60px;
+    background: rgba(70,20,20,0.4); border: 1px solid rgba(200,80,80,0.3); border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+}
+.bday-slide .bday-error-icon { font-size: 60px; color: #d4a060; margin-bottom: 24px; }
+.bday-slide .bday-error-title { font-size: 36px; font-weight: 700; color: #ffffff; margin-bottom: 18px; }
+.bday-slide .bday-error-divider { width: 50px; height: 1px; margin: 0 auto 18px; background: linear-gradient(90deg, transparent, #c9a55c, transparent); }
+.bday-slide .bday-error-message { color: rgba(255,255,255,0.75); font-size: 16px; letter-spacing: 1px; line-height: 1.7; }
+
+.bday-slide .bday-confetti {
+    position: absolute; top: -25px; width: 8px; height: 12px; z-index: 9999; pointer-events: none;
+    border-radius: 2px; animation: bdayConfettiFall linear forwards; will-change: transform, opacity;
+}
+@keyframes bdayConfettiFall {
+    0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+    100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+}
+
+@media (max-width: 900px) {
+    .bday-slide .bday-employee { flex-direction: column; gap: 40px; padding: 40px 25px; }
+    .bday-slide .bday-photo-container { width: 240px; height: 240px; }
+    .bday-slide .bday-employee-photo { width: 232px; height: 232px; }
+    .bday-slide .bday-details { text-align: center; }
+    .bday-slide .bday-name { font-size: 40px; }
+    .bday-slide .bday-message { font-size: 16px; }
+    .bday-slide .bday-tags { justify-content: center; }
+    .bday-slide .bday-special-label::after { display: none; }
+    .bday-slide .bday-title { font-size: 38px; }
+    .bday-slide .bday-company { font-size: 13px; letter-spacing: 5px; }
+    .bday-slide .bday-subtitle { font-size: 12px; letter-spacing: 2px; }
+    .bday-slide .bday-frame-outer { left: 16px; right: 16px; top: 16px; bottom: 16px; }
+    .bday-slide .bday-frame-inner { left: 22px; right: 22px; top: 22px; bottom: 22px; }
+    .bday-slide .bday-corner { display: none; }
+}
+
+.bday-slide .bday-screen {
+    position: relative; z-index: 5; width: 100%; height: 100%; overflow: hidden;
 }
 </style>
 </head>
@@ -784,9 +1039,54 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
             <canvas id="s6_modalChart"></canvas>
         </div>
     </div>
+
+    </div>
+</div>
+
+<!-- SLIDE 7: BIRTHDAY CELEBRATION -->
+<div class="slide bday-slide">
+    <div class="bday-screen">
+        <div class="bday-bg-gradient"></div>
+        <div class="bday-bg-pattern"></div>
+        <div class="bday-frame-outer"></div>
+        <div class="bday-frame-inner"></div>
+        <div class="bday-corner tl"></div>
+        <div class="bday-corner tr"></div>
+        <div class="bday-corner bl"></div>
+        <div class="bday-corner br"></div>
+
+        <div class="bday-header">
+            <div class="bday-company">PRESTIGE TECHNOSTAR TEAM</div>
+            <div class="bday-header-divider"></div>
+            <div class="bday-title">Happy Birthday</div>
+            <div class="bday-subtitle">Today We Celebrate You</div>
+        </div>
+
+        <div id="birthdayContent">
+            <div class="bday-loading">Loading</div>
+        </div>
+
+        <div class="bday-progress-indicator" id="bdayProgress" style="display:none;"></div>
+
+        <div class="bday-footer">
+            <div class="bday-footer-line"></div>
+            Warmest Wishes From <strong>PRESTIGE TECHNOSTAR TEAM</strong>
+        </div>
+    </div>
 </div>
 
 <button id="fsBtn" onclick="toggleFullScreen()">📱 Full Screen</button>
+
+<div class="es-month-modal" id="es_monthModal" onclick="if(event.target===this)this.style.display='none'">
+    <div class="es-month-modal-content">
+        <div class="es-month-modal-header">
+            <h3 id="es_monthModalTitle">Month Details</h3>
+            <button class="es-month-modal-close" onclick="document.getElementById('es_monthModal').style.display='none'">&times;</button>
+        </div>
+        <div class="es-month-modal-body" id="es_monthModalBody"></div>
+        <div class="es-month-modal-footer" id="es_monthModalFooter"></div>
+    </div>
+</div>
 
 <script>
 
@@ -806,6 +1106,7 @@ const ES_INCIDENT_SHEET =
   'https://docs.google.com/spreadsheets/d/1O95sjMBE-vzSm-cdRlN98OjqPX_mubWSAL1nJuio6bA/gviz/tq?tqx=out:csv';
 
 let es_pie, es_csNmChart, es_csIncChart;
+let es_nearByMonth = {}, es_incidentByMonth = {};
 
 async function es_csv(url) {
   const response = await fetch(url + "&_=" + Date.now());
@@ -963,8 +1264,8 @@ async function es_loadEnterpriseDashboard() {
       fetch(ES_NEAR_SHEET + "&_=" + Date.now()).then(r => r.text()),
       fetch(ES_INCIDENT_SHEET + "&_=" + Date.now()).then(r => r.text())
     ]);
-    const nearData = Papa.parse(nearCSV, { header: true }).data;
-    const incidentData = Papa.parse(incidentCSV, { header: true }).data;
+    const nearData = Papa.parse(nearCSV, { header: false }).data;
+    const incidentData = Papa.parse(incidentCSV, { header: false }).data;
     es_processSafetyData(nearData, incidentData);
   } catch (e) {
     console.error("ES Dashboard Error:", e);
@@ -975,6 +1276,8 @@ function es_processSafetyData(nearData, incidentData) {
   let monthMap = {};
   let nearTotal = 0;
   let incidentTotal = 0;
+  es_nearByMonth = {};
+  es_incidentByMonth = {};
 
   function addToMap(row, field) {
     const values = Object.values(row);
@@ -990,8 +1293,29 @@ function es_processSafetyData(nearData, incidentData) {
         monthMap[key] = { near: 0, incident: 0, sortDate: new Date(d.getFullYear(), d.getMonth(), 1) };
       }
       monthMap[key][field]++;
-      if (field === 'near') nearTotal++;
-      else incidentTotal++;
+      if (field === 'near') {
+        nearTotal++;
+        if (!es_nearByMonth[key]) es_nearByMonth[key] = [];
+        es_nearByMonth[key].push({ date: values[3] || '', time: values[4] || '', name: values[1] || '', location: values[5] || '', observation: values[6] || '' });
+      } else {
+        incidentTotal++;
+        if (!es_incidentByMonth[key]) es_incidentByMonth[key] = [];
+        es_incidentByMonth[key].push({
+          date: values[4] || '',
+          time: values[5] || '',
+          name: values[9] || '',
+          location: values[6] || '',
+          building: values[2] || '',
+          incidentType: values[7] || '',
+          otherType: values[8] || '',
+          injuredName: values[12] || '',
+          employeeId: values[13] || '',
+          occupation: values[14] || '',
+          observation: values[11] || '',
+          manDaysLost: values[17] || '',
+          photo: values[19] || ''
+        });
+      }
     }
   }
 
@@ -1021,12 +1345,13 @@ const ES_CHART_OPTS = {
   plugins: {
     legend: { display: false },
     datalabels: {
-      color: '#000000', /* Black text for yellow/orange bars */
-      anchor: 'center', /* ✅ CHANGED: Center of bar */
-      align: 'center', /* ✅ CHANGED: Center of bar */
-      offset: 0, /* ✅ CHANGED: No offset */
+      color: '#000000',
+      anchor: 'center',
+      align: 'center',
+      offset: 0,
       font: { weight: 'bold', size: 12 },
-      formatter: (v) => v > 0 ? v : ''
+      formatter: (v) => v > 0 ? v : '',
+      pointerEvents: 'none'
     }
   },
   scales: {
@@ -1036,34 +1361,44 @@ const ES_CHART_OPTS = {
 };
 
 function es_drawCsNmChart(labels, data) {
-  const ctx = document.getElementById("es_csNmChart").getContext('2d');
+  const canvas = document.getElementById("es_csNmChart");
+  const ctx = canvas.getContext('2d');
   if (es_csNmChart) es_csNmChart.destroy();
   es_csNmChart = new Chart(ctx, {
     type: 'bar',
     data: { labels, datasets: [{ label: 'Near Miss', data, backgroundColor: 'rgba(247, 199, 9, 0.85)', borderColor: '#fa8715', borderWidth: 2, borderRadius: 6 }] },
     plugins: [ChartDataLabels],
-    options: ES_CHART_OPTS
+    options: Object.assign({}, ES_CHART_OPTS, {
+      onClick: function(evt, elements) {
+        if (elements.length > 0) es_showMonthModal(labels[elements[0].index], 'near');
+      }
+    })
   });
 }
 
 function es_drawCsIncChart(labels, data) {
-  const ctx = document.getElementById("es_csIncChart").getContext('2d');
+  const canvas = document.getElementById("es_csIncChart");
+  const ctx = canvas.getContext('2d');
   if (es_csIncChart) es_csIncChart.destroy();
   es_csIncChart = new Chart(ctx, {
     type: 'bar',
-    data: { 
-      labels, 
-      datasets: [{ 
-        label: 'Incident', 
-        data, 
-        backgroundColor: 'rgba(249, 115, 22, 0.85)', 
-        borderColor: '#ea580c', 
-        borderWidth: 2, 
-        borderRadius: 6 
-      }] 
+    data: {
+      labels,
+      datasets: [{
+        label: 'Incident',
+        data,
+        backgroundColor: 'rgba(249, 115, 22, 0.85)',
+        borderColor: '#ea580c',
+        borderWidth: 2,
+        borderRadius: 6
+      }]
     },
     plugins: [ChartDataLabels],
-    options: ES_CHART_OPTS
+    options: Object.assign({}, ES_CHART_OPTS, {
+      onClick: function(evt, elements) {
+        if (elements.length > 0) es_showMonthModal(labels[elements[0].index], 'incident');
+      }
+    })
   });
 }
 
@@ -1090,17 +1425,22 @@ setInterval(()=>{
 },1000);
 
 let current=0;
-const slides=document.querySelectorAll(".slide");
+let slides=document.querySelectorAll(".slide");
 let slideTimer = null;
 let isPaused = false;
 
 const dotsEl = document.getElementById("dots");
-slides.forEach((_,i)=>{
-  let d = document.createElement("div");
-  d.className = "slide-dot" + (i===0?" active":"");
-  d.onclick = ()=> goSlide(i);
-  dotsEl.appendChild(d);
-});
+
+function buildDots(){
+  dotsEl.innerHTML = '';
+  slides.forEach((_,i)=>{
+    let d = document.createElement("div");
+    d.className = "slide-dot" + (i===0?" active":"");
+    d.onclick = ()=> goSlide(i);
+    dotsEl.appendChild(d);
+  });
+}
+buildDots();
 
 function updateDots(){
   document.querySelectorAll(".slide-dot").forEach((d,i)=>{
@@ -2226,6 +2566,245 @@ setInterval(loadWaterDashboardSlide3, 30000); // Auto Update
 setInterval(loadWaterDashboard, 20000); // ✅ UPDATED: Auto Update Total KLD every 20s
 setInterval(loadCampusAnalytics, 10000); // Auto Update
 setInterval(loadMarrData, 30000); // Auto Update
+
+function es_showMonthModal(monthKey, type) {
+  const records = type === 'near' ? es_nearByMonth[monthKey] : es_incidentByMonth[monthKey];
+  const label = type === 'near' ? 'Near Miss' : 'Incident';
+  const titleEl = document.getElementById('es_monthModalTitle');
+  const bodyEl = document.getElementById('es_monthModalBody');
+  const footerEl = document.getElementById('es_monthModalFooter');
+  titleEl.innerHTML = '<i class="fas fa-' + (type === 'near' ? 'exclamation-triangle' : 'fire') + '"></i> ' + label + ' — ' + monthKey;
+  if (!records || records.length === 0) {
+    bodyEl.innerHTML = '<div style="text-align:center;padding:30px;color:#94a3b8;"><i class="fas fa-inbox" style="font-size:32px;margin-bottom:10px;display:block;"></i>No records found</div>';
+    footerEl.textContent = '';
+  } else {
+    let html = '';
+    records.forEach(function(r, i) {
+      html += '<div class="es-month-record">';
+      html += '<div class="es-month-record-header">';
+      html += '<span class="es-month-record-date">' + (r.date || 'N/A') + (r.time ? '  ' + r.time : '') + '</span>';
+      html += '<span class="es-month-record-name">#' + (i + 1) + '  ' + (r.name || 'N/A') + '</span>';
+      html += '</div>';
+      if (r.location) html += '<div class="es-month-record-location"><i class="fas fa-map-marker-alt"></i> ' + r.location + '</div>';
+      if (type === 'incident') {
+        if (r.building) html += '<div class="es-month-record-location"><i class="fas fa-building"></i> Building: ' + r.building + '</div>';
+        if (r.incidentType) html += '<div class="es-month-record-location"><i class="fas fa-exclamation-circle"></i> Type: ' + r.incidentType + (r.otherType && r.otherType !== 'No' ? ' — ' + r.otherType : '') + '</div>';
+        if (r.injuredName && r.injuredName !== 'No') html += '<div class="es-month-record-location"><i class="fas fa-user-injured"></i> Injured: ' + r.injuredName + (r.employeeId && r.employeeId !== 'No' ? ' (ID: ' + r.employeeId + ')' : '') + (r.occupation && r.occupation !== 'No' ? ' — ' + r.occupation : '') + '</div>';
+        if (r.manDaysLost && r.manDaysLost !== 'No' && r.manDaysLost !== '0') html += '<div class="es-month-record-location"><i class="fas fa-calendar-times"></i> Man Days Lost: ' + r.manDaysLost + '</div>';
+      }
+      if (r.observation) html += '<div class="es-month-record-obs">' + r.observation + '</div>';
+      if (type === 'incident' && r.photo && r.photo.startsWith('http')) html += '<div class="es-month-record-location" style="margin-top:8px;"><a href="' + r.photo + '" target="_blank" style="color:#3b82f6;text-decoration:none;"><i class="fas fa-camera"></i> View Photo</a></div>';
+      html += '</div>';
+    });
+    bodyEl.innerHTML = html;
+    footerEl.textContent = 'Total: ' + records.length + ' record' + (records.length > 1 ? 's' : '');
+  }
+  document.getElementById('es_monthModal').style.display = 'flex';
+}
+
+/* =========================================
+   BIRTHDAY SLIDE LOGIC
+   ========================================= */
+const BDAY_API_URL = "https://script.google.com/macros/s/AKfycbwOr9KHauHY619pdstBU9W0-pzNSAgzjvjCB4NLMajNtXE1hfyUi7XPO8B0ujPpaD-CpA/exec";
+const BDAY_SWITCH_INTERVAL = 5000;
+let bday_birthdays = [];
+let bday_currentIndex = 0;
+let bday_isTransitioning = false;
+let bday_loaded = false;
+
+function bdayEscapeHTML(value) {
+    return String(value).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function bdayPlaceholderPhoto() {
+    return "https://placehold.co/700x700/1a2a40/c9a55c/png?text=Employee+Photo";
+}
+
+function bdayRenderEmployee(person, content) {
+    content.innerHTML =
+        '<div class="bday-employee">' +
+            '<div class="bday-photo-container">' +
+                '<div class="bday-photo-glow"></div>' +
+                '<div class="bday-photo-ring"></div>' +
+                '<div class="bday-photo-inner-ring"></div>' +
+                '<img id="bdayPhoto" class="bday-employee-photo" alt="Employee Photo">' +
+            '</div>' +
+            '<div class="bday-details">' +
+                '<div class="bday-special-label">A Special Day For A Special Person</div>' +
+                '<div class="bday-name">' + bdayEscapeHTML(person.name) + '</div>' +
+                '<div class="bday-employee-id">Employee ID: ' + bdayEscapeHTML(person.employeeId || "N/A") + '</div>' +
+                '<div class="bday-message">' +
+                    'May your special day be filled with <strong>happiness, laughter and joy.</strong> ' +
+                    'May the year ahead bring you <strong>success, good health and wonderful memories.</strong> ' +
+                    'Wishing you a truly <strong>HAPPY BIRTHDAY.</strong>' +
+                '</div>' +
+                '<div class="bday-tags">' +
+                    '<div class="bday-tag">Happiness</div>' +
+                    '<div class="bday-tag">Success</div>' +
+                    '<div class="bday-tag">Good Health</div>' +
+                    '<div class="bday-tag">Wonderful Memories</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>';
+
+    var photo = document.getElementById('bdayPhoto');
+    if (person.photo && person.photo.length > 20) {
+        photo.src = person.photo;
+    } else {
+        photo.src = bdayPlaceholderPhoto();
+    }
+    photo.onerror = function() {
+        this.onerror = null;
+        this.src = bdayPlaceholderPhoto();
+    };
+}
+
+function bdayUpdateProgress() {
+    var indicator = document.getElementById('bdayProgress');
+    if (bday_birthdays.length <= 1) { indicator.style.display = 'none'; return; }
+    indicator.style.display = 'flex';
+    indicator.innerHTML = '';
+    for (var i = 0; i < bday_birthdays.length; i++) {
+        var dot = document.createElement('div');
+        dot.className = 'bday-progress-dot' + (i === bday_currentIndex ? ' active' : '');
+        indicator.appendChild(dot);
+    }
+}
+
+function bdayShowBirthday(isFirstLoad) {
+    if (bday_birthdays.length === 0) {
+        bdayShowNoBirthday();
+        return;
+    }
+    var person = bday_birthdays[bday_currentIndex];
+    var content = document.getElementById('birthdayContent');
+
+    if (isFirstLoad) {
+        bdayRenderEmployee(person, content);
+        bdayUpdateProgress();
+        return;
+    }
+
+    var currentCard = content.querySelector('.bday-employee, .bday-no-birthday, .bday-error');
+    if (currentCard) { currentCard.classList.add('fade-out'); }
+
+    setTimeout(function() {
+        bdayRenderEmployee(person, content);
+        bdayUpdateProgress();
+    }, 500);
+}
+
+function bdayShowNoBirthday() {
+    var content = document.getElementById('birthdayContent');
+    document.getElementById('bdayProgress').style.display = 'none';
+    content.innerHTML =
+        '<div class="bday-no-birthday">' +
+            '<div class="bday-no-icon">&#10022;</div>' +
+            '<div class="bday-no-title">No Birthday Today</div>' +
+            '<div class="bday-no-divider"></div>' +
+            '<div class="bday-no-text">' +
+                'Wishing the entire <strong>PRESTIGE TECHNOSTAR TEAM</strong> a wonderful day.' +
+            '</div>' +
+        '</div>';
+}
+
+function bdayShowError(message) {
+    var content = document.getElementById('birthdayContent');
+    document.getElementById('bdayProgress').style.display = 'none';
+    content.innerHTML =
+        '<div class="bday-error">' +
+            '<div class="bday-error-icon">&#9888;</div>' +
+            '<div class="bday-error-title">Birthday System Error</div>' +
+            '<div class="bday-error-divider"></div>' +
+            '<div class="bday-error-message">' + bdayEscapeHTML(message) + '</div>' +
+        '</div>';
+}
+
+function bdayCreateConfetti() {
+    var slide = document.querySelector('.bday-slide');
+    if (!slide) return;
+    slide.querySelectorAll('.bday-confetti').forEach(function(item) { item.remove(); });
+    var colors = ['#c9a55c', '#d4b673', '#e0c98a', '#f5ecd5', '#b8934a'];
+    for (var i = 0; i < 40; i++) {
+        var el = document.createElement('div');
+        el.className = 'bday-confetti';
+        el.style.left = (Math.random() * 100) + '%';
+        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.width = (5 + Math.random() * 5) + 'px';
+        el.style.height = (8 + Math.random() * 8) + 'px';
+        el.style.animationDuration = (5 + Math.random() * 3) + 's';
+        el.style.animationDelay = (Math.random() * 2) + 's';
+        el.style.opacity = '0.65';
+        slide.appendChild(el);
+        (function(element) {
+            setTimeout(function() { if (element.parentNode) element.remove(); }, 10000);
+        })(el);
+    }
+}
+
+async function bdayLoadBirthdays() {
+    try {
+        var response = await fetch(BDAY_API_URL + '?t=' + Date.now());
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+        var data = await response.json();
+
+        if (data.success !== true) {
+            bdayShowError(data.error || 'Birthday system error');
+            bdayToggleSlide(true);
+            return;
+        }
+
+        bday_birthdays = Array.isArray(data.birthdays) ? data.birthdays : [];
+        bday_currentIndex = 0;
+        bday_loaded = true;
+
+        if (bday_birthdays.length === 0) {
+            bdayShowNoBirthday();
+            bdayToggleSlide(true);  // no birthdays = hide slide, run only 6
+        } else {
+            bdayShowBirthday(true);
+            bdayCreateConfetti();
+            bdayToggleSlide(false); // has birthdays = show slide, run all 7
+        }
+    } catch (error) {
+        console.error('Birthday API ERROR:', error);
+        bdayShowError('Unable to connect to Birthday System.');
+        bdayToggleSlide(true);  // on error also hide
+    }
+}
+
+/* Show/hide birthday slide and rebuild navigation */
+function bdayToggleSlide(hide) {
+    var bdayEl = document.querySelector('.bday-slide');
+    if (!bdayEl) return;
+
+    if (hide) {
+        bdayEl.classList.add('bday-hidden');
+    } else {
+        bdayEl.classList.remove('bday-hidden');
+    }
+
+    // Rebuild slides list and dots
+    slides = document.querySelectorAll('.slide:not(.bday-hidden)');
+    if (current >= slides.length) current = 0;
+    buildDots();
+    show(current);
+    startSlides();
+}
+
+// Birthday slide auto-switch every 5 seconds
+setInterval(function() {
+    if (bday_birthdays.length <= 1 || bday_isTransitioning) return;
+    bday_currentIndex++;
+    if (bday_currentIndex >= bday_birthdays.length) bday_currentIndex = 0;
+    bdayShowBirthday(false);
+}, BDAY_SWITCH_INTERVAL);
+
+// Refresh birthday data every 5 minutes
+setInterval(function() { bdayLoadBirthdays(); }, 300000);
+
+// Initial load
+bdayLoadBirthdays();
 
 </script>
 </body> 
