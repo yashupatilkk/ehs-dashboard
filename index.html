@@ -292,7 +292,7 @@ th { background:#1e3c72; color:white; }
 .s5-footer{ background:linear-gradient(135deg,#1e293b,#334155); color:white; text-align:center; padding:10px; font-size:13px; font-weight:bold; flex-shrink:0; }
 
 /* SLIDE 6 (Now Slide 7) */
-.slide:nth-child(7) { height: 100vh; display: none; flex-direction: column; background: #ffffff; }
+.slide:nth-child(7) { height: calc(100vh - 130px); display: none; flex-direction: column; background: #ffffff; }
 .slide:nth-child(7).active { display: flex; }
 .slide:nth-child(6) { height: 100vh; display: none; flex-direction: column; background: #ffffff; }
 .slide:nth-child(6).active { display: flex; }
@@ -424,7 +424,7 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 /* =========================================
    BIRTHDAY SLIDE (Slide 7) - SCOPED
    ========================================= */
-.bday-slide { height: 100vh; display: none; flex-direction: column; background: #0a1a2e; position: relative; overflow: hidden; }
+.bday-slide { height: calc(100vh - 130px); display: none; flex-direction: column; background: #0a1a2e; position: relative; overflow: hidden; }
 .bday-slide.active { display: flex; }
 .bday-slide.bday-hidden { display: none !important; }
 
@@ -474,7 +474,7 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 .bday-slide .bday-corner.br::after { bottom: 0; right: 0; }
 
 .bday-slide .bday-header {
-    position: absolute; top: 80px; left: 0; right: 0; text-align: center; z-index: 10; padding: 0 40px;
+    position: absolute; top: 35px; left: 0; right: 0; text-align: center; z-index: 10; padding: 0 40px;
     animation: bdayFadeInDown 1s ease;
 }
 @keyframes bdayFadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -499,7 +499,7 @@ button:focus { outline: none; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5); }
 .bday-slide .bday-subtitle::before, .bday-slide .bday-subtitle::after { content: '\2014'; margin: 0 16px; color: #c9a55c; }
 
 .bday-slide #birthdayContent {
-    position: absolute; top: 280px; left: 5%; right: 5%; bottom: 110px;
+    position: absolute; top: 200px; left: 5%; right: 5%; bottom: 70px;
     display: flex; align-items: center; justify-content: center; z-index: 5;
 }
 
