@@ -1514,7 +1514,8 @@ function updateWaterPie(values){
   if(!waterPie){
     waterPie = new Chart(document.getElementById("waterPie"),{
       type:"pie",
-      data:{labels:["WTP","BWSSB","STP","Rain","RO","CWTP","CSTP"],datasets:[{data:values, backgroundColor:["#1e3c72","#2196f3","#4caf50","#00bcd4","#ff9800","#9c27b0","#f44336"]}]}
+      data:{labels:["WTP","BWSSB","STP","Rain","RO","CWTP","CSTP"],datasets:[{data:values, backgroundColor:["#1e3c72","#2196f3","#4caf50","#00bcd4","#ff9800","#9c27b0","#f44336"]}]},
+      options:{responsive:true}
     });
   } else {
     waterPie.data.datasets[0].data=values; waterPie.update();
@@ -2603,7 +2604,7 @@ function es_showMonthModal(monthKey, type) {
 }
 
 /* =========================================
-   BIRTHDAY SLIDE LOGIC
+   BIRTHDAY SLIDE LOGIC — FIXED FOR IMAGE LOADING
    ========================================= */
 const BDAY_API_URL = "https://script.google.com/macros/s/AKfycbwOr9KHauHY619pdstBU9W0-pzNSAgzjvjCB4NLMajNtXE1hfyUi7XPO8B0ujPpaD-CpA/exec";
 const BDAY_SWITCH_INTERVAL = 5000;
@@ -2620,6 +2621,28 @@ function bdayPlaceholderPhoto() {
     return "https://placehold.co/700x700/1a2a40/c9a55c/png?text=Employee+Photo";
 }
 
+/* ✅ FIX 1: Convert Google Drive share URLs → direct-embeddable image URLs */
+function bdayConvertPhotoUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    url = url.trim();
+    
+    // Pattern 1: drive.google.com/file/d/FILE_ID/view
+    var m1 = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+    if (m1) return 'https://drive.google.com/uc?export=view&id=' + m1[1];
+    
+    // Pattern 2: drive.google.com/open?id=FILE_ID
+    var m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m2 && url.indexOf('drive.google.com') !== -1) {
+        return 'https://drive.google.com/uc?export=view&id=' + m2[1];
+    }
+    
+    // Already a direct URL — return as-is
+    if (url.indexOf('data:') === 0) return url; // base64 floating image
+    if (url.indexOf('http') === 0) return url;
+    
+    return '';
+}
+
 function bdayRenderEmployee(person, content) {
     content.innerHTML =
         '<div class="bday-employee">' +
@@ -2627,7 +2650,9 @@ function bdayRenderEmployee(person, content) {
                 '<div class="bday-photo-glow"></div>' +
                 '<div class="bday-photo-ring"></div>' +
                 '<div class="bday-photo-inner-ring"></div>' +
-                '<img id="bdayPhoto" class="bday-employee-photo" alt="Employee Photo">' +
+                '<img id="bdayPhoto" class="bday-employee-photo" alt="Employee Photo" ' +
+                'referrerpolicy="no-referrer" crossorigin="anonymous" loading="eager" ' +
+                'src="' + bdayPlaceholderPhoto() + '">' +
             '</div>' +
             '<div class="bday-details">' +
                 '<div class="bday-special-label">A Special Day For A Special Person</div>' +
@@ -2648,15 +2673,26 @@ function bdayRenderEmployee(person, content) {
         '</div>';
 
     var photo = document.getElementById('bdayPhoto');
-    if (person.photo && person.photo.length > 20) {
-        photo.src = person.photo;
-    } else {
-        photo.src = bdayPlaceholderPhoto();
-    }
+    var realUrl = bdayConvertPhotoUrl(person.photo);
+
+    console.log('BIRTHDAY DEBUG:', {
+        rawPhoto: person.photo,
+        converted: realUrl,
+        name: person.name
+    });
+
     photo.onerror = function() {
+        console.warn('Photo failed to load, using placeholder:', realUrl);
         this.onerror = null;
         this.src = bdayPlaceholderPhoto();
     };
+
+    if (realUrl) {
+        // Slight delay ensures element is in DOM before src assignment
+        setTimeout(function() {
+            photo.src = realUrl;
+        }, 50);
+    }
 }
 
 function bdayUpdateProgress() {
@@ -2762,9 +2798,12 @@ async function bdayLoadBirthdays() {
             bdayShowNoBirthday();
             bdayToggleSlide(true);  // no birthdays = hide slide, run only 6
         } else {
-            bdayShowBirthday(true);
-            bdayCreateConfetti();
-            bdayToggleSlide(false); // has birthdays = show slide, run all 7
+            /* ✅ FIX 3: Show slide FIRST, then render — so img loads while parent is visible */
+            bdayToggleSlide(false);
+            setTimeout(function() {
+                bdayShowBirthday(true);
+                bdayCreateConfetti();
+            }, 100);
         }
     } catch (error) {
         console.error('Birthday API ERROR:', error);
